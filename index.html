@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haki — Python Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+<style>
+:root {
+  --blue: #3b82f6; --blue-l: rgba(59, 130, 246, 0.12); --blue-b: rgba(59, 130, 246, 0.25);
+  --green: #10b981; --green-l: rgba(16, 185, 129, 0.1); --green-b: rgba(16, 185, 129, 0.25);
+  --amber: #f59e0b; --amber-l: rgba(245, 158, 11, 0.12); --amber-b: rgba(245, 158, 11, 0.25);
+  --red: #ef4444; --red-l: rgba(239, 68, 68, 0.12); --red-b: rgba(239, 68, 68, 0.25);
+  --purple: #8b5cf6; --purple-l: rgba(139, 92, 246, 0.12); --purple-b: rgba(139, 92, 246, 0.25);
+  --teal: #14b8a6; --teal-l: rgba(20, 184, 166, 0.1);
+  --radius: 8px;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --sans: 'Inter', -apple-system, system-ui, sans-serif;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.theme-dark {
+  --bg: #0c0c0e; --s1: #16161a; --s2: #1e1e24; --s3: #26262e; --s4: #2e2e38;
+  --t1: #f1f1f3; --t2: #a1a1aa; --t3: #71717a; --t4: #3f3f46;
+  --border: rgba(255, 255, 255, 0.06); --border2: rgba(255, 255, 255, 0.1);
+  --shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+body.theme-light {
+  --bg: #ffffff; --s1: #f8f9fa; --s2: #f1f3f5; --s3: #e9ecef; --s4: #dee2e6;
+  --t1: #1a1a1a; --t2: #4a4a4a; --t3: #71717a; --t4: #a1a1aa;
+  --border: rgba(0, 0, 0, 0.06); --border2: rgba(0, 0, 0, 0.1);
+  --shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:13px;transition:background 0.3s ease, color 0.3s ease}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9999}
+#loading.gone{display:none}
+.spin{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#load-msg{color:var(--t2);font-size:13px}
+#load-sub{color:var(--t3);font-size:11px}
+
+/* LAYOUT */
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.toolbar{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:44px}
+.logo{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;margin-right:4px}
+.logo em{color:var(--blue);font-style:normal}
+.sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
+.btn{padding:5px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--s2);color:var(--t1);font-size:12px;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
+.btn:hover:not(:disabled){background:var(--s3);transform:translateY(-1px);border-color:var(--t4)}
+.btn:active:not(:disabled){background:var(--s4);transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:default;box-shadow:none}
+.btn-blue{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)}
+.btn-blue:hover:not(:disabled){background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-green{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.btn-green:hover:not(:disabled){background:var(--green);color:#fff;border-color:var(--green)}
+.btn-red{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.btn-red:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red)}
+.badge{padding:2px 8px;border-radius:4px;font-size:9.5px;font-weight:600;letter-spacing:.02em;font-family:var(--mono);text-transform:uppercase}
+.badge-blue{background:var(--blue-l);color:var(--blue);border:1px solid var(--blue-b)}
+.badge-green{background:var(--green-l);color:var(--green);border:1px solid var(--green-b)}
+.badge-red{background:var(--red-l);color:var(--red);border:1px solid var(--red-b)}
+.badge-purple{background:var(--purple-l);color:var(--purple);border:1px solid var(--purple-b)}
+.badge-amber{background:var(--amber-l);color:var(--amber);border:1px solid var(--amber-b)}
+.scrub-wrap{flex:1;display:flex;align-items:center;gap:8px;position:relative}
+.scrub-track-wrap{flex:1;position:relative;height:12px;display:flex;align-items:center}
+.scrub-markers{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:flex}
+.marker{position:absolute;top:50%;width:4px;height:4px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 4px currentColor}
+.marker-call{color:var(--purple);background:var(--purple)}
+.marker-ret{color:var(--green);background:var(--green)}
+.marker-err{color:var(--red);background:var(--red)}
+.scrub-wrap input{width:100%;accent-color:var(--blue);height:3px;background:var(--s3);border-radius:2px;cursor:pointer}
+.step-ctr{font-size:10.5px;color:var(--t3);font-family:var(--mono);white-space:nowrap}
+
+/* MODE TABS */
+.mode-tabs{display:flex;align-items:center;gap:0;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 12px;overflow-x:auto}
+.mtab{padding:7px 13px;font-size:12px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .12s,border-color .12s}
+.mtab:hover{color:var(--t2)}
+.mtab.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* EDITOR */
+.editor-section{flex-shrink:0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.editor-section.shut{height:0 !important; flex-basis: 0 !important}
+.CodeMirror{flex:1;font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--bg);color:var(--t1)}
+.CodeMirror-scroll{background:var(--bg)}
+.CodeMirror-gutters{background:var(--s1);border-right:1px solid var(--border)}
+.CodeMirror-linenumber{color:var(--t4);padding:0 8px}
+.CodeMirror-cursor{border-left:2px solid var(--blue)}
+.CodeMirror-selected{background:rgba(91,159,214,.15)}
+.CodeMirror-hints{background:var(--s2);border:1px solid var(--border2);border-radius:var(--radius)}
+.CodeMirror-hint{color:var(--t2);padding:3px 10px;font-family:var(--mono);font-size:12px}
+.CodeMirror-hint-active{background:var(--blue-l);color:var(--blue)}
+.cm-keyword{color:#d4926a}.cm-def{color:var(--blue)}.cm-variable{color:var(--t1)}
+.cm-string{color:var(--green)}.cm-number{color:var(--amber)}.cm-comment{color:var(--t3)}
+.cm-operator{color:var(--t2)}.cm-builtin{color:var(--teal)}.cm-error{color:var(--red)}
+
+/* MAIN VIEWS */
+.view{height:100%;display:flex;overflow:hidden;background:var(--bg)}
+.view.hidden{display:none}
+
+.viewport{flex:none;display:flex;flex-direction:column;overflow:hidden}
+.main-split-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* THREE-COLUMN LAYOUT */
+.col-code{display:flex;flex-direction:column;min-width:200px;overflow:hidden}
+.col-frames{display:flex;flex-direction:column;min-width:200px;overflow:hidden}
+.col-heap{display:flex;flex-direction:column;min-width:200px;overflow:hidden}
+
+/* PANEL HEADERS */
+.ph{padding:8px 14px;background:linear-gradient(to right, var(--s1), var(--s2));border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.phd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* CODE VIEW */
+.code-view{flex:1;overflow-y:auto;background:var(--bg);font-family:var(--mono);font-size:12.5px}
+.cl{display:flex;align-items:stretch;border-left:2px solid transparent;transition:background .1s,border-color .1s;cursor:pointer}
+.cl:hover .heat-bar{filter:brightness(1.3)}
+.cl.bp-set .ln{background:var(--red-l);color:var(--red)}
+.cl.hi-line{background:var(--blue-l);border-left-color:var(--blue)}
+.cl.hi-call{background:var(--purple-l);border-left-color:var(--purple)}
+.cl.hi-return{background:var(--green-l);border-left-color:var(--green)}
+.cl.hi-error,.cl.hi-exception{background:var(--red-l);border-left-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.heat-bar{width:4px;flex-shrink:0;background:transparent;transition:background .2s}
+.ln{width:28px;text-align:right;color:var(--t4);font-size:10.5px;padding:0 5px;flex-shrink:0;user-select:none;line-height:1.8;background:var(--s1);border-right:1px solid var(--border)}
+.lt{color:var(--t2);white-space:pre;padding:0 10px;flex:1;line-height:1.8}
+.cl.hi-line .lt,.cl.hi-call .lt,.cl.hi-return .lt,.cl.hi-error .lt{color:var(--t1)}
+.ret-ann{font-size:10.5px;color:var(--green);margin-left:6px;font-style:italic;opacity:.8}
+
+/* HEATMAP LEGEND */
+.hm-legend{display:flex;align-items:center;gap:6px;padding:4px 12px;border-top:1px solid var(--border);font-size:10px;color:var(--t3);flex-shrink:0}
+.hm-grad{width:60px;height:6px;border-radius:2px;background:linear-gradient(to right,var(--blue-l),var(--amber),var(--red))}
+
+/* FRAMES */
+.frames-scroll{flex:1;overflow-y:auto}
+.depth-meter{padding:6px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);flex-shrink:0}
+.depth-track{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.depth-fill{height:100%;border-radius:3px;background:var(--purple);transition:width .2s}
+.depth-lbl{font-size:10px;color:var(--t3);font-family:var(--mono);white-space:nowrap;min-width:55px}
+.frame-block{border-bottom:1px solid var(--border)}
+.frame-block:last-child{border-bottom:none}
+.fh{display:flex;align-items:center;gap:6px;padding:5px 12px}
+.fh.cur{background:var(--blue-l)}
+.fh-name{font-family:var(--mono);font-weight:600;color:var(--t1);font-size:12px}
+.fh-name.mod-fn{color:var(--t2);font-weight:400}
+.fh-line{margin-left:auto;font-size:10px;color:var(--t3);font-family:var(--mono)}
+.fh-badges{display:flex;gap:3px;flex-shrink:0}
+.vt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px}
+.vt td{padding:2px 12px 2px 24px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.6}
+.vt tr:last-child td{border-bottom:none}
+.vk{color:var(--t2);width:35%;word-break:break-all;cursor:pointer}
+.vk:hover{color:var(--blue);text-decoration:underline}
+.vv{color:var(--t1);word-break:break-all}
+.freevar-tag{font-size:9px;color:var(--teal);vertical-align:super;margin-left:2px}
+.ret-val-row td{color:var(--green)!important}
+.no-locals{padding:6px 24px;font-size:11px;color:var(--t4);font-style:italic;font-family:var(--mono)}
+.empty-frames{padding:16px 12px;font-size:12px;color:var(--t3);font-style:italic;font-family:var(--mono)}
+
+/* HEAP */
+.heap-scroll{flex:1;overflow-y:auto;padding:8px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px}
+.ho{border:1px solid var(--border2);border-radius:var(--radius);min-width:85px;max-width:190px;font-family:var(--mono);font-size:11.5px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ho:hover{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-l)}
+.ho.diff-changed{animation:flash-change .5s;border-color:var(--amber)}
+@keyframes flash-change{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px var(--amber-b)}}
+.ho.hi-heap{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-l)}
+.ho-hdr{padding:4px 8px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;gap:4px}
+.ho-id{font-size:8.5px;font-weight:400;letter-spacing:0;text-transform:none;opacity:.55}
+.ht-list .ho-hdr{background:var(--blue-l);color:var(--blue)}
+.ht-dict .ho-hdr{background:var(--amber-l);color:var(--amber)}
+.ht-tuple .ho-hdr{background:var(--purple-l);color:var(--purple)}
+.ht-set,.ht-frozenset{}.ht-set .ho-hdr,.ht-frozenset .ho-hdr{background:var(--teal-l);color:var(--teal)}
+.ht-obj .ho-hdr{background:var(--s3);color:var(--t2)}
+.ho-body{padding:4px 0}
+.hr{display:flex;align-items:baseline;gap:4px;padding:1px 8px;line-height:1.55}
+.hi{color:var(--t4);min-width:16px;text-align:right;font-size:10px;flex-shrink:0}
+.hk{color:var(--amber)}
+.hv{color:var(--t1);flex:1;word-break:break-all}
+.ho-empty{padding:5px 8px;font-size:10.5px;color:var(--t4)}
+.empty-heap{padding:10px;font-size:11.5px;color:var(--t3);font-family:var(--mono)}
+
+/* VALUE COLORS */
+.v-int,.v-float{color:var(--amber)}
+.v-str{color:var(--green)}
+.v-bool,.v-None{color:var(--blue)}
+.v-ref{color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted}
+.v-fn{color:var(--t3)}
+.v-trunc{color:var(--t4);font-style:italic}
+
+/* SVG ARROWS OVERLAY */
+#arrows-svg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
+
+/* TOOLTIP */
+#tooltip{position:fixed;background:rgba(30, 30, 36, 0.95);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:var(--radius);padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--t1);z-index:300;pointer-events:none;white-space:nowrap;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.1)}
+
+/* BOTTOM BAR */
+.bottom-bar{flex-shrink:0;background:var(--s1);display:flex;flex-direction:column;min-height:32px;overflow:hidden}
+.btabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.btab{padding:5px 12px;font-size:11px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .12s}
+.btab:hover{color:var(--t2)}
+.btab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.bc{flex:1;overflow:hidden;display:none}
+.bc.on{display:block}
+#console-logs{padding:6px 12px;font-family:var(--mono);font-size:11.5px;color:var(--t2);white-space:pre-wrap;overflow-y:auto;height:100%}
+#bc-memory,#bc-vars,#bc-depth{padding:8px 12px;overflow:auto;height:100%}
+canvas.chart{display:block;border-radius:var(--radius)}
+
+/* OBJECT HISTORY MODAL */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:400}
+#modal.show{display:flex}
+.modal-box{background:var(--s2);border:1px solid var(--border2);border-radius:8px;width:520px;max-height:70vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hdr{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:500;gap:8px}
+.modal-body{flex:1;overflow-y:auto;padding:10px;font-family:var(--mono);font-size:12px}
+.mh-entry{padding:6px 10px;border-radius:var(--radius);margin-bottom:4px;background:var(--s3);display:flex;gap:10px;align-items:flex-start}
+.mh-step{color:var(--t3);font-size:10.5px;width:50px;flex-shrink:0}
+.mh-val{color:var(--t1);word-break:break-all}
+.modal-close{margin-left:auto;cursor:pointer;color:var(--t3);font-size:16px;padding:2px 6px;border-radius:4px}
+.modal-close:hover{background:var(--s3);color:var(--t1)}
+
+/* VAR TIMELINE MODAL */
+#vt-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:400}
+#vt-modal.show{display:flex}
+.vt-box{background:var(--s2);border:1px solid var(--border2);border-radius:8px;width:560px;max-height:60vh;overflow:hidden;display:flex;flex-direction:column}
+.vt-hdr{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:500;gap:8px}
+.vt-body{padding:12px;flex:1;overflow:auto}
+
+/* QUIZ MODE */
+#view-quiz{flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px}
+.quiz-card{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:20px;width:100%;max-width:600px}
+.quiz-q{font-size:14px;color:var(--t1);margin-bottom:12px}
+.quiz-opts{display:flex;gap:8px;flex-wrap:wrap}
+.quiz-opt{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-size:12px;transition:all .12s}
+.quiz-opt:hover{background:var(--s3);color:var(--t1)}
+.quiz-opt.correct{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.quiz-opt.wrong{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.quiz-info{font-size:12px;color:var(--t3);font-family:var(--mono)}
+.quiz-score{font-size:13px;font-weight:500}
+.quiz-code{font-family:var(--mono);font-size:12px;padding:12px;background:var(--bg);border-radius:var(--radius);margin-bottom:12px;white-space:pre;overflow-x:auto;max-height:200px;overflow-y:auto}
+
+/* SLIDES MODE */
+#view-slides{flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;background:var(--bg)}
+.slide{background:var(--s1);border:1px solid var(--border2);border-radius:10px;width:100%;max-width:700px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.slide-num{font-size:11px;color:var(--t3)}
+.slide-code{font-family:var(--mono);font-size:12.5px;background:var(--bg);border-radius:var(--radius);padding:12px;max-height:200px;overflow:auto;white-space:pre}
+.slide-info{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.slide-panel{background:var(--s2);border-radius:var(--radius);padding:10px;font-size:12px}
+.slide-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.slide-nav{display:flex;align-items:center;gap:10px}
+.slide-ctr{font-size:12px;color:var(--t3);font-family:var(--mono)}
+
+/* COMPARE MODE */
+#view-compare{flex:1;display:flex;overflow:hidden;gap:0}
+.cmp-side{display:flex;flex-direction:column;overflow:hidden;min-width:300px}
+.cmp-toolbar{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+.cmp-editor-wrap{height:200px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0}
+.cmp-code{flex:1;overflow-y:auto;font-family:var(--mono);font-size:12px;background:var(--bg)}
+.cmp-stats{padding:10px 14px;border-top:1px solid var(--border);background:var(--s1);display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.cmp-bar-row{display:flex;align-items:center;gap:10px;font-size:11px}
+.cmp-bar-lbl{width:50px;color:var(--t3);font-weight:600}
+.cmp-bar-bg{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:flex}
+.cmp-bar-fill{height:100%;transition:width 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28)}
+.cmp-badge{padding:2px 6px;border-radius:4px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+
+/* STDOUT OVERLAY */
+.stdout-overlay{position:fixed;bottom:60px;left:10%;right:10%;background:rgba(30,30,36,.95);backdrop-filter:blur(12px);border:1px solid var(--border2);border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.5);z-index:400;display:none;flex-direction:column;max-height:60%}
+.so-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.so-body{padding:16px;overflow-y:auto;font-family:var(--mono);font-size:12px;color:var(--t2);line-height:1.6;white-space:pre-wrap}
+
+/* COMPLEXITY MODE */
+#view-complexity{flex-direction:column;padding:16px;gap:12px;overflow-y:auto}
+.cx-setup{background:var(--s2);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;max-width:560px}
+.cx-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cx-row label{font-size:12px;color:var(--t2);min-width:100px}
+.cx-row input,.cx-row select{background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t1);padding:4px 8px;font-size:12px;font-family:var(--mono)}
+#cx-canvas-wrap{background:var(--s2);border-radius:8px;padding:14px;flex:1;display:flex;flex-direction:column;gap:6px;min-height:260px}
+#cx-lbl{font-size:11.5px;color:var(--t2)}
+
+/* EMBED MODE */
+#view-embed{flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px}
+.embed-card{background:var(--s2);border-radius:8px;padding:20px;width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px}
+.embed-code{font-family:var(--mono);font-size:11.5px;background:var(--bg);border-radius:var(--radius);padding:10px;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow:auto;color:var(--t2)}
+.embed-info{font-size:12px;color:var(--t3)}
+
+/* ANNOTATION */
+.annot-wrap{padding:4px 12px;border-top:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:6px}
+.annot-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:11.5px;color:var(--t2);padding:2px 0}
+.annot-input::placeholder{color:var(--t4)}
+.annot-lbl{font-size:10px;color:var(--t4);white-space:nowrap}
+.has-annot{color:var(--amber)}
+
+/* SPLIT JS GUTTERS */
+.gutter { background-color: var(--s1); background-repeat: no-repeat; background-position: 50%; transition: background-color 0.2s; }
+.gutter:hover { background-color: var(--border2); }
+.gutter.gutter-horizontal { cursor: col-resize; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAG8aZOnfofRMCEGdzBAbGTeOUTzz8Bjny89F3hZ1AAAAAASUVORK5CYII='); }
+.gutter.gutter-vertical {
+  cursor: row-resize;
+  background-image: none;
+  position: relative;
+  z-index: 10;
+}
+.gutter.gutter-vertical::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.gutter.gutter-vertical:hover::after {
+  background: var(--t4);
+}
+
+/* SCROLLBARS */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spin"></div>
+  <p id="load-msg">Loading Python runtime…</p>
+  <small id="load-sub">Pyodide ~8 MB · cached after first load · needs internet once</small>
+</div>
+
+<svg id="arrows-svg" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="rgba(91,159,214,.6)"/>
+    </marker>
+  </defs>
+</svg>
+
+<div id="tooltip"></div>
+<div id="modal"><div class="modal-box"><div class="modal-hdr"><span id="modal-title">Object history</span><span class="modal-close" onclick="closeModal()">✕</span></div><div class="modal-body" id="modal-body"></div></div></div>
+<div id="vt-modal"><div class="vt-box"><div class="vt-hdr"><span id="vt-title">Variable timeline</span><span class="modal-close" onclick="document.getElementById('vt-modal').classList.remove('show')">✕</span></div><div class="vt-body" id="vt-body"></div></div></div>
+
+<div class="app">
+  <div class="toolbar">
+    <div class="logo">🥷 <em>Haki</em> Visualizer</div>
+    <div class="sep"></div>
+    <button class="btn" id="theme-toggle" title="Toggle Dark/Light Mode" style="padding: 4px 8px">🌓</button>
+    <div class="sep"></div>
+    <select id="examples" onchange="loadExample()" style="background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t2);padding:4px 7px;font-size:12px;cursor:pointer">
+      <option value="">examples…</option>
+      <option value="sort">recursive sort</option>
+      <option value="fib">fibonacci</option>
+      <option value="bsearch">binary search</option>
+      <option value="bfs">BFS graph</option>
+      <option value="class">class & objects</option>
+      <option value="closure">closure</option>
+      <option value="gen">generator</option>
+    </select>
+    <button class="btn" onclick="toggleEditor()" title="E">✎ edit</button>
+    <button class="btn btn-blue" id="btn-run" disabled onclick="runCode()" title="R">▶ run</button>
+    <div class="sep"></div>
+    <button class="btn" id="btn-prev" disabled onclick="go(-1)" title="←">←</button>
+    <button class="btn" id="btn-sover" disabled onclick="stepOver()" title="Step Over">⤵ over</button>
+    <button class="btn" id="btn-sout" disabled onclick="stepOut()" title="Step Out">⤴ out</button>
+    <button class="btn" id="btn-ncall" disabled onclick="jumpToEv('call')" title="Next Call">call↓</button>
+    <button class="btn" id="btn-nret" disabled onclick="jumpToEv('return')" title="Next Return">ret↓</button>
+    <button class="btn" id="btn-next" disabled onclick="go(1)" title="→">→</button>
+    <button class="btn btn-green" id="btn-play" disabled onclick="togglePlay()" title="Space">▶</button>
+    <div class="sep"></div>
+    <div class="scrub-wrap">
+      <span style="font-size:10px;color:var(--t4)">0</span>
+      <div class="scrub-track-wrap">
+        <input type="range" id="scrub" min="0" max="0" value="0" oninput="scrubTo(+this.value)">
+        <div class="scrub-markers" id="scrub-markers"></div>
+      </div>
+      <span style="font-size:10px;color:var(--t4)" id="scrub-max">0</span>
+    </div>
+    <div class="speed-wrap">
+      <span style="font-size:10px;color:var(--t3)">spd</span>
+      <input type="range" id="speed" min="1" max="12" value="5">
+    </div>
+    <span class="step-ctr" id="step-ctr">—</span>
+    <span class="badge" id="ev-badge" style="display:none"></span>
+    <div class="sep"></div>
+    <button class="btn" onclick="exportPNG()" title="Save screenshot">⬇ PNG</button>
+    <button class="btn" onclick="exportJSON()" title="Export trace">⬇ JSON</button>
+    <button class="btn" onclick="shareTrace()" title="Share link">🔗 share</button>
+  </div>
+
+  <div class="mode-tabs">
+    <div class="mtab on" onclick="switchMode('viz')" data-mode="viz">Visualize</div>
+    <div class="mtab" onclick="switchMode('compare')" data-mode="compare">Compare</div>
+    <div class="mtab" onclick="switchMode('complexity')" data-mode="complexity">Complexity</div>
+    <div class="mtab" onclick="switchMode('slides')" data-mode="slides">Slides</div>
+    <div class="mtab" onclick="switchMode('quiz')" data-mode="quiz">Quiz</div>
+    <div class="mtab" onclick="switchMode('embed')" data-mode="embed">Embed</div>
+  </div>
+
+  <div class="main-split-wrap">
+  <div class="editor-section" id="editor-section">
+    <div class="ph" style="border-top:none"><div class="phd" style="background:var(--t3)"></div>editor <button class="btn btn-s" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleEditor()">hide</button></div>
+    <textarea id="cm-textarea"># Haki Visualization Example
+def factorial(n):
+    if n == 0: return 1
+    return n * factorial(n-1)
+
+print(factorial(5))</textarea>
+  </div>
+
+  <div class="viewport" id="viewport">
+
+  <!-- VISUALIZE VIEW -->
+  <div class="view" id="view-viz">
+    <div class="col-code">
+      <div class="ph"><div class="phd" style="background:var(--blue)"></div>code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click line # to set breakpoint</span></div>
+      <div class="code-view" id="code-view" onmousemove="handleCodeHover(event)" onmouseleave="hideTooltip()"></div>
+      <div class="hm-legend" id="hm-legend" style="display:none"><div class="hm-grad"></div><span>execution frequency</span></div>
+      <div id="step-info-box" style="display:none;white-space:pre;font-family:var(--mono);font-size:10px;padding:8px;background:var(--s1);border-top:1px solid var(--border);color:var(--t3)"></div>
+      <div id="narrative-wrap" style="padding:10px;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0;display:none">
+        <div style="font-size:9.5px;text-transform:uppercase;color:var(--blue);margin-bottom:4px;font-weight:600;letter-spacing:.05em">Narrative</div>
+        <div id="narrative-text" style="font-size:12px;color:var(--t2);line-height:1.5"></div>
+      </div>
+      <div class="annot-wrap"><span class="annot-lbl">📎 note:</span><input class="annot-input" id="annot-input" placeholder="annotate this step…" oninput="saveAnnotation()"></div>
+    </div>
+    <div class="col-frames">
+      <div class="ph"><div class="phd" style="background:var(--purple)"></div>frames · call stack</div>
+      <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div></div></div>
+      <div class="frames-scroll" id="frames-scroll"></div>
+    </div>
+    <div class="col-heap">
+      <div class="ph"><div class="phd" style="background:var(--amber)"></div>heap objects <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click card for history · hover ref for arrow</span></div>
+      <div class="heap-scroll" id="heap-scroll"></div>
+    </div>
+  </div>
+
+  <div class="view hidden" id="view-compare" style="flex-direction:column">
+    <div id="cmp-workspace" style="display:flex; flex:1; overflow:hidden">
+      <div class="cmp-side" id="cmp-side-a">
+        <div class="cmp-toolbar">
+          <strong style="color:var(--blue)">A</strong>
+          <input id="cmp-label-a" style="background:transparent;border:none;color:var(--t1);font-size:12px;flex:1;font-weight:600" value="Version A">
+          <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:var(--t3); margin-right:10px">
+            <span id="cmp-step-val-a">—</span> steps |
+            <span id="cmp-mem-val-a">—</span> |
+            <span id="cmp-depth-a">—</span>
+          </div>
+          <button class="btn btn-blue" onclick="runCompare('a')">▶ run A</button>
+        </div>
+        <div class="cmp-editor-wrap"><textarea id="cmp-textarea-a" style="display:none"></textarea></div>
+        <div class="cmp-code" id="cmp-view-a" style="padding:10px;color:var(--t4);font-style:italic">run to see trace</div>
+      </div>
+      <div class="cmp-side" id="cmp-side-b">
+        <div class="cmp-toolbar">
+          <strong style="color:var(--green)">B</strong>
+          <input id="cmp-label-b" style="background:transparent;border:none;color:var(--t1);font-size:12px;flex:1;font-weight:600" value="Version B">
+          <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:10px; color:var(--t3); margin-right:10px">
+            <span id="cmp-step-val-b">—</span> steps |
+            <span id="cmp-mem-val-b">—</span> |
+            <span id="cmp-depth-b">—</span>
+          </div>
+          <button class="btn btn-green" onclick="runCompare('b')">▶ run B</button>
+        </div>
+        <div class="cmp-editor-wrap"><textarea id="cmp-textarea-b" style="display:none"></textarea></div>
+        <div class="cmp-code" id="cmp-view-b" style="padding:10px;color:var(--t4);font-style:italic">run to see trace</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar" id="cmp-bottom-bar">
+      <div class="btabs">
+        <div class="btab on" onclick="switchBTab('console')">console</div>
+        <div class="btab" onclick="switchBTab('memory')">memory</div>
+        <div class="btab" onclick="switchBTab('profiling')">profiling</div>
+        <div class="btab" onclick="switchBTab('compare-score')">comparison scorecard</div>
+        <button class="phb" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleDrawer()" id="drawer-toggle">hide</button>
+      </div>
+      <div class="bc on" id="bc-console" style="display:flex;flex-direction:column">
+        <div id="console-logs" style="flex:1;padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--t2);overflow-y:auto;white-space:pre-wrap"></div>
+        <div class="console-input-wrap" style="padding:6px 12px;border-top:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:8px">
+          <span style="color:var(--blue);font-family:var(--mono);font-size:12px;font-weight:600">>>></span>
+          <input id="console-input" style="flex:1;background:transparent;border:none;color:var(--t1);font-family:var(--mono);font-size:12px;outline:none" placeholder="inspect variables (e.g. arr[i])" onkeydown="handleConsoleKey(event)">
+        </div>
+      </div>
+      <div class="bc" id="bc-memory"><canvas class="chart" id="mem-canvas" width="600" height="90"></canvas></div>
+      <div class="bc" id="bc-profiling">
+        <div style="padding:12px;height:100%;display:flex;flex-direction:column">
+          <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Function Call Flamegraph (time per call)</div>
+          <canvas id="flame-canvas" style="flex:1;width:100%"></canvas>
+        </div>
+      </div>
+      <div class="bc" id="bc-compare-score">
+        <div style="display:flex;gap:20px;padding:12px">
+          <div id="cmp-score-a" style="flex:1"></div>
+          <div id="cmp-score-b" style="flex:1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLEXITY VIEW -->
+  <div class="view hidden" id="view-complexity">
+    <div class="cx-setup">
+      <div style="font-size:13px;font-weight:500;margin-bottom:4px">Big-O Analysis</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:8px">Runs your code with different input sizes and plots step count vs n.</div>
+      <div class="cx-row"><label>Input variable</label><input id="cx-var" value="n" style="width:80px"><span style="font-size:11px;color:var(--t3)">prepended as <code style="font-family:var(--mono)">n = ‹value›</code></span></div>
+      <div class="cx-row"><label>From</label><input id="cx-from" type="number" value="1" style="width:70px"><label>To</label><input id="cx-to" type="number" value="12" style="width:70px"><label>Step</label><input id="cx-step" type="number" value="1" style="width:70px"></div>
+      <div class="cx-row"><button class="btn btn-blue" onclick="runComplexity()">▶ analyse</button><span id="cx-status" style="font-size:11px;color:var(--t3)"></span></div>
+    </div>
+    <div id="cx-canvas-wrap">
+      <div class="slide-lbl">Step count vs input size n</div>
+      <canvas id="cx-canvas" style="flex:1;width:100%"></canvas>
+      <div id="cx-lbl" style="font-size:11px;color:var(--t3)">run analysis to see chart</div>
+    </div>
+  </div>
+
+  <!-- SLIDES VIEW -->
+  <div class="view hidden" id="view-slides">
+    <div class="slide" id="slide-card">
+      <div style="font-size:13px;color:var(--t3)">Run code first, then switch to Slides mode.</div>
+    </div>
+    <div class="slide-nav">
+      <button class="btn" id="sl-prev" onclick="slideGo(-1)" disabled>← prev</button>
+      <span class="slide-ctr" id="sl-ctr">—</span>
+      <button class="btn" id="sl-next" onclick="slideGo(1)" disabled>next →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div class="view hidden" id="view-quiz">
+    <div id="quiz-inner">
+      <div style="color:var(--t3);font-size:13px">Run code first, then switch to Quiz mode.</div>
+    </div>
+  </div>
+
+  <!-- EMBED VIEW -->
+  <div class="view hidden" id="view-embed">
+    <div class="embed-card">
+      <div style="font-size:13px;font-weight:500">Embed this visualizer</div>
+      <div class="embed-info">Run your code first. This generates a self-contained iframe snippet embedding the current code and trace.</div>
+      <div class="embed-code" id="embed-code">—</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-blue" onclick="genEmbed()">⟳ generate</button>
+        <button class="btn" onclick="copyEmbed()">⎘ copy iframe</button>
+        <button class="btn" onclick="openEmbed()">↗ open standalone</button>
+      </div>
+    </div>
+  </div>
+
+  </div> <!-- end viewport -->
+  </div> <!-- end main-split-wrap -->
+</div> <!-- end app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/anyword-hint.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.0/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+
+<div id="stdout-overlay" class="stdout-overlay">
+  <div class="so-header">
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em" id="so-title">Console Output</div>
+    <button class="phb" onclick="document.getElementById('stdout-overlay').style.display='none'">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+// ─── PYTHON TRACER ───────────────────────────────────────────────────────────
+const PY_TRACER = `
+import sys, json, io as _io
+
+_steps = []
+_buf = _io.StringIO()
+_FNAME = '<usr>'
+_MAX = 2500
+
+def _sv(v, d=0, seen=None):
+    if seen is None: seen = set()
+    if d > 4: return {'t':'…'}
+    oid = id(v)
+    if isinstance(v, bool): return {'t':'bool','v':repr(v)}
+    if v is None: return {'t':'None','v':'None'}
+    if isinstance(v, int): return {'t':'int','v':v}
+    if isinstance(v, float): return {'t':'float','v':round(v,8)}
+    if isinstance(v, str):
+        s = v if len(v)<=100 else v[:100]+'…'
+        return {'t':'str','v':s}
+    if oid in seen: return {'t':'ref','id':oid}
+    ns = seen | {oid}
+    if isinstance(v, list): return {'t':'list','id':oid,'items':[_sv(x,d+1,ns) for x in v[:50]]}
+    if isinstance(v, tuple): return {'t':'tuple','id':oid,'items':[_sv(x,d+1,ns) for x in v[:50]]}
+    if isinstance(v, dict): return {'t':'dict','id':oid,'items':[[_sv(k,d+1,ns),_sv(vv,d+1,ns)] for k,vv in list(v.items())[:30]]}
+    if isinstance(v, (set,frozenset)): return {'t':type(v).__name__,'id':oid,'items':[_sv(x,d+1,ns) for x in list(v)[:30]]}
+    if callable(v):
+        n = getattr(v,'__qualname__',None) or getattr(v,'__name__','?')
+        return {'t':'fn','r':str(n)[:60]}
+    try:
+        attrs = {}
+        for k,vv in list(vars(v).items())[:20]:
+            if not k.startswith('__'): attrs[k]=_sv(vv,d+1,ns)
+    except: attrs={}
+    return {'t':type(v).__name__,'id':oid,'attrs':attrs,'r':repr(v)[:120]}
+
+def _tr(frame, event, arg):
+    if frame.f_code.co_filename != _FNAME: return None
+    if len(_steps) >= _MAX: return None
+    frames=[]
+    f=frame
+    while f and f.f_code.co_filename==_FNAME:
+        locs={}
+        for k,v in list(f.f_locals.items()):
+            if not k.startswith('__'):
+                try: locs[k]=_sv(v)
+                except: locs[k]={'t':'?'}
+        fl=f.f_code.co_flags
+        frames.append({'fn':f.f_code.co_name,'line':f.f_lineno,'locals':locs,
+            'freevars':list(f.f_code.co_freevars),'is_gen':bool(fl&0x20),'is_coro':bool(fl&0x100)})
+        f=f.f_back
+    frames.reverse()
+    
+    # Estimate heap memory
+    try:
+        mem_sum = 0
+        all_objs = set()
+        for fr in frames:
+            for v in fr['locals'].values():
+                oid = id(v)
+                if oid not in all_objs:
+                    mem_sum += sys.getsizeof(v)
+                    all_objs.add(oid)
+        mem = {'heap': mem_sum}
+    except:
+        mem = {'heap': 0}
+
+    step={'ev':event,'line':frame.f_lineno,'fn':frame.f_code.co_name,'frames':frames,'out':_buf.getvalue(),'mem':mem}
+    if event=='return' and arg is not None:
+        try: step['ret']=_sv(arg)
+        except: pass
+    if event=='exception':
+        try: step['exc']=str(arg[1])
+        except: pass
+    _steps.append(step)
+    return _tr
+
+def _run(code):
+    global _steps,_buf
+    _steps=[]
+    _buf=_io.StringIO()
+    old=sys.stdout
+    sys.stdout=_buf
+    try:
+        sys.settrace(_tr)
+        exec(compile(code,'<usr>','exec'),{'__builtins__':__builtins__,'__name__':'__main__'})
+    except Exception as e:
+        _steps.append({'ev':'error','line':-1,'fn':'','frames':[],'out':_buf.getvalue(),'exc':repr(e)})
+    finally:
+        sys.settrace(None)
+        sys.stdout=old
+    return json.dumps({'steps':_steps,'truncated':len(_steps)>=_MAX})
+
+def _run_n(code, var, val):
+    return _run(f"{var} = {repr(val)}\\n" + code)
+`;
+
+// ─── EXAMPLES ────────────────────────────────────────────────────────────────
+const EXAMPLES = {
+sort:`def sort_array(arr):
+    if len(arr) <= 1:
+        return
+    temp = arr.pop()
+    sort_array(arr)
+    insert(arr, temp)
+
+def insert(arr, temp):
+    if len(arr) == 0 or arr[-1] <= temp:
+        arr.append(temp)
+        return
+    val = arr.pop()
+    insert(arr, temp)
+    arr.append(val)
+
+my_list = [4, 2, 1, 3]
+sort_array(my_list)
+print(my_list)`,
+
+fib:`def fib(n):
+    if n <= 1:
+        return n
+    return fib(n-1) + fib(n-2)
+
+for i in range(7):
+    print(f"fib({i}) = {fib(i)}")`,
+
+bsearch:`def binary_search(arr, target, lo=0, hi=None):
+    if hi is None:
+        hi = len(arr) - 1
+    if lo > hi:
+        return -1
+    mid = (lo + hi) // 2
+    if arr[mid] == target:
+        return mid
+    elif arr[mid] < target:
+        return binary_search(arr, target, mid+1, hi)
+    else:
+        return binary_search(arr, target, lo, mid-1)
+
+data = [1, 3, 5, 7, 9, 11, 13, 15]
+print(binary_search(data, 7))
+print(binary_search(data, 6))`,
+
+bfs:`from collections import deque
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbour in graph.get(node, []):
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+    return order
+
+g = {'A':['B','C'],'B':['D'],'C':['D','E'],'D':[],'E':[]}
+print(bfs(g, 'A'))`,
+
+class:`class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, val):
+        self.items.append(val)
+
+    def pop(self):
+        return self.items.pop()
+
+    def peek(self):
+        return self.items[-1]
+
+s = Stack()
+s.push(10)
+s.push(20)
+s.push(30)
+print(s.peek())
+print(s.pop())
+print(s.items)`,
+
+closure:`def make_counter(start=0):
+    count = [start]
+    def increment(by=1):
+        count[0] += by
+        return count[0]
+    return increment
+
+c1 = make_counter()
+c2 = make_counter(10)
+print(c1())
+print(c1())
+print(c2(5))
+print(c1())`,
+
+gen:`def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+
+def squares(limit):
+    for i in range(1, limit+1):
+        yield i * i
+
+for v in countdown(5):
+    print(v)
+
+print(list(squares(4)))`
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let pyodide = null, editor = null, cmpEditorA = null, cmpEditorB = null, splitMain = null, splitBottom = null, splitEditor = null;
+let lastEditorSize = [20, 80], lastBottomSize = [75, 25];
+let steps = [], idx = 0, timer = null;
+let breakpoints = new Set();
+let annotations = new Map();
+let heatmap = {};
+let maxDepth = 0;
+let codeLines = [];
+let prevHeapIds = new Set();
+let quizState = {qi:0, score:0, answered:false};
+let slideIdx = 0;
+let cmpSteps = {a:[], b:[]};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Theme Init
+  const savedTheme = localStorage.getItem('haki-theme') || 'dark';
+  document.body.className = 'theme-' + savedTheme;
+  document.getElementById('theme-toggle').onclick = () => {
+    const isDark = document.body.classList.contains('theme-dark');
+    const next = isDark ? 'light' : 'dark';
+    document.body.className = 'theme-' + next;
+    localStorage.setItem('haki-theme', next);
+
+    const editors = [editor, cmpEditorA, cmpEditorB];
+    editors.forEach(ed => {
+      if (ed) ed.setOption('theme', next === 'dark' ? 'default' : 'default');
+    });
+  };
+
+  loadFromUrl();
+
+  editor = CodeMirror.fromTextArea(document.getElementById('cm-textarea'), {
+    mode:'python', theme:'default', lineNumbers:true, matchBrackets:true,
+    autoCloseBrackets:true, indentUnit:4, tabSize:4, indentWithTabs:false,
+    extraKeys:{"Ctrl-Space":"autocomplete","Tab": cm => {
+      if (cm.somethingSelected()) cm.indentSelection("add");
+      else cm.replaceSelection("    ");
+    }},
+    hintOptions:{completeSingle:false}
+  });
+  // Split.js Init
+  splitMain = Split(['.col-code', '.col-frames', '.col-heap'], {
+    sizes: [33, 33, 34],
+    minSize: 200,
+    gutterSize: 6,
+    onDrag: () => drawArrows(),
+    onDragEnd: () => drawArrows()
+  });
+
+  splitEditor = Split(['#editor-section', '#viewport'], {
+    direction: 'vertical',
+    sizes: [20, 80],
+    minSize: 0,
+    gutterSize: 6,
+    onDrag: () => drawArrows()
+  });
+
+  splitBottom = Split(['#cmp-workspace', '#cmp-bottom-bar'], {
+    direction: 'vertical',
+    sizes: [75, 25],
+    minSize: 0,
+    gutterSize: 6,
+    onDrag: () => { renderMemGraph(); renderFlamegraph(); drawArrows(); }
+  });
+
+  cmpEditorA = CodeMirror.fromTextArea(document.getElementById('cmp-textarea-a'), {
+    mode:'python', theme:'default', lineNumbers:true, matchBrackets:true, autoCloseBrackets:true
+  });
+  cmpEditorB = CodeMirror.fromTextArea(document.getElementById('cmp-textarea-b'), {
+    mode:'python', theme:'default', lineNumbers:true, matchBrackets:true, autoCloseBrackets:true
+  });
+  cmpEditorA.setValue(`def bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j],arr[j+1] = arr[j+1],arr[j]\n\na = [4,2,1,3,5]\nbubble_sort(a)\nprint(a)`);
+  cmpEditorB.setValue(`def merge_sort(arr):\n    if len(arr) <= 1: return arr\n    m = len(arr)//2\n    l = merge_sort(arr[:m])\n    r = merge_sort(arr[m:])\n    return merge(l,r)\ndef merge(l,r):\n    res=[]\n    while l and r:\n        if l[0]<=r[0]: res.append(l.pop(0))\n        else: res.append(r.pop(0))\n    return res+l+r\na = [4,2,1,3,5]\nprint(merge_sort(a))`);
+
+  Split(['#cmp-side-a', '#cmp-side-b'], {
+    sizes: [50, 50],
+    minSize: 300,
+    gutterSize: 6
+  });
+
+  try {
+    pyodide = await loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.0/full/'});
+    await pyodide.runPythonAsync(PY_TRACER);
+    const loadEl = document.getElementById('loading');
+    if (loadEl) loadEl.classList.add('gone');
+    const runBtn = document.getElementById('btn-run');
+    if (runBtn) runBtn.disabled = false;
+  } catch(e) {
+    const msgEl = document.getElementById('load-msg');
+    if (msgEl) msgEl.textContent = '⚠ Failed — check internet connection';
+    console.error(e);
+  }
+});
+
+// ─── EXAMPLES ────────────────────────────────────────────────────────────────
+function loadExample() {
+  const exEl = document.getElementById('examples');
+  if (!exEl) return;
+  const k = exEl.value;
+  if (!k || !EXAMPLES[k]) return;
+  editor.setValue(EXAMPLES[k]);
+  exEl.value = '';
+}
+
+// ─── EDITOR TOGGLE ───────────────────────────────────────────────────────────
+function toggleEditor() {
+  if (!splitEditor) return;
+  const isShut = splitEditor.getSizes()[0] < 2;
+  if (isShut) {
+    splitEditor.setSizes(lastEditorSize);
+  } else {
+    lastEditorSize = splitEditor.getSizes();
+    splitEditor.setSizes([0, 100]);
+  }
+}
+
+// ─── DRAWER MECHANICS ────────────────────────────────────────────────────────
+let drawerCollapsed = false;
+function toggleDrawer() {
+  if (!splitBottom) return;
+  drawerCollapsed = !drawerCollapsed;
+  const btn = document.getElementById('drawer-toggle');
+  if (drawerCollapsed) {
+    lastBottomSize = splitBottom.getSizes();
+    splitBottom.setSizes([99, 1]);
+    btn.textContent = 'show';
+  } else {
+    splitBottom.setSizes(lastBottomSize);
+    btn.textContent = 'hide';
+  }
+  setTimeout(() => { renderMemGraph(); renderFlamegraph(); drawArrows(); }, 100);
+}
+
+// ─── RUN ─────────────────────────────────────────────────────────────────────
+async function runCode() {
+  if (!pyodide) return;
+  stopTimer();
+  const code = editor.getValue();
+  if (!code.trim()) return;
+  const runBtn = document.getElementById('btn-run');
+  if (runBtn) {
+    runBtn.textContent = '…';
+    runBtn.disabled = true;
+  }
+  try {
+    const raw = await pyodide.runPythonAsync(`_run(${JSON.stringify(code)})`);
+    const res = JSON.parse(raw);
+    steps = res.steps;
+    idx = 0;
+    codeLines = code.split('\n');
+    annotations.clear();
+    buildHeatmap();
+    maxDepth = Math.max(...steps.map(s=>s.frames.length), 1);
+    buildCodeView();
+    enableControls();
+    render();
+    
+    // Visualize mode console handling (since drawer is gone)
+    const con = document.getElementById('bc-stdout');
+    if (con) con.innerHTML = res.stdout ? `<pre style="margin:0;color:var(--t2)">${esc(res.stdout)}</pre>` : '<div style="color:var(--t4);font-style:italic">—</div>';
+    
+    if (res.truncated) showBanner(`⚠ Trace truncated at ${steps.length} steps.`, 'amber');
+  } catch(e) { console.error(e); }
+  finally {
+    const runBtn = document.getElementById('btn-run');
+    if (runBtn) {
+      runBtn.textContent = '▶ run';
+      runBtn.disabled = false;
+    }
+  }
+}
+
+function enableControls() {
+  ['btn-prev','btn-next','btn-play','btn-sover','btn-sout','btn-ncall','btn-nret'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.disabled = false;
+  });
+  const scrub = document.getElementById('scrub');
+  if (scrub) {
+    scrub.max = steps.length - 1;
+    scrub.value = 0;
+  }
+  const scrubMax = document.getElementById('scrub-max');
+  if (scrubMax) scrubMax.textContent = steps.length - 1;
+  drawScrubMarkers();
+}
+
+function drawScrubMarkers() {
+  const container = document.getElementById('scrub-markers');
+  container.innerHTML = '';
+  if (steps.length < 2) return;
+  const total = steps.length - 1;
+  steps.forEach((s, i) => {
+    if (s.ev === 'call' || s.ev === 'error' || s.ev === 'exception' || (s.ev === 'return' && s.fn !== '<module>')) {
+      const m = document.createElement('div');
+      m.className = `marker marker-${s.ev === 'call' ? 'call' : s.ev === 'return' ? 'ret' : 'err'}`;
+      m.style.left = (i / total * 100) + '%';
+      container.appendChild(m);
+    }
+  });
+}
+
+function showBanner(msg, color='blue') {
+  const b = document.createElement('div');
+  b.style.cssText = `padding:5px 14px;background:var(--${color}-l);border-bottom:1px solid var(--${color}-b);font-size:11.5px;color:var(--${color});flex-shrink:0;z-index:10`;
+  b.textContent = msg;
+  const cv = document.getElementById('code-view');
+  cv.parentElement.insertBefore(b, cv);
+  setTimeout(()=>b.remove(), 5000);
+}
+
+// ─── HEATMAP ─────────────────────────────────────────────────────────────────
+function buildHeatmap() {
+  heatmap = {};
+  steps.forEach(s => {
+    if (s.line > 0) heatmap[s.line] = (heatmap[s.line]||0) + 1;
+  });
+  const max = Math.max(...Object.values(heatmap), 1);
+  const legend = document.getElementById('hm-legend');
+  if (legend) legend.style.display = Object.keys(heatmap).length ? 'flex' : 'none';
+  return {hm: heatmap, max};
+}
+
+function heatColor(count, max) {
+  const r = count / max;
+  if (r < 0.33) return `rgba(91,159,214,${0.15+r*0.5})`;
+  if (r < 0.66) return `rgba(212,146,42,${0.2+r*0.4})`;
+  return `rgba(201,79,79,${0.2+r*0.6})`;
+}
+
+// ─── CODE VIEW ───────────────────────────────────────────────────────────────
+function buildCodeView() {
+  const cv = document.getElementById('code-view');
+  cv.innerHTML = '';
+  const max = Math.max(...Object.values(heatmap), 1);
+  codeLines.forEach((line, i) => {
+    const ln = i + 1;
+    const row = document.createElement('div');
+    row.className = 'cl' + (breakpoints.has(ln) ? ' bp-set' : '');
+    row.dataset.ln = ln;
+    const heat = document.createElement('div');
+    heat.className = 'heat-bar';
+    if (heatmap[ln]) heat.style.background = heatColor(heatmap[ln], max);
+    const lnEl = document.createElement('span');
+    lnEl.className = 'ln';
+    lnEl.textContent = ln;
+    lnEl.title = heatmap[ln] ? `executed ${heatmap[ln]}x` : '';
+    lnEl.onclick = (e) => { e.stopPropagation(); toggleBP(ln); };
+    const lt = document.createElement('span');
+    lt.className = 'lt';
+    lt.textContent = line || ' ';
+    row.appendChild(heat);
+    row.appendChild(lnEl);
+    row.appendChild(lt);
+    cv.appendChild(row);
+  });
+}
+
+function toggleBP(ln) {
+  if (breakpoints.has(ln)) breakpoints.delete(ln);
+  else breakpoints.add(ln);
+  document.querySelectorAll('.cl').forEach(el => {
+    el.classList.toggle('bp-set', breakpoints.has(+el.dataset.ln));
+  });
+}
+
+// ─── HEAP COLLECTION ─────────────────────────────────────────────────────────
+function collectHeap(frames) {
+  const map = new Map();
+  function scan(v) {
+    if (!v || typeof v !== 'object') return;
+    if (v.id) {
+      if (!map.has(v.id)) { map.set(v.id, v); }
+      if (v.items) {
+        const items = v.items;
+        items.forEach(x => Array.isArray(x) ? x.forEach(scan) : scan(x));
+      }
+      if (v.attrs) Object.values(v.attrs).forEach(scan);
+    } else {
+      if (v.items) v.items.forEach(x => Array.isArray(x) ? x.forEach(scan) : scan(x));
+      if (v.attrs) Object.values(v.attrs).forEach(scan);
+    }
+  }
+  frames.forEach(f => Object.values(f.locals).forEach(scan));
+  return map;
+}
+
+// ─── VALUE RENDERER ──────────────────────────────────────────────────────────
+function rv(val) {
+  if (!val) return '<span class="v-trunc">—</span>';
+  const t = val.t;
+  if (t==='None')  return '<span class="v-None">None</span>';
+  if (t==='bool')  return `<span class="v-bool">${esc(val.v)}</span>`;
+  if (t==='int')   return `<span class="v-int">${val.v}</span>`;
+  if (t==='float') return `<span class="v-float">${val.v}</span>`;
+  if (t==='str')   return `<span class="v-str">"${esc(val.v)}"</span>`;
+  if (t==='fn')    return `<span class="v-fn">fn ${esc(val.r||'')}</span>`;
+  if (t==='…')     return '<span class="v-trunc">…(deep)</span>';
+  if (!val.id)     return `<span class="v-trunc">${esc(val.r||t)}</span>`;
+  const cnt = val.items ? val.items.length : (val.attrs ? Object.keys(val.attrs).length : 0);
+  const lbl = t==='list'?`list[${cnt}]`:t==='tuple'?`tuple[${cnt}]`:t==='dict'?`{${cnt}}`:t==='set'?`set{${cnt}}`:t==='frozenset'?`frozenset{${cnt}}`:`${t}`;
+  return `<span class="v-ref" data-id="${val.id}" onmouseenter="hlHeap(${val.id})" onmouseleave="uhlHeap()" onclick="showObjHistory(${val.id})">→ ${esc(lbl)}</span>`;
+}
+
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── MAIN RENDER ─────────────────────────────────────────────────────────────
+function render() {
+  if (!steps.length) return;
+  const s = steps[idx];
+  const prevS = idx > 0 ? steps[idx-1] : null;
+
+  // code highlight
+  document.querySelectorAll('.cl').forEach(el => {
+    const ln = +el.dataset.ln;
+    el.classList.remove('hi-line','hi-call','hi-return','hi-error','hi-exception','hi-exec');
+    // remove old return annotations
+    el.querySelectorAll('.ret-ann').forEach(x=>x.remove());
+    if (ln === s.line) {
+      const cls = s.ev==='return'?'hi-return':s.ev==='call'?'hi-call':s.ev==='error'||s.ev==='exception'?'hi-error':'hi-line';
+      el.classList.add(cls);
+      el.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+  });
+
+  // return value annotation on caller line
+  if (s.ev==='return' && s.ret && idx>0) {
+    const caller = steps.slice(0,idx).reverse().find(st=>st.frames.length < s.frames.length);
+    if (caller && caller.line > 0) {
+      const callerEl = document.querySelector(`.cl[data-ln="${caller.line}"] .lt`);
+      if (callerEl) {
+        const ann = document.createElement('span');
+        ann.className = 'ret-ann';
+        ann.textContent = `↩ ${renderVal(s.ret)}`;
+        callerEl.appendChild(ann);
+      }
+    }
+  }
+
+  renderFrames(s, prevS);
+  renderHeap(s, prevS);
+  renderDepthMeter(s);
+  renderStdout();
+  renderStepInfo(s);
+  updateScrub();
+  updateBadge(s);
+  updateAnnotation();
+  drawArrows();
+  updateSlide();
+}
+
+function renderVal(val) {
+  if (!val) return '—';
+  if (val.t==='int'||val.t==='float') return String(val.v);
+  if (val.t==='str') return `"${val.v}"`;
+  if (val.t==='bool'||val.t==='None') return val.v;
+  if (val.id) return `${val.t}[…]`;
+  return val.r || val.t;
+}
+
+// ─── FRAMES ──────────────────────────────────────────────────────────────────
+function renderFrames(s, prevS) {
+  const fb = document.getElementById('frames-scroll');
+  if (!s.frames.length) { fb.innerHTML = '<div class="empty-frames">call stack empty</div>'; return; }
+  fb.innerHTML = '';
+  s.frames.forEach((f, fi) => {
+    const cur = fi === s.frames.length - 1;
+    const mod = f.fn === '<module>';
+    const block = document.createElement('div');
+    block.className = 'frame-block';
+
+    const fh = document.createElement('div');
+    fh.className = 'fh' + (cur?' cur':'');
+    const badges = [];
+    if (cur) badges.push('<span class="badge badge-blue" style="font-size:8.5px">current</span>');
+    if (f.is_gen) badges.push('<span class="badge badge-green" style="font-size:8.5px">gen</span>');
+    if (f.is_coro) badges.push('<span class="badge badge-purple" style="font-size:8.5px">async</span>');
+    if (f.freevars&&f.freevars.length) badges.push('<span class="badge badge-amber" style="font-size:8.5px">closure</span>');
+    fh.innerHTML = `<span class="fh-name${mod?' mod-fn':''}">${esc(mod?'global scope':f.fn)}</span><div class="fh-badges">${badges.join('')}</div><span class="fh-line">line ${f.line}</span>`;
+    block.appendChild(fh);
+
+    const keys = Object.keys(f.locals);
+    if (keys.length) {
+      const tbl = document.createElement('table');
+      tbl.className = 'vt';
+      keys.forEach(k => {
+        const isFree = f.freevars && f.freevars.includes(k);
+        const tr = document.createElement('tr');
+        if (cur && s.ev==='return' && s.ret && fi===s.frames.length-1) tr.className='ret-val-row';
+        tr.innerHTML = `<td class="vk" onclick="showVarTimeline('${esc(k)}',${fi})" title="click to see timeline">${esc(k)}${isFree?'<sup class="freevar-tag">free</sup>':''}</td><td class="vv">${rv(f.locals[k])}</td>`;
+        tbl.appendChild(tr);
+      });
+      if (cur && s.ev==='return' && s.ret) {
+        const tr = document.createElement('tr');
+        tr.className='ret-val-row';
+        tr.innerHTML=`<td class="vk">↩ return</td><td class="vv">${rv(s.ret)}</td>`;
+        tbl.appendChild(tr);
+      }
+      block.appendChild(tbl);
+    } else {
+      block.innerHTML += '<div class="no-locals">no locals</div>';
+    }
+
+    fb.appendChild(block);
+  });
+}
+
+// ─── HEAP ────────────────────────────────────────────────────────────────────
+function renderHeap(s, prevS) {
+  const heap = collectHeap(s.frames);
+  const prevHeap = prevS ? collectHeap(prevS.frames) : new Map();
+  const hs = document.getElementById('heap-scroll');
+  hs.innerHTML = '';
+  if (!heap.size) { hs.innerHTML = '<div class="empty-heap">no heap objects</div>'; return; }
+
+  heap.forEach(val => {
+    const t = val.t;
+    const changed = prevHeap.has(val.id) && JSON.stringify(prevHeap.get(val.id)) !== JSON.stringify(val);
+    const isNew = !prevHeap.has(val.id) && prevS;
+    const cls = `ho ht-${['list','dict','tuple','set','frozenset'].includes(t)?t:'obj'}${changed?' diff-changed':''}`;
+    const el = document.createElement('div');
+    el.className = cls;
+    el.id = 'ho-' + val.id;
+    el.title = 'click to see history';
+    el.onclick = () => showObjHistory(val.id);
+
+    let body = '';
+    if (t==='list'||t==='tuple') {
+      const items = val.items||[];
+      body = items.length ? items.map((x,i)=>`<div class="hr"><span class="hi">${i}</span><span class="hv">${rv(x)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+    } else if (t==='dict') {
+      const items = val.items||[];
+      body = items.length ? items.map(([k,v])=>`<div class="hr"><span class="hk">${rv(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+    } else if (t==='set'||t==='frozenset') {
+      const items = val.items||[];
+      body = items.length ? items.map(x=>`<div class="hr"><span class="hv">${rv(x)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+    } else {
+      const attrs = val.attrs||{};
+      const repr = val.r ? `<div class="hr" style="color:var(--t3);font-size:10.5px;word-break:break-all">${esc(val.r)}</div>` : '';
+      body = repr + Object.entries(attrs).map(([k,v])=>`<div class="hr"><span class="hk">${esc(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>`).join('') || '<div class="ho-empty">—</div>';
+    }
+
+    const newBadge = isNew ? '<span class="badge badge-green" style="font-size:8px;margin-left:4px">new</span>' : '';
+    el.innerHTML = `<div class="ho-hdr">${t.toUpperCase()}${newBadge}<span class="ho-id">id:${val.id}</span></div><div class="ho-body">${body}</div>`;
+    hs.appendChild(el);
+  });
+}
+
+// ─── SVG ARROWS ──────────────────────────────────────────────────────────────
+function drawArrows() {
+  requestAnimationFrame(() => {
+    const svg = document.getElementById('arrows-svg');
+    if (svg) svg.innerHTML = `<defs><marker id="arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="rgba(91,159,214,.55)"/></marker></defs>`;
+    document.querySelectorAll('.v-ref[data-id]').forEach(el => {
+      const id = el.dataset.id;
+      const target = document.getElementById('ho-' + id);
+      if (!target) return;
+      const sr = el.getBoundingClientRect();
+      const tr = target.getBoundingClientRect();
+      if (!sr.width || !tr.width) return;
+      const x1 = sr.right, y1 = sr.top + sr.height/2;
+      const x2 = tr.left, y2 = tr.top + tr.height/2;
+      const cx1 = x1 + Math.abs(x2-x1)*0.5;
+      const cx2 = x2 - Math.abs(x2-x1)*0.2;
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',`M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`);
+      path.setAttribute('stroke','rgba(91,159,214,.5)');
+      path.setAttribute('stroke-width','1.4');
+      path.setAttribute('fill','none');
+      path.setAttribute('marker-end','url(#arr)');
+      svg.appendChild(path);
+    });
+  });
+}
+
+function hlHeap(id) {
+  document.querySelectorAll('.ho').forEach(e=>e.classList.remove('hi-heap'));
+  const el = document.getElementById('ho-'+id);
+  if (el) { el.classList.add('hi-heap'); el.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+}
+function uhlHeap() { document.querySelectorAll('.ho').forEach(e=>e.classList.remove('hi-heap')); }
+
+// ─── DEPTH METER ─────────────────────────────────────────────────────────────
+function renderDepthMeter(s) {
+  const d = s.frames.length;
+  const pct = maxDepth ? (d/maxDepth*100) : 0;
+  const fill = document.getElementById('depth-fill');
+  if (fill) {
+    fill.style.width = pct+'%';
+    fill.style.background = pct > 80 ? 'var(--red)' : pct > 50 ? 'var(--amber)' : 'var(--purple)';
+  }
+  const lbl = document.getElementById('depth-lbl');
+  if (lbl) lbl.textContent = `depth: ${d} / ${maxDepth}`;
+}
+
+// ─── STDOUT ──────────────────────────────────────────────────────────────────
+function renderStdout() {
+  const s = steps[idx];
+  const el = document.getElementById('console-logs');
+  if (!el || !s) return;
+  el.textContent = s.out || '—';
+}
+
+// ─── STEP INFO ───────────────────────────────────────────────────────────────
+function renderStepInfo(s) {
+  const fn = s.fn==='<module>'?'global scope':`${s.fn}()`;
+  let info = `event:  ${s.ev}\nfn:     ${fn}\nline:   ${s.line}\nframes: ${s.frames.length}`;
+  if (s.exc) info += `\nerror:  ${s.exc}`;
+  if (s.ret) info += `\nreturn: ${renderVal(s.ret)}`;
+  const ann = annotations.get(idx);
+  if (ann) info += `\nnote:   ${ann}`;
+  const infoBox = document.getElementById('step-info-box');
+  if (infoBox) infoBox.textContent = info;
+
+  // Narrative Layer
+  const nt = document.getElementById('narrative-text');
+  const nw = document.getElementById('narrative-wrap');
+  const prevS = idx > 0 ? steps[idx-1] : null;
+
+  let nar = "";
+  if (s.ev === 'call') {
+    nar = `Calling function <strong style="color:var(--purple)">${esc(s.fn)}</strong>. Python creates a new frame on the stack for this call.`;
+  } else if (s.ev === 'return') {
+    nar = `Function <span style="color:var(--purple)">${esc(s.fn)}</span> is finishing. It's returning <strong style="color:var(--green)">${esc(renderVal(s.ret))}</strong> to where it was called.`;
+  } else if (s.ev === 'exception' || s.ev === 'error') {
+    nar = `An error occurred: <strong style="color:var(--red)">${esc(s.exc || "Something went wrong")}</strong>. Python stops normal execution and starts "bubbling up" the error.`;
+  } else if (prevS && s.line !== prevS.line) {
+    if (s.line < prevS.line && s.fn === prevS.fn) {
+        nar = `Continuing the loop or recurring. Python jumps back to line ${s.line}.`;
+    } else {
+        nar = `Python moves to the next instruction at line ${s.line}.`;
+    }
+  } else {
+    nar = `Python is currently executing line ${s.line} in ${esc(fn)}.`;
+  }
+
+  nt.innerHTML = nar;
+  nw.style.display = 'block';
+}
+
+// ─── TOOLTIPS ────────────────────────────────────────────────────────────────
+function handleCodeHover(e) {
+  const el = e.target.closest('.lt');
+  if (!el) return hideTooltip();
+  const ln = +el.closest('.cl').dataset.ln;
+  const s = steps[idx];
+  if (!s || !s.frames.length) return hideTooltip();
+
+  // Simple heuristic: find if cursor is over a word that exists in locals
+  const rect = el.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  // This is a rough estimation since we don't have perfect font metrics
+  const charWidth = 7.5; // average for mono 12.5px
+  const charIdx = Math.floor(x / charWidth);
+  const text = el.textContent;
+
+  // Find word at character index
+  const match = text.slice(0, charIdx).match(/(\w+)$/);
+  const match2 = text.slice(charIdx).match(/^(\w+)/);
+  const word = (match ? match[1] : "") + (match2 ? match2[1] : "");
+
+  if (word && s.frames[s.frames.length-1].locals[word]) {
+    const val = s.frames[s.frames.length-1].locals[word];
+    showTooltip(e.clientX, e.clientY, `${word} = ${renderVal(val)}`);
+  } else {
+    hideTooltip();
+  }
+}
+
+function showTooltip(x, y, txt) {
+  const tt = document.getElementById('tooltip');
+  tt.textContent = txt;
+  tt.style.display = 'block';
+  tt.style.left = (x + 10) + 'px';
+  tt.style.top = (y - 25) + 'px';
+}
+function hideTooltip() {
+  const tt = document.getElementById('tooltip');
+  if (tt) tt.style.display = 'none';
+}
+
+// ─── BADGE ───────────────────────────────────────────────────────────────────
+function updateBadge(s) {
+  const badge = document.getElementById('ev-badge');
+  if (!badge) return;
+  const map = {call:'badge-purple CALL',line:'badge-blue LINE',return:'badge-green RETURN',exception:'badge-red EXCEPT',error:'badge-red ERROR'};
+  const [cls,label] = (map[s.ev]||'badge-blue '+s.ev.toUpperCase()).split(' ');
+  badge.className = 'badge ' + cls;
+  badge.textContent = label;
+  badge.style.display='';
+  const stepCtr = document.getElementById('step-ctr');
+  if (stepCtr) stepCtr.textContent = `${idx+1}/${steps.length}`;
+}
+
+// ─── SCRUB ───────────────────────────────────────────────────────────────────
+function updateScrub() {
+  const sc = document.getElementById('scrub');
+  if (sc) sc.value = idx;
+}
+function scrubTo(i) { idx = i; render(); }
+
+// ─── ANNOTATIONS ─────────────────────────────────────────────────────────────
+function updateAnnotation() {
+  const inp = document.getElementById('annot-input');
+  if (inp) inp.value = annotations.get(idx) || '';
+}
+function saveAnnotation() {
+  const inp = document.getElementById('annot-input');
+  if (!inp) return;
+  const v = inp.value.trim();
+  if (v) annotations.set(idx, v);
+  else annotations.delete(idx);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function go(d) {
+  idx = Math.max(0, Math.min(steps.length-1, idx+d));
+  render();
+}
+
+function stepOver() {
+  const curDepth = steps[idx].frames.length;
+  for (let i=idx+1; i<steps.length; i++) {
+    if (steps[i].frames.length <= curDepth) { idx=i; render(); return; }
+  }
+  go(1);
+}
+
+function stepOut() {
+  const curDepth = steps[idx].frames.length;
+  for (let i=idx+1; i<steps.length; i++) {
+    if (steps[i].frames.length < curDepth) { idx=i; render(); return; }
+  }
+  go(1);
+}
+
+function jumpToEv(ev) {
+  for (let i=idx+1; i<steps.length; i++) {
+    if (steps[i].ev===ev) { idx=i; render(); return; }
+    if (breakpoints.has(steps[i].line) && ev!=='return') { idx=i; render(); return; }
+  }
+}
+
+function togglePlay() {
+  if (timer) { stopTimer(); return; }
+  const btn = document.getElementById('btn-play');
+  if (btn) {
+    btn.textContent='⏸';
+    btn.className='btn btn-red';
+  }
+  const speedEl = document.getElementById('speed');
+  const spd = speedEl ? +speedEl.value : 5;
+  const delay = Math.round(1200/spd);
+  timer = setInterval(()=>{
+    if (idx>=steps.length-1) { stopTimer(); return; }
+    // stop at breakpoints
+    const next = steps[idx+1];
+    if (breakpoints.has(next?.line)) { idx++; render(); stopTimer(); return; }
+    go(1);
+  }, delay);
+}
+function stopTimer() {
+  clearInterval(timer); timer=null;
+  const btn = document.getElementById('btn-play');
+  if (btn) {
+    btn.textContent='▶';
+    btn.className='btn btn-green';
+  }
+}
+
+// ─── MEMORY & DEPTH GRAPHS ───────────────────────────────────────────────────
+function drawLineChart(canvas, data, color, labelFn) {
+  const dpr = window.devicePixelRatio||1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width*dpr||600;
+  canvas.height = rect.height*dpr||90;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+  const W=rect.width||600, H=rect.height||90, pad=18;
+  ctx.clearRect(0,0,W,H);
+  if (!data.length) return;
+  const min=Math.min(...data), max=Math.max(...data,1);
+  const range=max-min||1;
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const y=H-pad-(f*(H-pad*2));
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+  });
+  // current step marker
+  if (idx<data.length) {
+    const cx = pad + (idx/(data.length-1||1))*(W-pad*2);
+    ctx.strokeStyle='rgba(91,159,214,.3)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx,pad); ctx.lineTo(cx,H-pad); ctx.stroke();
+  }
+  // line
+  ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x=pad+(i/(data.length-1||1))*(W-pad*2);
+    const y=H-pad-((v-min)/range)*(H-pad*2);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // labels
+  ctx.fillStyle='rgba(155,155,148,.6)'; ctx.font=`9px var(--mono,monospace)`;
+  ctx.fillText(max,2,pad+4); ctx.fillText(min,2,H-pad+2);
+  if (data.length>1) {
+    ctx.fillStyle='rgba(155,155,148,.4)';
+    ctx.fillText(0,pad-4,H-2); ctx.fillText(data.length-1,W-pad-14,H-2);
+  }
+}
+
+function renderMemGraph() {
+  const data = steps.map(s=>collectHeap(s.frames).size);
+  const canvas = document.getElementById('mem-canvas');
+  if (canvas) drawLineChart(canvas, data, 'var(--amber)');
+}
+
+function renderDepGraph() {
+  // Obsolete: replaced by Flamegraph/Profiling
+}
+
+// ─── OBJECT HISTORY ──────────────────────────────────────────────────────────
+function showObjHistory(id) {
+  const history = [];
+  steps.forEach((s, si) => {
+    const heap = collectHeap(s.frames);
+    if (heap.has(id)) {
+      const val = heap.get(id);
+      history.push({step:si, val: JSON.parse(JSON.stringify(val))});
+    }
+  });
+  const body = document.getElementById('modal-body');
+  const title = document.getElementById('modal-title');
+  if (title) title.textContent = `Object history — id:${id} (${history.length} steps)`;
+  if (body) {
+    body.innerHTML = history.map(h=>{
+      const v=h.val;
+      const summary = v.items ? `[${v.items.map(x=>Array.isArray(x)?`${renderVal(x[0])}:${renderVal(x[1])}`:renderVal(x)).join(', ')}]` : (v.attrs?JSON.stringify(Object.fromEntries(Object.entries(v.attrs).map(([k,vv])=>[k,renderVal(vv)]))):v.r||v.t);
+      return `<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(summary)}</span></div>`;
+    }).join('') || '<div style="padding:10px;color:var(--t3)">Not found in any step</div>';
+  }
+  const modal = document.getElementById('modal');
+  if (modal) modal.classList.add('show');
+}
+function closeModal() {
+  const modal = document.getElementById('modal');
+  if (modal) modal.classList.remove('show');
+}
+
+// ─── VARIABLE TIMELINE ───────────────────────────────────────────────────────
+function showVarTimeline(varName, frameIdx) {
+  const history = [];
+  steps.forEach((s,si)=>{
+    const f = s.frames[frameIdx]||s.frames[s.frames.length-1];
+    if (f && f.locals[varName] !== undefined) {
+      history.push({step:si, val:f.locals[varName]});
+    }
+  });
+  if (!history.length) return;
+  const title = document.getElementById('vt-title');
+  if (title) title.textContent = `Timeline: ${varName}`;
+  const body = document.getElementById('vt-body');
+  if (!body) return;
+
+  // sparkline
+  const nums = history.map(h=>typeof h.val.v==='number'?h.val.v:null);
+  const hasNums = nums.some(n=>n!==null);
+  let html = '';
+  if (hasNums) {
+    html += `<canvas id="vt-canvas" width="520" height="80" style="width:100%;border-radius:4px;margin-bottom:10px"></canvas>`;
+  }
+  html += history.slice(-30).map(h=>`<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(renderVal(h.val))}</span></div>`).join('');
+  body.innerHTML = html;
+
+  if (hasNums) {
+    const canvas = document.getElementById('vt-canvas');
+    if (canvas) {
+      const numData = nums.filter(n=>n!==null);
+      drawLineChart(canvas, numData, 'var(--blue)');
+    }
+  }
+  const vtModal = document.getElementById('vt-modal');
+  if (vtModal) vtModal.classList.add('show');
+}
+
+// ─── BOTTOM TABS ─────────────────────────────────────────────────────────────
+function switchBTab(id) {
+  const tabs = ['console','memory','profiling','compare-score'];
+  document.querySelectorAll('#cmp-bottom-bar .btab').forEach((t,i)=>{
+    t.classList.toggle('on', tabs[i]===id);
+  });
+  document.querySelectorAll('#cmp-bottom-bar .bc').forEach((c,i)=>{
+    c.classList.toggle('on', tabs[i]===id);
+  });
+  if (id==='memory') { setTimeout(renderMemGraph,50); }
+  if (id==='profiling') { setTimeout(renderFlamegraph,50); }
+}
+
+// ─── CONSOLE REPL ────────────────────────────────────────────────────────────
+function handleConsoleKey(e) {
+  if (e.key === 'Enter') {
+    const input = e.target.value;
+    if (!input.trim()) return;
+    execConsole(input);
+    e.target.value = '';
+  }
+}
+
+async function execConsole(code) {
+  const logs = document.getElementById('console-logs');
+  const line = document.createElement('div');
+  line.style.marginBottom = '4px';
+  line.innerHTML = `<span style="color:var(--blue)">>>></span> <span style="color:var(--t1)">${esc(code)}</span>`;
+  logs.appendChild(line);
+
+  if (!steps[idx]) {
+    appendLog('Error: No execution trace active.', 'red');
+    return;
+  }
+
+  try {
+    const s = steps[idx];
+    const frame = s.frames[s.frames.length - 1];
+    if (!frame) throw new Error("No active frame");
+
+    // Inject current state into Python
+    const localNames = Object.keys(frame.locals);
+    await pyodide.runPythonAsync(`
+_repl_locals = {}
+`);
+    for (const name of localNames) {
+      const val = frame.locals[name];
+      if (val.t === 'bool') {
+        await pyodide.runPythonAsync(`_repl_locals["${name}"] = ${val.v ? 'True' : 'False'}`);
+      } else if (['int','float','str'].includes(val.t) || val.v === null) {
+        await pyodide.runPythonAsync(`_repl_locals["${name}"] = ${JSON.stringify(val.v)}`);
+      }
+    }
+    
+    // Run user code in that context
+    const result = await pyodide.runPythonAsync(`eval(${JSON.stringify(code)}, {}, _repl_locals)`);
+    appendLog(String(result), 'green');
+  } catch (err) {
+    appendLog(err.message, 'red');
+  }
+  logs.scrollTop = logs.scrollHeight;
+}
+
+function appendLog(msg, color) {
+  const logs = document.getElementById('console-logs');
+  const d = document.createElement('div');
+  d.style.color = `var(--${color})`;
+  d.style.marginBottom = '8px';
+  d.textContent = msg;
+  logs.appendChild(d);
+}
+
+// ─── SHARING ─────────────────────────────────────────────────────────────────
+function shareTrace() {
+  const state = {
+    code: editor.getValue(),
+    bp: Array.from(breakpoints),
+    theme: document.body.classList.contains('theme-dark') ? 'dark' : 'light'
+  };
+  const blob = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+  const url = window.location.origin + window.location.pathname + '?h=' + blob;
+  
+  navigator.clipboard.writeText(url).then(() => {
+    showBanner('🔗 Share link copied to clipboard!', 'green');
+  });
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const blob = params.get('h');
+  if (!blob) return;
+  try {
+    const state = JSON.parse(decodeURIComponent(escape(atob(blob))));
+    if (state.code) editor.setValue(state.code);
+    if (state.bp) {
+      breakpoints = new Set(state.bp);
+      buildCodeView();
+    }
+    if (state.theme) {
+      document.body.className = 'theme-' + state.theme;
+      localStorage.setItem('haki-theme', state.theme);
+    }
+    // Auto-run if code exists
+    setTimeout(runCode, 500);
+  } catch(e) { console.error("Restore failed", e); }
+}
+
+// ─── MODE SWITCHING ──────────────────────────────────────────────────────────
+let curMode = 'viz';
+
+function initCompare() {
+  if (cmpEditorA && cmpEditorB) return;
+  const config = {
+    mode: 'python',
+    theme: 'default',
+    lineNumbers: true,
+    smartIndent: true,
+    indentUnit: 4,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    extraKeys: {
+      "Ctrl-Space": "autocomplete",
+      "Tab": cm => {
+        if (cm.somethingSelected()) cm.indentSelection("add");
+        else cm.replaceSelection("    ");
+      }
+    }
+  };
+  if (!cmpEditorA) {
+    cmpEditorA = CodeMirror.fromTextArea(document.getElementById('cmp-textarea-a'), config);
+    cmpEditorA.setValue(editor.getValue());
+  }
+  if (!cmpEditorB) {
+    cmpEditorB = CodeMirror.fromTextArea(document.getElementById('cmp-textarea-b'), config);
+    cmpEditorB.setValue(editor.getValue());
+  }
+  setTimeout(() => {
+    cmpEditorA.refresh();
+    cmpEditorB.refresh();
+  }, 100);
+}
+
+function switchMode(mode) {
+  curMode = mode;
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('on',t.dataset.mode===mode));
+  ['viz','compare','complexity','slides','quiz','embed'].forEach(m=>{
+    const el = document.getElementById('view-'+m);
+    if (el) el.classList.toggle('hidden', m!==mode);
+  });
+  
+  // Logic for the split handle on mode change
+  if (mode === 'compare') {
+    setTimeout(() => { if(splitBottom) splitBottom.setSizes(lastBottomSize); }, 50);
+    initCompare();
+  }
+  
+  if (mode==='slides') renderSlideMode();
+  if (mode==='quiz') initQuiz();
+  if (mode==='embed') genEmbed();
+}
+
+// ─── SLIDES MODE ─────────────────────────────────────────────────────────────
+function renderSlideMode() {
+  if (!steps.length) return;
+  slideIdx = idx;
+  renderSlide();
+}
+
+function renderSlide() {
+  const s = steps[slideIdx];
+  if (!s) return;
+  const fn = s.fn==='<module>'?'global scope':`${s.fn}()`;
+  const card = document.getElementById('slide-card');
+  const highlights = codeLines.map((line,i)=>{
+    const ln=i+1;
+    let cls='';
+    if(ln===s.line) cls=s.ev==='return'?'style="color:var(--green)"':s.ev==='call'?'style="color:var(--purple)"':s.ev==='error'?'style="color:var(--red)"':'style="color:var(--blue)"';
+    return `<div ${cls}>${String(ln).padStart(3)} | ${esc(line)}</div>`;
+  }).join('');
+  const locals = s.frames.length ? Object.entries(s.frames[s.frames.length-1].locals).slice(0,8).map(([k,v])=>`<div><span style="color:var(--t3)">${esc(k)}</span> = ${rv(v)}</div>`).join('') : '—';
+  const heap = collectHeap(s.frames);
+  const heapSum = heap.size ? [...heap.values()].slice(0,4).map(v=>`<div><span style="color:var(--amber)">${v.t}</span> id:${v.id}</div>`).join('') : '—';
+  const ann = annotations.get(slideIdx) ? `<div style="margin-top:8px;padding:8px;background:var(--amber-l);border-radius:4px;font-size:12px;color:var(--amber)">📎 ${esc(annotations.get(slideIdx))}</div>` : '';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="slide-num">Step ${slideIdx+1} / ${steps.length}</span>
+      <span class="badge badge-${s.ev==='return'?'green':s.ev==='call'?'purple':s.ev==='error'?'red':'blue'}">${s.ev.toUpperCase()}</span>
+      <span style="font-size:12px;color:var(--t2)">${esc(fn)} · line ${s.line}</span>
+    </div>
+    <div class="slide-code">${highlights}</div>
+    <div class="slide-info">
+      <div class="slide-panel"><div class="slide-lbl">locals</div><div style="font-family:var(--mono);font-size:11.5px">${locals}</div></div>
+      <div class="slide-panel"><div class="slide-heap">heap</div><div style="font-family:var(--mono);font-size:11.5px">${heapSum}</div></div>
+    </div>
+    ${ann}
+  `;
+  const slCtr = document.getElementById('sl-ctr');
+  if (slCtr) slCtr.textContent = `${slideIdx+1} / ${steps.length}`;
+  const slPrev = document.getElementById('sl-prev');
+  if (slPrev) slPrev.disabled = slideIdx===0;
+  const slNext = document.getElementById('sl-next');
+  if (slNext) slNext.disabled = slideIdx===steps.length-1;
+}
+function slideGo(d) { slideIdx=Math.max(0,Math.min(steps.length-1,slideIdx+d)); renderSlide(); }
+function updateSlide() { if (curMode==='slides') { slideIdx=idx; renderSlide(); } }
+
+// ─── QUIZ MODE ───────────────────────────────────────────────────────────────
+function initQuiz() {
+  if (!steps.length) return;
+  quizState = {qi:0, score:0, total:0, answered:false};
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const container = document.getElementById('quiz-inner');
+  if (quizState.qi >= steps.length-1) {
+    container.innerHTML=`<div class="quiz-card"><div class="quiz-q" style="font-size:16px">🎉 Quiz complete!</div><div class="quiz-score">Score: ${quizState.score} / ${quizState.total}</div><button class="btn btn-blue" style="margin-top:12px" onclick="initQuiz()">restart</button></div>`;
+    return;
+  }
+  const s = steps[quizState.qi];
+  const next = steps[quizState.qi+1];
+  const events = ['call','line','return','exception','error'];
+  const correct = next.ev;
+  const opts = [...new Set([correct,...events.filter(e=>e!==correct).slice(0,3)])].sort(()=>Math.random()-.5);
+  const codeSnip = codeLines.slice(Math.max(0,s.line-3),s.line+2).map((l,i)=>{
+    const ln=Math.max(0,s.line-3)+i+1;
+    return `<span style="${ln===s.line?'color:var(--blue)':''}">${String(ln).padStart(3)} | ${esc(l)}</span>`;
+  }).join('\n');
+  container.innerHTML=`
+    <div class="quiz-card" style="max-width:560px;width:100%">
+      <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Question ${quizState.qi+1} · Score ${quizState.score}/${quizState.total}</div>
+      <div class="quiz-code">${codeSnip}</div>
+      <div class="quiz-q">Currently at: <strong style="color:var(--blue)">${s.ev}</strong> event in <strong>${esc(s.fn==='<module>'?'global':s.fn)}</strong> (line ${s.line})<br>What is the <em>next</em> event?</div>
+      <div class="quiz-opts" id="quiz-opts">
+        ${opts.map(o=>`<button class="quiz-opt" onclick="answerQuiz('${o}','${correct}')">${o}</button>`).join('')}
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+        <div class="quiz-info" id="quiz-fb"></div>
+        <button class="btn" id="quiz-next-btn" style="display:none;margin-left:auto" onclick="nextQuiz()">next →</button>
+      </div>
+    </div>
+  `;
+}
+
+function answerQuiz(chosen, correct) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  quizState.total++;
+  const ok = chosen===correct;
+  if (ok) quizState.score++;
+  document.querySelectorAll('.quiz-opt').forEach(btn=>{
+    if (btn.textContent===chosen) btn.classList.add(ok?'correct':'wrong');
+    if (btn.textContent===correct && !ok) btn.classList.add('correct');
+    btn.disabled=true;
+  });
+  document.getElementById('quiz-fb').textContent = ok ? '✓ correct!' : `✗ it was "${correct}"`;
+  document.getElementById('quiz-fb').style.color = ok ? 'var(--green)' : 'var(--red)';
+  document.getElementById('quiz-next-btn').style.display='';
+}
+
+function nextQuiz() {
+  quizState.qi++;
+  quizState.answered=false;
+  renderQuiz();
+}
+
+// ─── PERFORMANCE FLAMEGRAPH ──────────────────────────────────────────────────
+function renderFlamegraph() {
+  const canvas = document.getElementById('flame-canvas');
+  if (!canvas || !steps.length) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // Build Call Tree
+  const root = { name: '<root>', start: 0, end: steps.length - 1, depth: 0, children: [] };
+  const stack = [root];
+  
+  steps.forEach((s, i) => {
+    const currentDepth = s.frames.length;
+    while (stack.length > currentDepth + 1) { // Root + actual frames
+      const closed = stack.pop();
+      closed.end = i - 1;
+    }
+    if (stack.length < currentDepth + 1) {
+      const parent = stack[stack.length - 1];
+      const newNode = {
+        name: s.fn,
+        start: i,
+        end: steps.length - 1,
+        depth: stack.length,
+        children: []
+      };
+      parent.children.push(newNode);
+      stack.push(newNode);
+    }
+  });
+
+  const rowH = 18;
+  const total = steps.length;
+
+  function drawNode(node) {
+    if (node.name === '<root>') {
+      node.children.forEach(drawNode);
+      return;
+    }
+    const x = (node.start / total) * W;
+    const w = ((node.end - node.start + 1) / total) * W;
+    const y = (node.depth - 1) * (rowH + 2);
+    
+    // Aesthetic coloring based on name hash
+    let hash = 0;
+    for (let i = 0; i < node.name.length; i++) hash = node.name.charCodeAt(i) + ((hash << 5) - hash);
+    const hue = Math.abs(hash % 360);
+    
+    ctx.fillStyle = `hsla(${hue}, 60%, ${document.body.classList.contains('theme-dark') ? '40%' : '70%'}, 0.8)`;
+    ctx.fillRect(x, y, w - 1, rowH);
+    
+    if (w > 20) {
+      ctx.fillStyle = document.body.classList.contains('theme-dark') ? '#eee' : '#222';
+      ctx.font = '9px var(--mono)';
+      ctx.fillText(node.name, x + 4, y + 12);
+    }
+    
+    node.children.forEach(drawNode);
+  }
+
+  drawNode(root);
+
+  // Interactive Sync
+  canvas.onclick = (e) => {
+    const clickX = e.offsetX;
+    const clickY = e.offsetY;
+    function findNode(node) {
+      const x = (node.start / total) * W;
+      const w = ((node.end - node.start + 1) / total) * W;
+      const y = (node.depth - 1) * (rowH + 2);
+      if (clickX >= x && clickX <= x + w && clickY >= y && clickY <= y + rowH) return node;
+      for (let child of node.children) {
+        const found = findNode(child);
+        if (found) return found;
+      }
+      return null;
+    }
+    const target = findNode(root);
+    if (target) scrubTo(target.start);
+  };
+}
+
+async function runCompare(side) {
+  if (!pyodide) return;
+  const ed = side === 'a' ? cmpEditorA : cmpEditorB;
+  const code = ed.getValue();
+  const btn = document.querySelector(`[onclick="runCompare('${side}')"]`);
+  btn.textContent='…'; btn.disabled=true;
+  try {
+    const raw = await pyodide.runPythonAsync(`_run(${JSON.stringify(code)})`);
+    const res = JSON.parse(raw);
+    cmpSteps[side] = res.steps;
+    const cv = document.getElementById(`cmp-view-${side}`);
+    cv.innerHTML='';
+    const lines = code.split('\n');
+    const hm={};
+    res.steps.forEach(s=>{ if(s.line>0) hm[s.line]=(hm[s.line]||0)+1; });
+    const maxH=Math.max(...Object.values(hm),1);
+    lines.forEach((line,i)=>{
+      const ln=i+1;
+      const d=document.createElement('div');
+      d.style.cssText=`display:flex;align-items:center;gap:6px;padding:1px 8px;font-family:var(--mono);font-size:11.5px;border-left:2px solid transparent;${hm[ln]?`border-left-color:${heatColor(hm[ln],maxH)}`:''}`
+      d.innerHTML=`<span style="color:var(--t4);width:22px;text-align:right;flex-shrink:0">${ln}</span><span style="color:var(--t2)">${esc(line)||' '}</span>${hm[ln]?`<span style="color:var(--t3);font-size:10px;margin-left:auto">${hm[ln]}x</span>`:''}`;
+      cv.appendChild(d);
+    });
+    
+    // Summary Stats
+    const stats = {
+      steps: res.steps.length,
+      maxDepth: Math.max(...res.steps.map(s => s.frames.length), 0),
+      mem: Math.max(...res.steps.map(s => (s.mem && s.mem.heap) ? s.mem.heap : 0), 0),
+      stdout: res.stdout || ''
+    };
+    cmpSteps[side]._summary = stats;
+
+    const sval = document.getElementById(`cmp-step-val-${side}`);
+    if (sval) sval.textContent = stats.steps;
+    const mval = document.getElementById(`cmp-mem-val-${side}`);
+    if (mval) mval.textContent = (stats.mem / 1024).toFixed(1) + ' KB';
+    const dval = document.getElementById(`cmp-depth-${side}`);
+    if (dval) dval.textContent = `max depth: ${stats.maxDepth}`;
+    
+    updateCompareScorecard();
+  } catch(e){console.error(e);}
+  finally{btn.textContent=`▶ run ${side.toUpperCase()}`; btn.disabled=false;}
+}
+
+function updateCompareScorecard() {
+  const sa = cmpSteps.a._summary, sb = cmpSteps.b._summary;
+  
+  ['a','b'].forEach(side => {
+    const s = cmpSteps[side]._summary;
+    const other = cmpSteps[side==='a'?'b':'a']._summary;
+    const box = document.getElementById(`cmp-score-${side}`);
+    if (!box) return;
+    if (!s) { box.innerHTML = `<div style="color:var(--t4);font-size:11px;font-style:italic;padding:12px">Run side ${side.toUpperCase()} to see scorecard</div>`; return; }
+
+    // Calculate winner badges
+    let badge = '';
+    if (other) {
+      if (s.steps < other.steps) {
+        const d = ((1 - s.steps / other.steps) * 100).toFixed(0);
+        badge = `<span class="cmp-badge badge-green">${d}% LEANER</span>`;
+      } else if (s.steps > other.steps) {
+        const d = ((s.steps / other.steps - 1) * 100).toFixed(0);
+        badge = `<span class="cmp-badge badge-red">+${d}% STEPS</span>`;
+      }
+    }
+
+    const sa_steps = sa ? sa.steps : 0;
+    const sb_steps = sb ? sb.steps : 0;
+    const sa_mem = sa ? sa.mem : 0;
+    const sb_mem = sb ? sb.mem : 0;
+
+    const labelEl = document.getElementById(`cmp-label-${side}`);
+    const sideLabel = labelEl ? labelEl.value : (side === 'a' ? 'Version A' : 'Version B');
+
+    box.innerHTML = `
+      <div style="font-size:12px; font-weight:600; color:var(--t1); margin-bottom:8px; display:flex; align-items:center; gap:8px">
+        ${sideLabel} ${badge}
+      </div>
+      <div class="cmp-bar-row">
+        <div class="cmp-bar-lbl">STEPS</div>
+        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--blue); width: ${ (s.steps / Math.max(sa_steps, sb_steps, 1) * 100) }%"></div></div>
+        <span style="font-family:var(--mono)">${s.steps}</span>
+      </div>
+      <div class="cmp-bar-row" style="margin-top:4px">
+        <div class="cmp-bar-lbl">MEMORY</div>
+        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--green); width: ${ (s.mem / Math.max(sa_mem, sb_mem, 1) * 100) }%"></div></div>
+        <span style="font-family:var(--mono)">${(s.mem / 1024).toFixed(1)}KB</span>
+      </div>
+      <div style="font-size:10px; color:var(--t3); margin-top:8px">max recursion depth: ${s.maxDepth}</div>
+    `;
+  });
+}
+
+function showStdout(side) {
+  const s = cmpSteps[side]?._summary; if (!s) return;
+  const label = document.getElementById(`cmp-label-${side}`).value;
+  document.getElementById('so-title').textContent = `Output for ${label}`;
+  document.getElementById('so-body').textContent = s.stdout || '(no output)';
+  document.getElementById('stdout-overlay').style.display = 'flex';
+}
+
+// ─── COMPLEXITY ──────────────────────────────────────────────────────────────
+async function runComplexity() {
+  if (!pyodide) return;
+  const code = editor.getValue();
+  const varName = document.getElementById('cx-var').value.trim() || 'n';
+  const from = +document.getElementById('cx-from').value||1;
+  const to   = +document.getElementById('cx-to').value||12;
+  const step = +document.getElementById('cx-step').value||1;
+  const ns=[]; const counts=[];
+  const status = document.getElementById('cx-status');
+  status.textContent='running…';
+  for (let n=from; n<=to; n+=step) {
+    try {
+      const raw = await pyodide.runPythonAsync(`_run_n(${JSON.stringify(code)},${JSON.stringify(varName)},${n})`);
+      const res = JSON.parse(raw);
+      ns.push(n); counts.push(res.steps.length);
+    } catch(e) { break; }
+  }
+  status.textContent=`done — ${ns.length} runs`;
+  // draw chart
+  const canvas = document.getElementById('cx-canvas');
+  const wrap = document.getElementById('cx-canvas-wrap');
+  if (!canvas || !wrap) return;
+  canvas.width = wrap.clientWidth || 600; 
+  canvas.height = Math.max(wrap.clientHeight - 80, 200);
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height, pad=40;
+  ctx.clearRect(0,0,W,H);
+  if (!counts.length) return;
+  const maxC=Math.max(...counts,1), minC=Math.min(...counts);
+  const maxN=Math.max(...ns), minN=Math.min(...ns);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.lineWidth=1;
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const y=H-pad-f*(H-pad*2);
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+  });
+  // axes labels
+  ctx.fillStyle='rgba(155,155,148,.5)'; ctx.font=`10px monospace`;
+  ctx.fillText('steps',2,pad); ctx.fillText(maxC,4,pad+12);
+  ctx.fillText('n→',W-pad+4,H-2);
+  ns.forEach((n,i)=>{
+    const x=pad+(n-minN)/(maxN-minN||1)*(W-pad*2);
+    ctx.fillText(n,x-4,H-2);
+  });
+  // data points
+  ctx.strokeStyle='var(--blue)'; ctx.lineWidth=2; ctx.beginPath();
+  ns.forEach((n,i)=>{
+    const x=pad+(n-minN)/(maxN-minN||1)*(W-pad*2);
+    const y=H-pad-((counts[i]-minC)/(maxC-minC||1))*(H-pad*2);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ns.forEach((n,i)=>{
+    const x=pad+(n-minN)/(maxN-minN||1)*(W-pad*2);
+    const y=H-pad-((counts[i]-minC)/(maxC-minC||1))*(H-pad*2);
+    ctx.fillStyle='var(--blue)'; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(155,155,148,.6)'; ctx.font='9px monospace'; ctx.fillText(counts[i],x+4,y-4);
+  });
+  // Fit Big-O
+  const bestFit = fitComplexity(ns, counts);
+  const cxLbl = document.getElementById('cx-lbl');
+  if (cxLbl) cxLbl.textContent = bestFit ? `Estimated complexity: ${bestFit.label} (fit: ${(bestFit.r2*100).toFixed(1)}%)` : '';
+
+  // Draw best-fit curve
+  if (bestFit) {
+    ctx.setLineDash([5, 5]); ctx.strokeStyle = 'rgba(255,165,0,0.5)'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    const steps_ref = 50;
+    for (let i=0; i<=steps_ref; i++) {
+      const n = minN + (maxN-minN)*(i/steps_ref);
+      const val = bestFit.basis(n) * bestFit.c;
+      const x = pad + (n-minN)/(maxN-minN||1)*(W-pad*2);
+      const ratio = (val-minC)/(maxC-minC||1);
+      const y = H-pad-ratio*(H-pad*2);
+      if (isNaN(y)) continue;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+// ─── BIG-O MATH ──────────────────────────────────────────────────────────────
+const BASIS_FUNCS = [
+  { label: 'O(1)', b: n => 1 },
+  { label: 'O(log n)', b: n => Math.log2(Math.max(n, 1.1)) },
+  { label: 'O(n)', b: n => n },
+  { label: 'O(n log n)', b: n => n * Math.log2(Math.max(n, 1.1)) },
+  { label: 'O(n²)', b: n => n * n },
+  { label: 'O(n³)', b: n => n * n * n },
+  { label: 'O(2ⁿ)', b: n => Math.pow(2, Math.min(n, 30)) }
+];
+
+function fitComplexity(ns, counts) {
+  if (ns.length < 3) return null;
+  let best = null;
+  let minError = Infinity;
+
+  BASIS_FUNCS.forEach(f => {
+    // c = sum(y * b(n)) / sum(b(n)^2)
+    let sumYB = 0, sumB2 = 0;
+    ns.forEach((n, i) => {
+      const bVal = f.b(n);
+      sumYB += counts[i] * bVal;
+      sumB2 += bVal * bVal;
+    });
+    const c = sumYB / (sumB2 || 1);
+    
+    // Calculate R2 or MSE
+    let ssRes = 0, ssTot = 0;
+    const meanY = counts.reduce((a,b)=>a+b,0)/counts.length;
+    ns.forEach((n, i) => {
+      const pred = c * f.b(n);
+      ssRes += Math.pow(counts[i] - pred, 2);
+      ssTot += Math.pow(counts[i] - meanY, 2);
+    });
+    const r2 = 1 - (ssRes / (ssTot || 1));
+    const error = ssRes / counts.length;
+
+    if (error < minError) {
+      minError = error;
+      best = { ...f, c, r2, basis: f.b };
+    }
+  });
+  return best;
+}
+
+// ─── EMBED MODE ──────────────────────────────────────────────────────────────
+function genEmbed() {
+  const embedCode = document.getElementById('embed-code');
+  if (!embedCode) return;
+  if (!steps.length) { embedCode.textContent='Run code first.'; return; }
+  const code = esc(editor.getValue());
+  const snippet = `<iframe src="https://pythontutor.com/iframe-embed.html" style="width:100%;height:500px;border:none"></iframe>\n\n<!-- Or open the downloaded python_visualizer_pro.html locally and share it. -->`;
+  embedCode.textContent = snippet;
+}
+function copyEmbed() {
+  const embedCode = document.getElementById('embed-code');
+  if (!embedCode) return;
+  navigator.clipboard.writeText(embedCode.textContent).catch(()=>{});
+}
+function openEmbed() { window.open('https://pythontutor.com/','_blank'); }
+
+// ─── EXPORT ──────────────────────────────────────────────────────────────────
+function exportPNG() {
+  const el = document.querySelector('#view-viz');
+  if (!el || typeof html2canvas==='undefined') {
+    alert('html2canvas not loaded — try refreshing with an internet connection.');
+    return;
+  }
+  html2canvas(el, {backgroundColor:'#0e0e0c',scale:1.5}).then(canvas=>{
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download=`python_viz_step_${idx+1}.png`;
+    a.click();
+  });
+}
+
+function exportJSON() {
+  const data = {code:editor.getValue(), steps, annotations:Object.fromEntries(annotations)};
+  const a=document.createElement('a');
+  a.href='data:application/json,'+encodeURIComponent(JSON.stringify(data,null,2));
+  a.download='python_trace.json';
+  a.click();
+}
+
+// ─── KEYBOARD ────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA') return;
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') { e.preventDefault(); go(1); }
+  if (e.key==='ArrowLeft'||e.key==='ArrowUp') { e.preventDefault(); go(-1); }
+  if (e.key===' ') { e.preventDefault(); togglePlay(); }
+  if (e.key==='r'||e.key==='R') { e.preventDefault(); runCode(); }
+  if (e.key==='e'||e.key==='E') { e.preventDefault(); toggleEditor(); }
+  if (e.key==='Escape') { closeModal(); document.getElementById('vt-modal').classList.remove('show'); stopTimer(); }
+});
+
+// close modals on backdrop click
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target===e.currentTarget)closeModal(); });
+document.getElementById('vt-modal').addEventListener('click', e=>{ if(e.target===e.currentTarget)document.getElementById('vt-modal').classList.remove('show'); });
+
+// redraw arrows on scroll
+document.getElementById('frames-scroll').addEventListener('scroll', drawArrows);
+document.getElementById('heap-scroll').addEventListener('scroll', drawArrows);
+window.addEventListener('resize', ()=>{ renderMemGraph(); renderFlamegraph(); drawArrows(); });
+</script>
+</body>
+</html>
