@@ -2850,6 +2850,7 @@ function pgRunJsTrace(code) {
     URL.revokeObjectURL(url);
     alert("Worker Error: " + e.message);
   };
+  worker.postMessage(code);
 }
 
 function pgOpenVizModal(title, sub) {
