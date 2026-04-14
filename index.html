@@ -2826,12 +2826,12 @@ function pgRunJsTrace(code) {
   worker.onmessage = e => {
     URL.revokeObjectURL(url);
     if (!e.data.ok) {
-       alert("Error during execution:\\n" + e.data.err);
+       alert("Error during execution:\n" + e.data.err);
        return;
     }
     steps = e.data.steps;
     idx = 0;
-    codeLines = code.split('\\n');
+    codeLines = code.split('\n');
     annotations.clear();
     buildHeatmap();
     maxDepth = Math.max(...steps.map(s => s.frames.length), 1);
