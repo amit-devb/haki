@@ -326,6 +326,51 @@ canvas.chart{display:block;border-radius:var(--radius)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 ::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+/* --- RESPONSIVE MOBILE FIXES --- */
+@media (max-width: 850px) {
+  /* Toolbar Wrap */
+  .toolbar { gap: 10px; justify-content: center; padding: 12px; }
+  .btn { padding: 8px 14px; font-size: 13px; }
+  .scrub-wrap { width: 100%; order: 10; margin: 6px 0; }
+  .speed-wrap, .step-ctr, #ev-badge { order: 11; }
+  
+  /* Mode Tabs Scrollable */
+  .mode-tabs { white-space: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+  
+  /* Main & Editor Setup */
+  .app { height: auto; min-height: 100vh; overflow-y: auto; }
+  .main-split-wrap { flex-direction: column !important; height: auto !important; overflow: visible !important; }
+  .viewport { height: auto !important; overflow: visible !important; }
+  .editor-section { height: 30vh !important; min-height: 200px; flex: none !important; }
+  
+  /* Container Overrides */
+  .view, #cmp-workspace { 
+    flex-direction: column !important; 
+    overflow-y: auto !important; 
+    height: auto !important;
+  }
+  
+  /* Visualize Mode Stack */
+  .col-code, .col-frames, .col-heap { 
+    width: 100% !important; 
+    height: 50vh !important; 
+    flex: none !important; 
+    border-bottom: 3px solid var(--border); 
+  }
+  
+  /* Compare Mode Stack */
+  .cmp-side { 
+    width: 100% !important; 
+    height: 50vh !important; 
+    flex: none !important; 
+    border-bottom: 3px solid var(--border); 
+  }
+  #cmp-bottom-bar { flex: none !important; height: auto !important; min-height: 400px; }
+  
+  /* Disable Desktop Extras */
+  .gutter { display: none !important; }
+  #arrows-svg { display: none !important; }
+}
 </style>
 </head>
 <body>
