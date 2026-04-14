@@ -31,14 +31,14 @@
 
 ### Hosted version
 The project is hosted on GitHub Pages. You can access it at:
-[https://username.github.io/haki/](https://username.github.io/haki/) (Replace `username` with your GitHub username)
+[https://amit-devb.github.io/haki/](https://amit-devb.github.io/haki/)
 
 ### Local Development
 Since Haki is a static web application, you can run it simply by opening `index.html` in any modern browser.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/haki.git
+   git clone git@github.com:amit-devb/haki.git
    cd haki
    ```
 2. Open `index.html` in your browser.
