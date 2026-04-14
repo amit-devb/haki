@@ -2595,7 +2595,7 @@ function pgUpdateHeader() {
   const vizBtn = document.getElementById('pg-btn-viz');
   vizBtn.style.display = '';
   const labels = {
-    python: '📊 Visualize', javascript: '🔍 Visualize (PT)',
+    python: '📊 Visualize', javascript: '🔍 Visualize',
     java: '🔍 Visualize (PT)', c: '🔍 Visualize (PT)', cpp: '🔍 Visualize (PT)',
     sql: '🔍 Visualize SQL', go: '↗ Go Playground', rust: '↗ Rust Playground',
     typescript: '↗ TS Playground'
@@ -3064,47 +3064,78 @@ function jsTracerWorkerWrapper() {
           enter: (node) => {
             const type = node.type;
             const bodyLoc = node.body ? node.body.loc : node.loc;
+            
+            // Block single-statement consequents
+            let needsBlock = false;
+            if (node.parent) {
+               const pt = node.parent.type;
+               if ((pt === 'IfStatement' || pt === 'ForStatement' || pt === 'WhileStatement' || pt === 'ForInStatement' || pt === 'ForOfStatement') && type !== 'BlockStatement') {
+                  if (node === node.parent.consequent || node === node.parent.alternate || node === node.parent.body) {
+                     needsBlock = true;
+                     insert(node.start, "{ ");
+                  }
+               }
+            }
 
             // Statements: Before they execute
             if (
               type.endsWith('Statement') || type === 'VariableDeclaration'
             ) {
-              if (type !== 'BlockStatement' && node.parent?.type !== 'ForStatement') {
+              if (type !== 'BlockStatement' && node.parent?.type !== 'ForStatement' && node.parent?.type !== 'ForInStatement' && node.parent?.type !== 'ForOfStatement') {
                 const line = node.loc.start.line;
-                insert(node.start, "__step__(" + line + ", 'line');\\n");
+                insert(node.start, "__step__(" + line + ", 'line');\n");
               }
             }
 
             // Track variables inside function parameters
             if (type === 'FunctionDeclaration' || type === 'FunctionExpression' || type === 'ArrowFunctionExpression') {
-              node.params.forEach(p => {
-                 if (p.type === 'Identifier') {
-                   // Inject inside body
-                   const bodyStart = node.body.type === 'BlockStatement' ? node.body.start + 1 : node.body.start;
-                   insert(bodyStart, "__var__('" + p.name + "', " + p.name + ");\\n");
-                 }
-              });
               const fnName = node.id ? node.id.name : '<anonymous>';
               const line = node.loc.start.line;
-              const blockStart = node.body.type === 'BlockStatement' ? node.body.start + 1 : node.body.start;
-              insert(blockStart, "__enter__(" + line + ", '" + fnName + "');\\n");
 
-              if (node.body.type === 'BlockStatement') {
-                 insert(node.body.end - 1, "\\n__exit__(" + node.loc.end.line + ");\\n");
+              if (node.body.type !== 'BlockStatement') {
+                 let pre = "{ __enter__(" + line + ", '" + fnName + "'); ";
+                 node.params.forEach(p => {
+                    if (p.type === 'Identifier') pre += "__var__('" + p.name + "', " + p.name + "); ";
+                 });
+                 pre += "let _ret = ";
+                 insert(node.body.start, pre);
+                 insert(node.body.end, "; __exit__(" + node.body.loc.end.line + "); return _ret; }");
+              } else {
+                 let pre = "__enter__(" + line + ", '" + fnName + "');\n";
+                 node.params.forEach(p => {
+                    if (p.type === 'Identifier') {
+                      pre += "__var__('" + p.name + "', " + p.name + ");\n";
+                    }
+                 });
+                 insert(node.body.start + 1, pre);
+                 insert(node.body.end - 1, "\n__exit__(" + node.loc.end.line + ");\n");
               }
             }
 
             // Return exits frame
             if (type === 'ReturnStatement') {
-               insert(node.start, "__exit__(" + node.loc.start.line + ");\\n");
+               insert(node.start, "__exit__(" + node.loc.start.line + ");\n");
             }
 
-            // Variable assignments and declarations
-            if (type === 'VariableDeclarator' && node.id.type === 'Identifier') {
-               insert(node.end, "; __var__('" + node.id.name + "', " + node.id.name + ");\\n");
+            // Variable Declarations
+            if (type === 'VariableDeclaration') {
+                if (node.parent && !node.parent.type.startsWith('For')) {
+                    let vars = "";
+                    node.declarations.forEach(d => {
+                        if (d.id.type === 'Identifier') vars += "__var__('" + d.id.name + "', " + d.id.name + "); ";
+                    });
+                    if (vars) insert(node.end, "; " + vars + "\n");
+                }
             }
+
+            // Assignments
             if (type === 'AssignmentExpression' && node.left.type === 'Identifier') {
-               insert(node.end, "; __var__('" + node.left.name + "', " + node.left.name + ");\\n");
+               insert(node.start, "(");
+               insert(node.end, ", __var__('" + node.left.name + "', " + node.left.name + "), " + node.left.name + ")");
+            }
+
+            if (needsBlock) {
+                 insert(node.end, " }");
             }
           }
         });
