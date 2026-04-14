@@ -64,6 +64,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .btn-green:hover:not(:disabled){background:var(--green);color:#fff;border-color:var(--green)}
 .btn-red{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
 .btn-red:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red)}
+.btn-purple{background:var(--purple-l);border-color:var(--purple-b);color:var(--purple)}
+.btn-purple:hover:not(:disabled){background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn-red:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red)}
 .badge{padding:2px 8px;border-radius:4px;font-size:9.5px;font-weight:600;letter-spacing:.02em;font-family:var(--mono);text-transform:uppercase}
 .badge-blue{background:var(--blue-l);color:var(--blue);border:1px solid var(--blue-b)}
 .badge-green{background:var(--green-l);color:var(--green);border:1px solid var(--green-b)}
@@ -326,6 +329,38 @@ canvas.chart{display:block;border-radius:var(--radius)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 ::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+.pg-viz-modal { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:500; display:none; flex-direction:column; }
+.pg-viz-modal.show { display:flex; }
+.pg-viz-hdr { display:flex; align-items:center; gap:10px; padding:10px 16px; background:var(--s1); border-bottom:1px solid var(--border); flex-shrink:0; }
+.pg-viz-body { flex:1; overflow:auto; display:flex; flex-direction:column; background:var(--bg); }
+.pg-sql-step-nav { display:flex; align-items:center; gap:10px; padding:10px 16px; background:var(--s1); border-bottom:1px solid var(--border); flex-shrink:0; }
+.pg-ext-card { padding:24px; max-width:520px; margin:32px auto; background:var(--s2); border-radius:10px; border:1px solid var(--border2); display:flex; flex-direction:column; gap:12px; }
+
+/* PLAYGROUND VIEW */
+#view-playground { flex-direction: column; padding: 0; }
+.pg-lang-bar { display: flex; gap: 6px; padding: 8px 12px; background: var(--s1); border-bottom: 1px solid var(--border); flex-wrap: wrap; flex-shrink: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pg-lang-btn { padding: 5px 11px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--s2); color: var(--t2); font-size: 11.5px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.pg-lang-btn:hover { background: var(--s3); color: var(--t1); border-color: var(--t4); }
+.pg-lang-btn.active { background: var(--blue-l); border-color: var(--blue-b); color: var(--blue); font-weight: 600; }
+.pg-main { flex: 1; display: flex; overflow: hidden; }
+.pg-editor-col { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); min-width: 0; overflow: hidden; }
+.pg-output-col { width: 42%; display: flex; flex-direction: column; overflow: hidden; min-width: 200px; }
+.pg-run-bar { padding: 7px 10px; background: var(--s1); border-top: 1px solid var(--border); display: flex; align-items: center; gap: 7px; flex-shrink: 0; flex-wrap: wrap; }
+.pg-output { flex: 1; padding: 10px 14px; font-family: var(--mono); font-size: 12px; color: var(--t2); overflow-y: auto; white-space: pre-wrap; line-height: 1.65; }
+.pg-output-hdr { padding: 7px 12px; background: var(--s1); border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pg-err { color: var(--red) !important; }
+.pg-ok { color: var(--green) !important; }
+.pg-sql-wrap { overflow: auto; padding: 8px; }
+.pg-sql-tbl { border-collapse: collapse; font-family: var(--mono); font-size: 11px; width: 100%; }
+.pg-sql-tbl th { background: var(--s3); color: var(--t2); padding: 4px 8px; border: 1px solid var(--border2); text-align: left; }
+.pg-sql-tbl td { padding: 3px 8px; border: 1px solid var(--border); color: var(--t1); }
+.pg-sql-tbl tr:nth-child(even) { background: var(--s1); }
+.pg-spin { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; margin-right: 4px; }
+@media (max-width: 850px) {
+  .pg-main { flex-direction: column !important; }
+  .pg-output-col { width: 100% !important; height: 40vh; }
+}
+
 /* --- RESPONSIVE MOBILE FIXES --- */
 @media (max-width: 850px) {
   /* Toolbar Wrap */
@@ -377,9 +412,11 @@ canvas.chart{display:block;border-radius:var(--radius)}
 
 <div id="loading">
   <div class="spin"></div>
+
   <p id="load-msg">Loading Python runtime…</p>
   <small id="load-sub">Pyodide ~8 MB · cached after first load · needs internet once</small>
 </div>
+
 
 <svg id="arrows-svg" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -390,15 +427,36 @@ canvas.chart{display:block;border-radius:var(--radius)}
 </svg>
 
 <div id="tooltip"></div>
-<div id="modal"><div class="modal-box"><div class="modal-hdr"><span id="modal-title">Object history</span><span class="modal-close" onclick="closeModal()">✕</span></div><div class="modal-body" id="modal-body"></div></div></div>
-<div id="vt-modal"><div class="vt-box"><div class="vt-hdr"><span id="vt-title">Variable timeline</span><span class="modal-close" onclick="document.getElementById('vt-modal').classList.remove('show')">✕</span></div><div class="vt-body" id="vt-body"></div></div></div>
 
+<div id="modal"><div class="modal-box"><div class="modal-hdr"><span id="modal-title">Object history</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+<div class="modal-body" id="modal-body"></div>
+</div>
+</div>
+
+<div id="vt-modal"><div class="vt-box"><div class="vt-hdr"><span id="vt-title">Variable timeline</span><span class="modal-close" onclick="document.getElementById('vt-modal').classList.remove('show')">✕</span></div>
+<div class="vt-body" id="vt-body"></div>
+</div>
+</div>
+
+
+<!-- PLAYGROUND VISUALIZATION MODAL -->
+<div id="pg-viz-modal" class="pg-viz-modal">
+  <div class="pg-viz-hdr">
+    <span id="pg-viz-title" style="font-size:13px;font-weight:600;color:var(--t1)">Visualization</span>
+    <span id="pg-viz-sub" style="font-size:11px;color:var(--t3)"></span>
+    <button class="btn" style="margin-left:auto" onclick="pgCloseViz()">✕ Close</button>
+  </div>
+  <div class="pg-viz-body" id="pg-viz-body"></div>
+</div>
 <div class="app">
   <div class="toolbar">
     <div class="logo">🥷 <em>Haki</em> Visualizer</div>
+
     <div class="sep"></div>
+
     <button class="btn" id="theme-toggle" title="Toggle Dark/Light Mode" style="padding: 4px 8px">🌓</button>
     <div class="sep"></div>
+
     <select id="examples" onchange="loadExample()" style="background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t2);padding:4px 7px;font-size:12px;cursor:pointer">
       <option value="">examples…</option>
       <option value="sort">recursive sort</option>
@@ -412,6 +470,7 @@ canvas.chart{display:block;border-radius:var(--radius)}
     <button class="btn" onclick="toggleEditor()" title="E">✎ edit</button>
     <button class="btn btn-blue" id="btn-run" disabled onclick="runCode()" title="R">▶ run</button>
     <div class="sep"></div>
+
     <button class="btn" id="btn-prev" disabled onclick="go(-1)" title="←">←</button>
     <button class="btn" id="btn-sover" disabled onclick="stepOver()" title="Step Over">⤵ over</button>
     <button class="btn" id="btn-sout" disabled onclick="stepOut()" title="Step Out">⤴ out</button>
@@ -420,38 +479,56 @@ canvas.chart{display:block;border-radius:var(--radius)}
     <button class="btn" id="btn-next" disabled onclick="go(1)" title="→">→</button>
     <button class="btn btn-green" id="btn-play" disabled onclick="togglePlay()" title="Space">▶</button>
     <div class="sep"></div>
+
     <div class="scrub-wrap">
       <span style="font-size:10px;color:var(--t4)">0</span>
       <div class="scrub-track-wrap">
         <input type="range" id="scrub" min="0" max="0" value="0" oninput="scrubTo(+this.value)">
         <div class="scrub-markers" id="scrub-markers"></div>
+
       </div>
+
       <span style="font-size:10px;color:var(--t4)" id="scrub-max">0</span>
     </div>
+
     <div class="speed-wrap">
       <span style="font-size:10px;color:var(--t3)">spd</span>
       <input type="range" id="speed" min="1" max="12" value="5">
     </div>
+
     <span class="step-ctr" id="step-ctr">—</span>
     <span class="badge" id="ev-badge" style="display:none"></span>
     <div class="sep"></div>
+
     <button class="btn" onclick="exportPNG()" title="Save screenshot">⬇ PNG</button>
     <button class="btn" onclick="exportJSON()" title="Export trace">⬇ JSON</button>
     <button class="btn" onclick="shareTrace()" title="Share link">🔗 share</button>
   </div>
 
+
   <div class="mode-tabs">
     <div class="mtab on" onclick="switchMode('viz')" data-mode="viz">Visualize</div>
+
     <div class="mtab" onclick="switchMode('compare')" data-mode="compare">Compare</div>
+
     <div class="mtab" onclick="switchMode('complexity')" data-mode="complexity">Complexity</div>
+
     <div class="mtab" onclick="switchMode('slides')" data-mode="slides">Slides</div>
+
     <div class="mtab" onclick="switchMode('quiz')" data-mode="quiz">Quiz</div>
+
     <div class="mtab" onclick="switchMode('embed')" data-mode="embed">Embed</div>
+
+    <div class="mtab" onclick="switchMode('playground')" data-mode="playground">🌐 Playground</div>
+
   </div>
+
 
   <div class="main-split-wrap">
   <div class="editor-section" id="editor-section">
-    <div class="ph" style="border-top:none"><div class="phd" style="background:var(--t3)"></div>editor <button class="btn btn-s" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleEditor()">hide</button></div>
+    <div class="ph" style="border-top:none"><div class="phd" style="background:var(--t3)"></div>
+editor <button class="btn btn-s" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleEditor()">hide</button></div>
+
     <textarea id="cm-textarea"># Haki Visualization Example
 def factorial(n):
     if n == 0: return 1
@@ -460,31 +537,55 @@ def factorial(n):
 print(factorial(5))</textarea>
   </div>
 
+
   <div class="viewport" id="viewport">
 
   <!-- VISUALIZE VIEW -->
   <div class="view" id="view-viz">
     <div class="col-code">
-      <div class="ph"><div class="phd" style="background:var(--blue)"></div>code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click line # to set breakpoint</span></div>
+      <div class="ph"><div class="phd" style="background:var(--blue)"></div>
+code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click line # to set breakpoint</span></div>
+
       <div class="code-view" id="code-view" onmousemove="handleCodeHover(event)" onmouseleave="hideTooltip()"></div>
-      <div class="hm-legend" id="hm-legend" style="display:none"><div class="hm-grad"></div><span>execution frequency</span></div>
+
+      <div class="hm-legend" id="hm-legend" style="display:none"><div class="hm-grad"></div>
+<span>execution frequency</span></div>
+
       <div id="step-info-box" style="display:none;white-space:pre;font-family:var(--mono);font-size:10px;padding:8px;background:var(--s1);border-top:1px solid var(--border);color:var(--t3)"></div>
+
       <div id="narrative-wrap" style="padding:10px;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0;display:none">
         <div style="font-size:9.5px;text-transform:uppercase;color:var(--blue);margin-bottom:4px;font-weight:600;letter-spacing:.05em">Narrative</div>
+
         <div id="narrative-text" style="font-size:12px;color:var(--t2);line-height:1.5"></div>
+
       </div>
+
       <div class="annot-wrap"><span class="annot-lbl">📎 note:</span><input class="annot-input" id="annot-input" placeholder="annotate this step…" oninput="saveAnnotation()"></div>
+
     </div>
+
     <div class="col-frames">
-      <div class="ph"><div class="phd" style="background:var(--purple)"></div>frames · call stack</div>
-      <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div></div></div>
+      <div class="ph"><div class="phd" style="background:var(--purple)"></div>
+frames · call stack</div>
+
+      <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div>
+</div>
+</div>
+
       <div class="frames-scroll" id="frames-scroll"></div>
+
     </div>
+
     <div class="col-heap">
-      <div class="ph"><div class="phd" style="background:var(--amber)"></div>heap objects <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click card for history · hover ref for arrow</span></div>
+      <div class="ph"><div class="phd" style="background:var(--amber)"></div>
+heap objects <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click card for history · hover ref for arrow</span></div>
+
       <div class="heap-scroll" id="heap-scroll"></div>
+
     </div>
+
   </div>
+
 
   <div class="view hidden" id="view-compare" style="flex-direction:column">
     <div id="cmp-workspace" style="display:flex; flex:1; overflow:hidden">
@@ -497,11 +598,16 @@ print(factorial(5))</textarea>
             <span id="cmp-mem-val-a">—</span> |
             <span id="cmp-depth-a">—</span>
           </div>
+
           <button class="btn btn-blue" onclick="runCompare('a')">▶ run A</button>
         </div>
+
         <div class="cmp-editor-wrap"><textarea id="cmp-textarea-a" style="display:none"></textarea></div>
+
         <div class="cmp-code" id="cmp-view-a" style="padding:10px;color:var(--t4);font-style:italic">run to see trace</div>
+
       </div>
+
       <div class="cmp-side" id="cmp-side-b">
         <div class="cmp-toolbar">
           <strong style="color:var(--green)">B</strong>
@@ -511,96 +617,178 @@ print(factorial(5))</textarea>
             <span id="cmp-mem-val-b">—</span> |
             <span id="cmp-depth-b">—</span>
           </div>
+
           <button class="btn btn-green" onclick="runCompare('b')">▶ run B</button>
         </div>
+
         <div class="cmp-editor-wrap"><textarea id="cmp-textarea-b" style="display:none"></textarea></div>
+
         <div class="cmp-code" id="cmp-view-b" style="padding:10px;color:var(--t4);font-style:italic">run to see trace</div>
+
       </div>
+
     </div>
+
 
     <div class="bottom-bar" id="cmp-bottom-bar">
       <div class="btabs">
         <div class="btab on" onclick="switchBTab('console')">console</div>
+
         <div class="btab" onclick="switchBTab('memory')">memory</div>
+
         <div class="btab" onclick="switchBTab('profiling')">profiling</div>
+
         <div class="btab" onclick="switchBTab('compare-score')">comparison scorecard</div>
+
         <button class="phb" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleDrawer()" id="drawer-toggle">hide</button>
       </div>
+
       <div class="bc on" id="bc-console" style="display:flex;flex-direction:column">
         <div id="console-logs" style="flex:1;padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--t2);overflow-y:auto;white-space:pre-wrap"></div>
+
         <div class="console-input-wrap" style="padding:6px 12px;border-top:1px solid var(--border);background:var(--s2);display:flex;align-items:center;gap:8px">
           <span style="color:var(--blue);font-family:var(--mono);font-size:12px;font-weight:600">>>></span>
           <input id="console-input" style="flex:1;background:transparent;border:none;color:var(--t1);font-family:var(--mono);font-size:12px;outline:none" placeholder="inspect variables (e.g. arr[i])" onkeydown="handleConsoleKey(event)">
         </div>
+
       </div>
+
       <div class="bc" id="bc-memory"><canvas class="chart" id="mem-canvas" width="600" height="90"></canvas></div>
+
       <div class="bc" id="bc-profiling">
         <div style="padding:12px;height:100%;display:flex;flex-direction:column">
           <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Function Call Flamegraph (time per call)</div>
+
           <canvas id="flame-canvas" style="flex:1;width:100%"></canvas>
         </div>
+
       </div>
+
       <div class="bc" id="bc-compare-score">
         <div style="display:flex;gap:20px;padding:12px">
           <div id="cmp-score-a" style="flex:1"></div>
+
           <div id="cmp-score-b" style="flex:1"></div>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 
   <!-- COMPLEXITY VIEW -->
   <div class="view hidden" id="view-complexity">
     <div class="cx-setup">
       <div style="font-size:13px;font-weight:500;margin-bottom:4px">Big-O Analysis</div>
+
       <div style="font-size:12px;color:var(--t3);margin-bottom:8px">Runs your code with different input sizes and plots step count vs n.</div>
+
       <div class="cx-row"><label>Input variable</label><input id="cx-var" value="n" style="width:80px"><span style="font-size:11px;color:var(--t3)">prepended as <code style="font-family:var(--mono)">n = ‹value›</code></span></div>
+
       <div class="cx-row"><label>From</label><input id="cx-from" type="number" value="1" style="width:70px"><label>To</label><input id="cx-to" type="number" value="12" style="width:70px"><label>Step</label><input id="cx-step" type="number" value="1" style="width:70px"></div>
+
       <div class="cx-row"><button class="btn btn-blue" onclick="runComplexity()">▶ analyse</button><span id="cx-status" style="font-size:11px;color:var(--t3)"></span></div>
+
     </div>
+
     <div id="cx-canvas-wrap">
       <div class="slide-lbl">Step count vs input size n</div>
+
       <canvas id="cx-canvas" style="flex:1;width:100%"></canvas>
       <div id="cx-lbl" style="font-size:11px;color:var(--t3)">run analysis to see chart</div>
+
     </div>
+
   </div>
+
 
   <!-- SLIDES VIEW -->
   <div class="view hidden" id="view-slides">
     <div class="slide" id="slide-card">
       <div style="font-size:13px;color:var(--t3)">Run code first, then switch to Slides mode.</div>
+
     </div>
+
     <div class="slide-nav">
       <button class="btn" id="sl-prev" onclick="slideGo(-1)" disabled>← prev</button>
       <span class="slide-ctr" id="sl-ctr">—</span>
       <button class="btn" id="sl-next" onclick="slideGo(1)" disabled>next →</button>
     </div>
+
   </div>
+
 
   <!-- QUIZ VIEW -->
   <div class="view hidden" id="view-quiz">
     <div id="quiz-inner">
       <div style="color:var(--t3);font-size:13px">Run code first, then switch to Quiz mode.</div>
+
     </div>
+
   </div>
+
 
   <!-- EMBED VIEW -->
   <div class="view hidden" id="view-embed">
     <div class="embed-card">
       <div style="font-size:13px;font-weight:500">Embed this visualizer</div>
+
       <div class="embed-info">Run your code first. This generates a self-contained iframe snippet embedding the current code and trace.</div>
+
       <div class="embed-code" id="embed-code">—</div>
+
       <div style="display:flex;gap:8px">
         <button class="btn btn-blue" onclick="genEmbed()">⟳ generate</button>
         <button class="btn" onclick="copyEmbed()">⎘ copy iframe</button>
         <button class="btn" onclick="openEmbed()">↗ open standalone</button>
       </div>
+
     </div>
+
   </div>
 
-  </div> <!-- end viewport -->
-  </div> <!-- end main-split-wrap -->
-</div> <!-- end app -->
+
+  <!-- PLAYGROUND VIEW -->
+  <div class="view hidden" id="view-playground">
+    <div class="pg-lang-bar" id="pg-lang-bar"></div>
+
+    <div class="pg-main">
+      <div class="pg-editor-col">
+        <div class="ph"><div class="phd" id="pg-phd" style="background:var(--blue)"></div>
+<span id="pg-lang-lbl">Editor</span><span style="margin-left:auto;font-size:10px;color:var(--t4)" id="pg-engine-lbl"></span></div>
+
+        <textarea id="pg-textarea" style="display:none"></textarea>
+        <div class="pg-run-bar">
+          <button class="btn btn-blue" id="pg-btn-run" onclick="pgRun()">▶ Run</button>
+          <button class="btn" onclick="pgClear()">🗑 Clear</button>
+          <button class="btn" onclick="pgReset()">↺ Reset</button>
+          <button class="btn btn-purple" id="pg-btn-viz" onclick="pgVisualizeLang()">🔍 Visualize</button>
+          <span id="pg-run-msg" style="font-size:11px;color:var(--t3)"></span>
+        </div>
+
+      </div>
+
+      <div class="pg-output-col">
+        <div class="pg-output-hdr"><span>Output</span><span id="pg-status-dot" style="margin-left:auto"></span></div>
+
+        <div class="pg-output" id="pg-output"><span style="color:var(--t4)">Run your code to see output…</span></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  </div>
+ <!-- end viewport -->
+  </div>
+ <!-- end main-split-wrap -->
+</div>
+ <!-- end app -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
@@ -611,14 +799,27 @@ print(factorial(5))</textarea>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.0/full/pyodide.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+<!-- Playground: extra CodeMirror language modes -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/mode/simple.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<!-- sql.js (SQLite in WebAssembly) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 
 <div id="stdout-overlay" class="stdout-overlay">
   <div class="so-header">
     <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em" id="so-title">Console Output</div>
+
     <button class="phb" onclick="document.getElementById('stdout-overlay').style.display='none'">✕</button>
   </div>
+
   <div class="so-body" id="so-body"></div>
+
 </div>
+
 
 <script>
 // ─── PYTHON TRACER ───────────────────────────────────────────────────────────
@@ -1213,7 +1414,8 @@ function renderFrames(s, prevS) {
     if (f.is_gen) badges.push('<span class="badge badge-green" style="font-size:8.5px">gen</span>');
     if (f.is_coro) badges.push('<span class="badge badge-purple" style="font-size:8.5px">async</span>');
     if (f.freevars&&f.freevars.length) badges.push('<span class="badge badge-amber" style="font-size:8.5px">closure</span>');
-    fh.innerHTML = `<span class="fh-name${mod?' mod-fn':''}">${esc(mod?'global scope':f.fn)}</span><div class="fh-badges">${badges.join('')}</div><span class="fh-line">line ${f.line}</span>`;
+    fh.innerHTML = `<span class="fh-name${mod?' mod-fn':''}">${esc(mod?'global scope':f.fn)}</span><div class="fh-badges">${badges.join('')}</div>
+<span class="fh-line">line ${f.line}</span>`;
     block.appendChild(fh);
 
     const keys = Object.keys(f.locals);
@@ -1264,21 +1466,28 @@ function renderHeap(s, prevS) {
     let body = '';
     if (t==='list'||t==='tuple') {
       const items = val.items||[];
-      body = items.length ? items.map((x,i)=>`<div class="hr"><span class="hi">${i}</span><span class="hv">${rv(x)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+      body = items.length ? items.map((x,i)=>`<div class="hr"><span class="hi">${i}</span><span class="hv">${rv(x)}</span></div>
+`).join('') : '<div class="ho-empty">empty</div>';
     } else if (t==='dict') {
       const items = val.items||[];
-      body = items.length ? items.map(([k,v])=>`<div class="hr"><span class="hk">${rv(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+      body = items.length ? items.map(([k,v])=>`<div class="hr"><span class="hk">${rv(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>
+`).join('') : '<div class="ho-empty">empty</div>';
     } else if (t==='set'||t==='frozenset') {
       const items = val.items||[];
-      body = items.length ? items.map(x=>`<div class="hr"><span class="hv">${rv(x)}</span></div>`).join('') : '<div class="ho-empty">empty</div>';
+      body = items.length ? items.map(x=>`<div class="hr"><span class="hv">${rv(x)}</span></div>
+`).join('') : '<div class="ho-empty">empty</div>';
     } else {
       const attrs = val.attrs||{};
-      const repr = val.r ? `<div class="hr" style="color:var(--t3);font-size:10.5px;word-break:break-all">${esc(val.r)}</div>` : '';
-      body = repr + Object.entries(attrs).map(([k,v])=>`<div class="hr"><span class="hk">${esc(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>`).join('') || '<div class="ho-empty">—</div>';
+      const repr = val.r ? `<div class="hr" style="color:var(--t3);font-size:10.5px;word-break:break-all">${esc(val.r)}</div>
+` : '';
+      body = repr + Object.entries(attrs).map(([k,v])=>`<div class="hr"><span class="hk">${esc(k)}</span><span style="color:var(--t4);padding:0 2px">:</span><span class="hv">${rv(v)}</span></div>
+`).join('') || '<div class="ho-empty">—</div>';
     }
 
     const newBadge = isNew ? '<span class="badge badge-green" style="font-size:8px;margin-left:4px">new</span>' : '';
-    el.innerHTML = `<div class="ho-hdr">${t.toUpperCase()}${newBadge}<span class="ho-id">id:${val.id}</span></div><div class="ho-body">${body}</div>`;
+    el.innerHTML = `<div class="ho-hdr">${t.toUpperCase()}${newBadge}<span class="ho-id">id:${val.id}</span></div>
+<div class="ho-body">${body}</div>
+`;
     hs.appendChild(el);
   });
 }
@@ -1574,7 +1783,8 @@ function showObjHistory(id) {
     body.innerHTML = history.map(h=>{
       const v=h.val;
       const summary = v.items ? `[${v.items.map(x=>Array.isArray(x)?`${renderVal(x[0])}:${renderVal(x[1])}`:renderVal(x)).join(', ')}]` : (v.attrs?JSON.stringify(Object.fromEntries(Object.entries(v.attrs).map(([k,vv])=>[k,renderVal(vv)]))):v.r||v.t);
-      return `<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(summary)}</span></div>`;
+      return `<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(summary)}</span></div>
+`;
     }).join('') || '<div style="padding:10px;color:var(--t3)">Not found in any step</div>';
   }
   const modal = document.getElementById('modal');
@@ -1607,7 +1817,8 @@ function showVarTimeline(varName, frameIdx) {
   if (hasNums) {
     html += `<canvas id="vt-canvas" width="520" height="80" style="width:100%;border-radius:4px;margin-bottom:10px"></canvas>`;
   }
-  html += history.slice(-30).map(h=>`<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(renderVal(h.val))}</span></div>`).join('');
+  html += history.slice(-30).map(h=>`<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(renderVal(h.val))}</span></div>
+`).join('');
   body.innerHTML = html;
 
   if (hasNums) {
@@ -1766,7 +1977,7 @@ function initCompare() {
 function switchMode(mode) {
   curMode = mode;
   document.querySelectorAll('.mtab').forEach(t=>t.classList.toggle('on',t.dataset.mode===mode));
-  ['viz','compare','complexity','slides','quiz','embed'].forEach(m=>{
+  ['viz','compare','complexity','slides','quiz','embed','playground'].forEach(m=>{
     const el = document.getElementById('view-'+m);
     if (el) el.classList.toggle('hidden', m!==mode);
   });
@@ -1780,6 +1991,10 @@ function switchMode(mode) {
   if (mode==='slides') renderSlideMode();
   if (mode==='quiz') initQuiz();
   if (mode==='embed') genEmbed();
+  if (mode==='playground') {
+    if (!pgEditor) pgInit();
+    else { setTimeout(() => pgEditor.refresh(), 50); }
+  }
 }
 
 // ─── SLIDES MODE ─────────────────────────────────────────────────────────────
@@ -1798,23 +2013,36 @@ function renderSlide() {
     const ln=i+1;
     let cls='';
     if(ln===s.line) cls=s.ev==='return'?'style="color:var(--green)"':s.ev==='call'?'style="color:var(--purple)"':s.ev==='error'?'style="color:var(--red)"':'style="color:var(--blue)"';
-    return `<div ${cls}>${String(ln).padStart(3)} | ${esc(line)}</div>`;
+    return `<div ${cls}>${String(ln).padStart(3)} | ${esc(line)}</div>
+`;
   }).join('');
-  const locals = s.frames.length ? Object.entries(s.frames[s.frames.length-1].locals).slice(0,8).map(([k,v])=>`<div><span style="color:var(--t3)">${esc(k)}</span> = ${rv(v)}</div>`).join('') : '—';
+  const locals = s.frames.length ? Object.entries(s.frames[s.frames.length-1].locals).slice(0,8).map(([k,v])=>`<div><span style="color:var(--t3)">${esc(k)}</span> = ${rv(v)}</div>
+`).join('') : '—';
   const heap = collectHeap(s.frames);
-  const heapSum = heap.size ? [...heap.values()].slice(0,4).map(v=>`<div><span style="color:var(--amber)">${v.t}</span> id:${v.id}</div>`).join('') : '—';
-  const ann = annotations.get(slideIdx) ? `<div style="margin-top:8px;padding:8px;background:var(--amber-l);border-radius:4px;font-size:12px;color:var(--amber)">📎 ${esc(annotations.get(slideIdx))}</div>` : '';
+  const heapSum = heap.size ? [...heap.values()].slice(0,4).map(v=>`<div><span style="color:var(--amber)">${v.t}</span> id:${v.id}</div>
+`).join('') : '—';
+  const ann = annotations.get(slideIdx) ? `<div style="margin-top:8px;padding:8px;background:var(--amber-l);border-radius:4px;font-size:12px;color:var(--amber)">📎 ${esc(annotations.get(slideIdx))}</div>
+` : '';
   card.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px">
       <span class="slide-num">Step ${slideIdx+1} / ${steps.length}</span>
       <span class="badge badge-${s.ev==='return'?'green':s.ev==='call'?'purple':s.ev==='error'?'red':'blue'}">${s.ev.toUpperCase()}</span>
       <span style="font-size:12px;color:var(--t2)">${esc(fn)} · line ${s.line}</span>
     </div>
+
     <div class="slide-code">${highlights}</div>
+
     <div class="slide-info">
-      <div class="slide-panel"><div class="slide-lbl">locals</div><div style="font-family:var(--mono);font-size:11.5px">${locals}</div></div>
-      <div class="slide-panel"><div class="slide-heap">heap</div><div style="font-family:var(--mono);font-size:11.5px">${heapSum}</div></div>
+      <div class="slide-panel"><div class="slide-lbl">locals</div>
+<div style="font-family:var(--mono);font-size:11.5px">${locals}</div>
+</div>
+
+      <div class="slide-panel"><div class="slide-heap">heap</div>
+<div style="font-family:var(--mono);font-size:11.5px">${heapSum}</div>
+</div>
+
     </div>
+
     ${ann}
   `;
   const slCtr = document.getElementById('sl-ctr');
@@ -1837,7 +2065,10 @@ function initQuiz() {
 function renderQuiz() {
   const container = document.getElementById('quiz-inner');
   if (quizState.qi >= steps.length-1) {
-    container.innerHTML=`<div class="quiz-card"><div class="quiz-q" style="font-size:16px">🎉 Quiz complete!</div><div class="quiz-score">Score: ${quizState.score} / ${quizState.total}</div><button class="btn btn-blue" style="margin-top:12px" onclick="initQuiz()">restart</button></div>`;
+    container.innerHTML=`<div class="quiz-card"><div class="quiz-q" style="font-size:16px">🎉 Quiz complete!</div>
+<div class="quiz-score">Score: ${quizState.score} / ${quizState.total}</div>
+<button class="btn btn-blue" style="margin-top:12px" onclick="initQuiz()">restart</button></div>
+`;
     return;
   }
   const s = steps[quizState.qi];
@@ -1852,16 +2083,23 @@ function renderQuiz() {
   container.innerHTML=`
     <div class="quiz-card" style="max-width:560px;width:100%">
       <div style="font-size:11px;color:var(--t3);margin-bottom:8px">Question ${quizState.qi+1} · Score ${quizState.score}/${quizState.total}</div>
+
       <div class="quiz-code">${codeSnip}</div>
+
       <div class="quiz-q">Currently at: <strong style="color:var(--blue)">${s.ev}</strong> event in <strong>${esc(s.fn==='<module>'?'global':s.fn)}</strong> (line ${s.line})<br>What is the <em>next</em> event?</div>
+
       <div class="quiz-opts" id="quiz-opts">
         ${opts.map(o=>`<button class="quiz-opt" onclick="answerQuiz('${o}','${correct}')">${o}</button>`).join('')}
       </div>
+
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
         <div class="quiz-info" id="quiz-fb"></div>
+
         <button class="btn" id="quiz-next-btn" style="display:none;margin-left:auto" onclick="nextQuiz()">next →</button>
       </div>
+
     </div>
+
   `;
 }
 
@@ -2028,7 +2266,8 @@ function updateCompareScorecard() {
     const other = cmpSteps[side==='a'?'b':'a']._summary;
     const box = document.getElementById(`cmp-score-${side}`);
     if (!box) return;
-    if (!s) { box.innerHTML = `<div style="color:var(--t4);font-size:11px;font-style:italic;padding:12px">Run side ${side.toUpperCase()} to see scorecard</div>`; return; }
+    if (!s) { box.innerHTML = `<div style="color:var(--t4);font-size:11px;font-style:italic;padding:12px">Run side ${side.toUpperCase()} to see scorecard</div>
+`; return; }
 
     // Calculate winner badges
     let badge = '';
@@ -2054,17 +2293,27 @@ function updateCompareScorecard() {
       <div style="font-size:12px; font-weight:600; color:var(--t1); margin-bottom:8px; display:flex; align-items:center; gap:8px">
         ${sideLabel} ${badge}
       </div>
+
       <div class="cmp-bar-row">
         <div class="cmp-bar-lbl">STEPS</div>
-        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--blue); width: ${ (s.steps / Math.max(sa_steps, sb_steps, 1) * 100) }%"></div></div>
+
+        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--blue); width: ${ (s.steps / Math.max(sa_steps, sb_steps, 1) * 100) }%"></div>
+</div>
+
         <span style="font-family:var(--mono)">${s.steps}</span>
       </div>
+
       <div class="cmp-bar-row" style="margin-top:4px">
         <div class="cmp-bar-lbl">MEMORY</div>
-        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--green); width: ${ (s.mem / Math.max(sa_mem, sb_mem, 1) * 100) }%"></div></div>
+
+        <div class="cmp-bar-bg"><div class="cmp-bar-fill" style="background:var(--green); width: ${ (s.mem / Math.max(sa_mem, sb_mem, 1) * 100) }%"></div>
+</div>
+
         <span style="font-family:var(--mono)">${(s.mem / 1024).toFixed(1)}KB</span>
       </div>
+
       <div style="font-size:10px; color:var(--t3); margin-top:8px">max recursion depth: ${s.maxDepth}</div>
+
     `;
   });
 }
@@ -2262,6 +2511,513 @@ document.getElementById('vt-modal').addEventListener('click', e=>{ if(e.target==
 document.getElementById('frames-scroll').addEventListener('scroll', drawArrows);
 document.getElementById('heap-scroll').addEventListener('scroll', drawArrows);
 window.addEventListener('resize', ()=>{ renderMemGraph(); renderFlamegraph(); drawArrows(); });
+
+// ─── PLAYGROUND (MULTI-LANGUAGE) ─────────────────────────────────────────────
+const PG_LANGS = [
+  { id:'python',     label:'🐍 Python',     cm:'python',     engine:'pyodide',  color:'#3b82f6',
+    starter:`# Python — runs via Pyodide in the browser\nname = "World"\nprint(f"Hello, {name}!")\n\n# Click '📊 Visualize' to step through execution` },
+  { id:'javascript', label:'🟨 JavaScript', cm:'javascript',  engine:'worker',   color:'#f59e0b',
+    starter:`// JavaScript — runs in a sandboxed Web Worker\nfunction greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nconsole.log(greet("World"));\n\nconst nums = [3,1,4,1,5,9,2,6];\nnums.sort((a,b) => a-b);\nconsole.log("Sorted:", nums.join(", "));` },
+  { id:'typescript', label:'🔷 TypeScript', cm:'javascript',  engine:'judge0',   color:'#3b82f6', j0id:74,
+    starter:`// TypeScript — compiled & run via Judge0\nfunction greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n\nconsole.log(greet("World"));\n\nconst nums: number[] = [3,1,4,1,5,9,2,6];\nnums.sort((a,b) => a-b);\nconsole.log("Sorted:", nums.join(", "));` },
+  { id:'go',         label:'🔵 Go',         cm:'go',          engine:'judge0',   color:'#14b8a6', j0id:60,
+    starter:`// Go — compiled & run via Judge0\npackage main\n\nimport "fmt"\n\nfunc factorial(n int) int {\n\tif n == 0 { return 1 }\n\treturn n * factorial(n-1)\n}\n\nfunc main() {\n\tfmt.Println("Hello, World!")\n\tfor i := 0; i <= 7; i++ {\n\t\tfmt.Printf("factorial(%d) = %d\\n", i, factorial(i))\n\t}\n}` },
+  { id:'rust',       label:'⚙️ Rust',       cm:'rust',        engine:'judge0',   color:'#ef4444', j0id:73,
+    starter:`// Rust — compiled & run via Judge0\nfn factorial(n: u64) -> u64 {\n    if n == 0 { 1 } else { n * factorial(n - 1) }\n}\n\nfn main() {\n    println!("Hello, World!");\n    for i in 0..=7 {\n        println!("factorial({}) = {}", i, factorial(i));\n    }\n}` },
+  { id:'java',       label:'☕ Java',       cm:'text/x-java', engine:'judge0',   color:'#f59e0b', j0id:62,
+    starter:`// Java — compiled & run via Judge0\npublic class Main {\n    static int factorial(int n) {\n        return n == 0 ? 1 : n * factorial(n - 1);\n    }\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n        for (int i = 0; i <= 7; i++) {\n            System.out.printf("factorial(%d) = %d%n", i, factorial(i));\n        }\n    }\n}` },
+  { id:'cpp',        label:'🔵 C++',        cm:'text/x-c++src',engine:'judge0',  color:'#8b5cf6', j0id:54,
+    starter:`// C++ — compiled & run via Judge0\n#include <iostream>\nusing namespace std;\n\nlong long factorial(int n) {\n    return n == 0 ? 1 : n * factorial(n-1);\n}\n\nint main() {\n    cout << "Hello, World!" << endl;\n    for (int i = 0; i <= 7; i++) {\n        cout << "factorial(" << i << ") = " << factorial(i) << endl;\n    }\n    return 0;\n}` },
+  { id:'c',          label:'🔧 C',          cm:'text/x-csrc', engine:'judge0',   color:'#a1a1aa', j0id:50,
+    starter:`// C — compiled & run via Judge0\n#include <stdio.h>\n\nlong long factorial(int n) {\n    return n == 0 ? 1 : n * factorial(n-1);\n}\n\nint main() {\n    printf("Hello, World!\\n");\n    for (int i = 0; i <= 7; i++) {\n        printf("factorial(%d) = %lld\\n", i, factorial(i));\n    }\n    return 0;\n}` },
+  { id:'sql',        label:'🗄️ SQL',       cm:'sql',         engine:'sqljs',    color:'#10b981',
+    starter:`-- SQL — runs via SQLite (sql.js) in the browser\nCREATE TABLE employees (\n  id INTEGER PRIMARY KEY,\n  name TEXT,\n  dept TEXT,\n  salary INTEGER\n);\n\nINSERT INTO employees VALUES\n  (1,'Alice','Engineering',95000),\n  (2,'Bob','Marketing',72000),\n  (3,'Carol','Engineering',105000),\n  (4,'Dave','HR',65000),\n  (5,'Eve','Engineering',88000);\n\n-- Average salary by department\nSELECT dept, AVG(salary) AS avg_salary, COUNT(*) AS headcount\nFROM employees\nGROUP BY dept\nORDER BY avg_salary DESC;` },
+];
+
+let pgCurrentLang = PG_LANGS[0];
+let pgEditor = null;
+let pgSqlDb = null;
+let pgSqlModule = null;
+let pgSqlReady = false;
+
+function pgInit() {
+  const bar = document.getElementById('pg-lang-bar');
+  PG_LANGS.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.className = 'pg-lang-btn' + (lang.id === pgCurrentLang.id ? ' active' : '');
+    btn.id = 'pg-btn-' + lang.id;
+    btn.textContent = lang.label;
+    btn.onclick = () => pgSelectLang(lang);
+    bar.appendChild(btn);
+  });
+
+  pgEditor = CodeMirror.fromTextArea(document.getElementById('pg-textarea'), {
+    lineNumbers: true,
+    mode: pgCurrentLang.cm,
+    theme: 'default',
+    indentUnit: 4,
+    smartIndent: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    lineWrapping: false,
+    extraKeys: { 'Ctrl-Enter': pgRun, 'Cmd-Enter': pgRun }
+  });
+  pgEditor.setValue(pgCurrentLang.starter);
+  pgEditor.getWrapperElement().style.flex = '1';
+  pgEditor.getWrapperElement().style.overflow = 'hidden';
+  pgEditor.getWrapperElement().style.fontSize = '12.5px';
+  pgEditor.getWrapperElement().style.fontFamily = "'JetBrains Mono', monospace";
+  const cmElem = pgEditor.getWrapperElement().querySelector('.CodeMirror');
+  if (cmElem) cmElem.style.height = '100%';
+  else pgEditor.getWrapperElement().querySelector('.CodeMirror-scroll').style.height = '100%';
+  pgEditor.refresh();
+  pgUpdateHeader();
+}
+
+function pgSelectLang(lang) {
+  pgCurrentLang = lang;
+  document.querySelectorAll('.pg-lang-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('pg-btn-' + lang.id);
+  if (btn) btn.classList.add('active');
+  pgEditor.setOption('mode', lang.cm);
+  pgEditor.setValue(lang.starter);
+  pgUpdateHeader();
+  pgClear();
+}
+
+function pgUpdateHeader() {
+  const lang = pgCurrentLang;
+  document.getElementById('pg-phd').style.background = lang.color;
+  document.getElementById('pg-lang-lbl').textContent = lang.label + ' Editor';
+  const engines = { pyodide:'Pyodide (in-browser)', worker:'Web Worker (in-browser)', sqljs:'SQLite WASM (in-browser)', judge0:'Judge0 CE API' };
+  document.getElementById('pg-engine-lbl').textContent = engines[lang.engine] || '';
+  // Always show visualize button — label changes per language
+  const vizBtn = document.getElementById('pg-btn-viz');
+  vizBtn.style.display = '';
+  const labels = {
+    python: '📊 Visualize', javascript: '🔍 Visualize (PT)',
+    java: '🔍 Visualize (PT)', c: '🔍 Visualize (PT)', cpp: '🔍 Visualize (PT)',
+    sql: '🔍 Visualize SQL', go: '↗ Go Playground', rust: '↗ Rust Playground',
+    typescript: '↗ TS Playground'
+  };
+  vizBtn.textContent = labels[lang.id] || '🔍 Visualize';
+}
+
+function pgSetStatus(html) { document.getElementById('pg-status-dot').innerHTML = html; }
+function pgSetMsg(txt) { document.getElementById('pg-run-msg').textContent = txt; }
+
+function pgShowOutput(stdout, stderr, ok) {
+  const el = document.getElementById('pg-output');
+  let html = '';
+  if (stdout) html += `<span>${escHtml(stdout)}</span>`;
+  if (stderr) html += (html ? '\n' : '') + `<span class="pg-err">${escHtml(stderr)}</span>`;
+  if (!html) html = '<span class="pg-ok">✓ (no output)</span>';
+  el.innerHTML = html;
+  pgSetStatus(ok ? '<span class="pg-ok">✓ OK</span>' : '<span class="pg-err">✗ Error</span>');
+  pgSetMsg('');
+}
+
+function pgShowSqlResults(results) {
+  const el = document.getElementById('pg-output');
+  if (!results || results.length === 0) { el.innerHTML = '<span class="pg-ok">✓ Query executed (no rows returned)</span>'; pgSetStatus('<span class="pg-ok">✓ OK</span>'); return; }
+  let html = '';
+  results.forEach(res => {
+    html += '<div class="pg-sql-wrap"><table class="pg-sql-tbl"><thead><tr>';
+    res.columns.forEach(c => html += `<th>${escHtml(c)}</th>`);
+    html += '</tr></thead><tbody>';
+    res.values.forEach(row => {
+      html += '<tr>';
+      row.forEach(v => html += `<td>${v === null ? '<i style="color:var(--t4)">NULL</i>' : escHtml(String(v))}</td>`);
+      html += '</tr>';
+    });
+    html += `</tbody></table><div style="font-size:10px;color:var(--t4);padding:4px 0">${res.values.length} row(s)</div>
+</div>
+`;
+  });
+  el.innerHTML = html;
+  pgSetStatus('<span class="pg-ok">✓ OK</span>');
+  pgSetMsg('');
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function pgRun() {
+  const code = pgEditor.getValue();
+  if (!code.trim()) return;
+  document.getElementById('pg-output').innerHTML = '<span class="pg-spin"></span><span style="color:var(--t3)">Running…</span>';
+  pgSetStatus('');
+  pgSetMsg(pgCurrentLang.engine === 'judge0' ? 'Compiling & running via Judge0 CE…' : 'Running…');
+
+  try {
+    if (pgCurrentLang.engine === 'pyodide') await pgRunPyodide(code);
+    else if (pgCurrentLang.engine === 'worker')  pgRunWorker(code);
+    else if (pgCurrentLang.engine === 'sqljs')   await pgRunSQL(code);
+    else if (pgCurrentLang.engine === 'judge0')  await pgRunJudge0(code, pgCurrentLang.j0id);
+  } catch(e) {
+    pgShowOutput('', String(e), false);
+  }
+}
+
+async function pgRunPyodide(code) {
+  if (!window.pyodide) { pgShowOutput('', 'Pyodide is still loading — please wait a moment and try again.', false); return; }
+  try {
+    let out = '';
+    const old = window.pyodide.runPython;
+    window.pyodide.globals.set('__pg_out__', '');
+    const result = window.pyodide.runPython(`
+import sys, io as _io
+_buf = _io.StringIO()
+_old_stdout = sys.stdout
+sys.stdout = _buf
+try:
+    exec(compile(${JSON.stringify(code)}, '<pg>', 'exec'), {'__builtins__': __builtins__, '__name__': '__main__'})
+except Exception as e:
+    sys.stdout = _old_stdout
+    raise
+finally:
+    sys.stdout = _old_stdout
+_buf.getvalue()
+    `);
+    pgShowOutput(result || '', '', true);
+  } catch(e) {
+    pgShowOutput('', String(e), false);
+  }
+}
+
+function pgRunWorker(code) {
+  const workerSrc = `
+const _logs = [];
+const _errs = [];
+const console = {
+  log:   (...a) => _logs.push(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' ')),
+  error: (...a) => _errs.push(a.map(x=>typeof x==='object'?JSON.stringify(x):String(x)).join(' ')),
+  warn:  (...a) => _logs.push('WARN: '+a.map(String).join(' ')),
+  info:  (...a) => _logs.push(a.map(String).join(' ')),
+  table: (...a) => _logs.push(JSON.stringify(a,null,2))
+};
+try {
+  ${code}
+  postMessage({ok:true, out:_logs.join('\\n'), err:_errs.join('\\n')});
+} catch(e) {
+  postMessage({ok:false, out:_logs.join('\\n'), err:e.message+( e.stack ? '\\n'+e.stack : '')});
+}`;
+  const blob = new Blob([workerSrc], { type:'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const worker = new Worker(url);
+  const timer = setTimeout(() => { worker.terminate(); URL.revokeObjectURL(url); pgShowOutput('', 'Timeout: execution took too long (>10s)', false); }, 10000);
+  worker.onmessage = e => { clearTimeout(timer); URL.revokeObjectURL(url); pgShowOutput(e.data.out, e.data.err, e.data.ok); };
+  worker.onerror  = e => { clearTimeout(timer); URL.revokeObjectURL(url); pgShowOutput('', e.message, false); };
+}
+
+async function pgRunSQL(code) {
+  if (!pgSqlReady) {
+    pgSetMsg('Loading SQLite WASM…');
+    try {
+      const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` });
+      pgSqlModule = SQL;
+      pgSqlDb = new SQL.Database();
+      pgSqlReady = true;
+    } catch(e) { pgShowOutput('', 'Failed to load sql.js: ' + e.message, false); return; }
+  }
+  // Fresh DB per run so DDL doesn't pile up
+  try {
+    const SQL = pgSqlDb.constructor;
+    const freshDb = new SQL.Database ? pgSqlDb : pgSqlDb;
+    // Re-init fresh db each run
+    const results = pgSqlDb.exec(code);
+    pgShowSqlResults(results);
+  } catch(e) {
+    // On error, reset DB so subsequent runs start clean
+    pgShowOutput('', e.message, false);
+  }
+  // Always reset for next run
+  try {
+    const resp = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` });
+    pgSqlDb = new resp.Database();
+  } catch(_){}
+}
+
+async function pgRunJudge0(code, langId) {
+  const JUDGE0 = 'https://ce.judge0.com';
+  let token;
+  try {
+    const sub = await fetch(`${JUDGE0}/submissions?base64_encoded=true&wait=false`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_code: btoa(unescape(encodeURIComponent(code))), language_id: langId, stdin: '' })
+    });
+    if (!sub.ok) throw new Error(`Judge0 returned HTTP ${sub.status}. It may be temporarily unavailable — try again in a moment.`);
+    const subJson = await sub.json();
+    token = subJson.token;
+  } catch(e) { pgShowOutput('', '⚠️ Could not reach Judge0 CE: ' + e.message, false); return; }
+
+  // Poll for result (max 30s)
+  for (let i = 0; i < 30; i++) {
+    await new Promise(r => setTimeout(r, 1000));
+    pgSetMsg(`Waiting for result… (${i+1}s)`);
+    const res = await fetch(`${JUDGE0}/submissions/${token}?base64_encoded=true`);
+    const r = await res.json();
+    if (r.status && r.status.id > 2) { // 1=In Queue, 2=Processing, 3+=done
+      const decode = s => { try { return s ? decodeURIComponent(escape(atob(s))) : ''; } catch { return s || ''; } };
+      const stdout = decode(r.stdout);
+      const stderr = decode(r.stderr) || decode(r.compile_output);
+      const ok = r.status.id === 3; // 3 = Accepted
+      const statusNote = ok ? '' : `[${r.status.description}]\n`;
+      pgShowOutput(stdout, statusNote + stderr, ok);
+      return;
+    }
+  }
+  pgShowOutput('', 'Timed out waiting for Judge0 result. The service may be busy — try again.', false);
+}
+
+function pgVisualize() {
+  const code = pgEditor.getValue();
+  if (editor) editor.setValue(code);
+  const edSec = document.getElementById('editor-section');
+  if (edSec && edSec.classList.contains('shut')) toggleEditor();
+  switchMode('viz');
+  setTimeout(() => runCode(), 300);
+}
+
+function pgClear() {
+  document.getElementById('pg-output').innerHTML = '<span style="color:var(--t4)">Run your code to see output…</span>';
+  pgSetStatus('');
+  pgSetMsg('');
+}
+
+function pgReset() {
+  pgEditor.setValue(pgCurrentLang.starter);
+  pgClear();
+}
+
+// ─── MULTI-LANGUAGE VISUALIZATION ────────────────────────────────────────────
+const PG_VIZ_MAP = {
+  python:     { type: 'haki' },
+  javascript: { type: 'js_native' },
+  java:       { type: 'pt',  ptLang: 'java' },
+  c:          { type: 'pt',  ptLang: 'c' },
+  cpp:        { type: 'pt',  ptLang: 'cpp' },
+  sql:        { type: 'sql' },
+  typescript: { type: 'ext', url: 'https://www.typescriptlang.org/play', label: 'TypeScript Playground',  hint: 'Paste your code. Click ▶ Run to execute.' },
+  go:         { type: 'ext', url: 'https://go.dev/play/',                label: 'Go Playground',           hint: 'Paste your code (top-right). Click Run.' },
+  rust:       { type: 'ext', url: 'https://play.rust-lang.org/',         label: 'Rust Playground',         hint: 'Paste your code. Click ▶ Run.' },
+};
+
+let pgSqlVizSteps = [];
+let pgSqlVizIdx   = 0;
+
+function pgVisualizeLang() {
+  const lang = pgCurrentLang;
+  const code = pgEditor.getValue();
+  const viz  = PG_VIZ_MAP[lang.id];
+  if (!viz) return;
+  if (viz.type === 'haki')  { pgVisualize(); return; }
+  if (viz.type === 'js_native') { pgRunJsTrace(code); return; }
+  if (viz.type === 'pt')    { pgOpenPythonTutor(code, viz.ptLang); return; }
+  if (viz.type === 'sql')   { pgVisualizeSql(code); return; }
+  if (viz.type === 'ext')   { pgOpenExternal(viz.url, viz.label, viz.hint, code); return; }
+}
+
+function pgRunJsTrace(code) {
+  const workerSrc = buildJsTracerWorker(code);
+  const blob = new Blob([workerSrc], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const worker = new Worker(url);
+  worker.onmessage = e => {
+    URL.revokeObjectURL(url);
+    if (!e.data.ok) {
+       alert("Error during execution:\\n" + e.data.err);
+       return;
+    }
+    steps = e.data.steps;
+    idx = 0;
+    codeLines = code.split('\\n');
+    annotations.clear();
+    buildHeatmap();
+    maxDepth = Math.max(...steps.map(s => s.frames.length), 1);
+    
+    // Switch to visualizer
+    if (editor) editor.setValue(code);
+    const edSec = document.getElementById('editor-section');
+    if (edSec && edSec.classList.contains('shut')) toggleEditor();
+    switchMode('viz');
+    
+    buildCodeView();
+    enableControls();
+    render();
+  };
+  worker.onerror = e => {
+    URL.revokeObjectURL(url);
+    alert("Worker Error: " + e.message);
+  };
+}
+
+function pgOpenVizModal(title, sub) {
+  document.getElementById('pg-viz-title').textContent = title;
+  document.getElementById('pg-viz-sub').textContent   = sub || '';
+  document.getElementById('pg-viz-modal').classList.add('show');
+}
+
+function pgCloseViz() {
+  document.getElementById('pg-viz-modal').classList.remove('show');
+  document.getElementById('pg-viz-body').innerHTML = '';
+}
+
+function pgOpenPythonTutor(code, ptLang) {
+  // Build both: iframe-embed URL (for hosted/HTTPS) and direct URL (for new tab)
+  const base = encodeURIComponent(code) +
+    '&origin=opt-frontend.js&py=' + ptLang +
+    '&rawInputLstJSON=%5B%5D&curInstr=0&heapPrimitives=nevernest&textReferences=false';
+  const iframeUrl = 'https://pythontutor.com/iframe-embed.html#code=' + base;
+  const directUrl = 'https://pythontutor.com/render#code=' + base + '&mode=display&cumulative=false';
+
+  // file:// protocol blocks cross-origin iframes — open Python Tutor in a new tab instead
+  if (window.location.protocol === 'file:') {
+    window.open(iframeUrl, '_blank');
+    const msg = document.getElementById('pg-run-msg');
+    msg.innerHTML = `<span style="color:var(--amber)">🔍 Opened Python Tutor in a new tab — step-by-step viz loading!</span>`;
+    setTimeout(() => { if (msg) msg.textContent = ''; }, 7000);
+    return;
+  }
+
+  pgOpenVizModal(`🔍 ${pgCurrentLang.label} — Visualization`, 'Powered by Python Tutor');
+  document.getElementById('pg-viz-body').innerHTML =
+    `<div style="padding:10px 16px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
+       <span style="font-size:11.5px;color:var(--t3)">Tip: if the frame is blocked, use the button below.</span>
+       <a href="${iframeUrl}" target="_blank" class="btn btn-blue" style="font-size:11px;padding:3px 10px;text-decoration:none">↗ Open in new tab</a>
+     </div>
+     <iframe src="${iframeUrl}" style="flex:1;border:none;width:100%;height:100%;min-height:500px" allowfullscreen></iframe>`;
+}
+
+function pgOpenExternal(url, label, hint, code) {
+  navigator.clipboard.writeText(code).catch(() => {});
+  window.open(url, '_blank');
+  const msg = document.getElementById('pg-run-msg');
+  msg.innerHTML = `<span style="color:var(--amber)">📋 Code copied to clipboard! ${hint}</span>`;
+  setTimeout(() => { if (msg) msg.textContent = ''; }, 7000);
+}
+
+async function pgVisualizeSql(code) {
+  pgOpenVizModal('🔍 SQL — Step-by-Step Execution', 'SQLite (in-browser)');
+  document.getElementById('pg-viz-body').innerHTML =
+    '<div style="padding:20px;color:var(--t3)"><span class="pg-spin"></span> Loading SQLite…</div>';
+
+  // Ensure sql.js is loaded
+  if (!pgSqlReady) {
+    try {
+      const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` });
+      pgSqlModule = SQL; pgSqlDb = new SQL.Database(); pgSqlReady = true;
+    } catch(e) {
+      document.getElementById('pg-viz-body').innerHTML =
+        `<div style="padding:20px;color:var(--red)">Failed to load SQLite: ${escHtml(e.message)}</div>`;
+      return;
+    }
+  }
+
+  // Fresh DB for visualization
+  const freshDb = new pgSqlModule.Database();
+
+  // Split into statements on ';'
+  const stmts = code.split(';').map(s => s.trim()).filter(s => s.length > 0);
+  if (stmts.length === 0) {
+    document.getElementById('pg-viz-body').innerHTML = '<div style="padding:20px;color:var(--t3)">No SQL statements found.</div>';
+    return;
+  }
+
+  const sqlSteps = [];
+  for (const stmt of stmts) {
+    let result = null, error = null;
+    try { result = freshDb.exec(stmt); } catch(e) { error = e.message; }
+
+    // Snapshot all tables after this statement
+    const tables = {};
+    try {
+      const tlist = freshDb.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+      if (tlist.length > 0) {
+        for (const tname of tlist[0].values.flat()) {
+          const rows = freshDb.exec(`SELECT * FROM "${tname}"`);
+          tables[tname] = rows.length > 0 ? rows[0] : { columns: [], values: [] };
+        }
+      }
+    } catch(_) {}
+    sqlSteps.push({ stmt, result, error, tables });
+  }
+
+  pgSqlVizSteps = sqlSteps;
+  pgSqlVizIdx   = 0;
+  pgRenderSqlStep();
+}
+
+function pgRenderSqlStep() {
+  const steps = pgSqlVizSteps;
+  const idx   = pgSqlVizIdx;
+  const step  = steps[idx];
+  const body  = document.getElementById('pg-viz-body');
+
+  let html = `
+    <div class="pg-sql-step-nav">
+      <button class="btn" onclick="pgSqlStepGo(-1)" ${idx===0?'disabled':''}>← Prev</button>
+      <span style="font-family:var(--mono);font-size:11.5px;color:var(--t3)">Statement ${idx+1} / ${steps.length}</span>
+      <button class="btn" onclick="pgSqlStepGo(1)" ${idx===steps.length-1?'disabled':''}>Next →</button>
+      <span style="margin-left:auto;font-size:10px;color:var(--t4)">Ctrl+← / →</span>
+    </div>
+    <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px">Statement ${idx+1}</div>
+        <pre style="margin:0;font-family:var(--mono);font-size:12.5px;background:var(--s2);padding:10px 14px;border-radius:var(--radius);border-left:3px solid var(--blue);color:var(--t1);white-space:pre-wrap">${escHtml(step.stmt)}</pre>
+      </div>`;
+
+  if (step.error) {
+    html += `<div style="background:var(--red-l);border:1px solid var(--red-b);border-radius:var(--radius);padding:8px 12px;font-family:var(--mono);font-size:12px;color:var(--red)">✗ Error: ${escHtml(step.error)}</div>`;
+  } else if (step.result && step.result.length > 0) {
+    html += `<div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:600;letter-spacing:.06em;margin-bottom:6px">Result</div>`;
+    step.result.forEach(rs => {
+      html += `<table class="pg-sql-tbl" style="margin-bottom:6px"><thead><tr>` +
+        rs.columns.map(c => `<th>${escHtml(c)}</th>`).join('') + `</tr></thead><tbody>`;
+      rs.values.forEach(row => {
+        html += '<tr>' + row.map(v => `<td>${v===null?'<i style="color:var(--t4)">NULL</i>':escHtml(String(v))}</td>`).join('') + '</tr>';
+      });
+      html += `</tbody></table><div style="font-size:10px;color:var(--t4);margin-bottom:8px">${rs.values.length} row(s)</div>`;
+    });
+    html += '</div>';
+  } else if (!step.error) {
+    html += `<div style="color:var(--green);font-family:var(--mono);font-size:12px">✓ Executed successfully</div>`;
+  }
+
+  const tableNames = Object.keys(step.tables);
+  html += `<div>
+    <div style="font-size:10px;color:var(--t3);text-transform:uppercase;font-weight:600;letter-spacing:.06em;margin-bottom:8px">Database State${tableNames.length ? ` (${tableNames.length} table${tableNames.length>1?'s':''})` : ''}</div>`;
+  if (tableNames.length === 0) {
+    html += `<span style="font-size:11.5px;color:var(--t4);font-style:italic">(no tables yet)</span>`;
+  } else {
+    tableNames.forEach(tname => {
+      const tbl = step.tables[tname];
+      html += `<div style="margin-bottom:12px">`;
+      html += `<div style="font-size:11.5px;color:var(--amber);font-family:var(--mono);font-weight:600;margin-bottom:4px">📋 ${escHtml(tname)}</div>`;
+      if (tbl.values && tbl.values.length > 0) {
+        html += `<table class="pg-sql-tbl"><thead><tr>` +
+          (tbl.columns||[]).map(c=>`<th>${escHtml(c)}</th>`).join('') +
+          `</tr></thead><tbody>`;
+        tbl.values.forEach(row => {
+          html += '<tr>' + row.map(v=>`<td>${v===null?'<i style="color:var(--t4)">NULL</i>':escHtml(String(v))}</td>`).join('') + '</tr>';
+        });
+        html += `</tbody></table><div style="font-size:10px;color:var(--t4);margin-top:2px">${tbl.values.length} row(s)</div>`;
+      } else {
+        html += `<span style="font-size:11.5px;color:var(--t4);font-style:italic;font-family:var(--mono)">(empty)</span>`;
+      }
+      html += '</div>';
+    });
+  }
+  html += '</div></div>';
+  body.innerHTML = html;
+}
+
+function pgSqlStepGo(dir) {
+  const ni = pgSqlVizIdx + dir;
+  if (ni >= 0 && ni < pgSqlVizSteps.length) { pgSqlVizIdx = ni; pgRenderSqlStep(); }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 </script>
+<script src="js_tracer.js"></script>
 </body>
 </html>
