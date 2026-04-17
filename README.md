@@ -1,6 +1,6 @@
-# 🥷 Haki — Python Visualizer
+# 🥷 Haki — Visualizer
 
-**Haki** is a premium, high-performance Python execution visualizer designed to help developers and students understand complex recursive algorithms, memory management, and performance characteristics — all entirely within the browser.
+**Haki** is a premium, high-performance execution visualizer designed to help developers and students understand complex recursive algorithms, memory management, and performance characteristics — all entirely within the browser.
 
 ![Haki Visualizer UI](./screenshot.png)
 

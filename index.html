@@ -50,11 +50,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
 /* LAYOUT */
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.toolbar{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:44px}
-.logo{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;margin-right:4px}
+.toolbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:40px}
+.logo{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:5px;margin-right:4px}
 .logo em{color:var(--blue);font-style:normal}
 .sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
-.btn{padding:5px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--s2);color:var(--t1);font-size:12px;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
+.toolgrp{display:flex;align-items:center;gap:6px}
+.toolgrp + .toolgrp{margin-left:6px}
+.btn.icon{padding:4px 8px}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn.ghost:hover:not(:disabled){background:var(--s2);transform:none}
+.sel{background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t2);padding:4px 7px;font-size:11.5px;cursor:pointer}
+.more{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--s2);color:var(--t1);font-size:11.5px;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
 .btn:hover:not(:disabled){background:var(--s3);transform:translateY(-1px);border-color:var(--t4)}
 .btn:active:not(:disabled){background:var(--s4);transform:translateY(0)}
 .btn:disabled{opacity:.3;cursor:default;box-shadow:none}
@@ -84,10 +91,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .step-ctr{font-size:10.5px;color:var(--t3);font-family:var(--mono);white-space:nowrap}
 
 /* MODE TABS */
-.mode-tabs{display:flex;align-items:center;gap:0;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 12px;overflow-x:auto}
-.mtab{padding:7px 13px;font-size:12px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .12s,border-color .12s}
+.mode-tabs{display:flex;align-items:center;gap:0;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;padding:0 10px;overflow-x:auto}
+.mtab{padding:6px 10px;font-size:11.5px;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .12s,border-color .12s}
 .mtab:hover{color:var(--t2)}
 .mtab.on{color:var(--blue);border-bottom-color:var(--blue)}
+/* Lens UI removed (right pane shows all sections). */
+.diff-panel{padding:10px;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0;display:none}
+.diff-h{display:flex;justify-content:space-between;gap:10px;font-size:9.5px;text-transform:uppercase;color:var(--t4);letter-spacing:.05em}
+.diff-body{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--t2);line-height:1.55}
+.diff-pill{display:inline-block;margin:0 6px 6px 0;padding:2px 8px;border-radius:999px;border:1px solid var(--border2);font-size:10.5px;color:var(--t2)}
+.diff-pill.chg{border-color:rgba(245,158,11,.35);color:var(--amber)}
+.diff-pill.new{border-color:rgba(134,239,172,.25);color:#86efac}
+.flash{animation:flash-change .6s ease}
+.cm-exec-line{background:rgba(91,159,214,.16)}
+.cm-exec-call{background:rgba(217,70,239,.14)}
+.cm-exec-ret{background:rgba(34,197,94,.14)}
+.cm-exec-err{background:rgba(239,68,68,.14)}
+.cm-hint{display:inline-flex;gap:6px;margin-left:10px;vertical-align:middle}
+.cm-badge{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;line-height:1.4;border:1px solid var(--border2);color:var(--t2);background:rgba(255,255,255,.02)}
+.cm-badge.tdz{border-color:rgba(245,158,11,.55);color:var(--amber);background:rgba(245,158,11,.07);font-weight:700}
+.cm-badge.hoist{border-color:rgba(147,197,253,.35);color:#93c5fd;background:rgba(147,197,253,.06)}
+.cm-exec-dot{width:10px;height:10px;border-radius:50%;background:rgba(91,159,214,.95);box-shadow:0 0 0 2px rgba(91,159,214,.25)}
 
 /* EDITOR */
 .editor-section{flex-shrink:0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
@@ -109,7 +133,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .view{height:100%;display:flex;overflow:hidden;background:var(--bg)}
 .view.hidden{display:none}
 
-.viewport{flex:none;display:flex;flex-direction:column;overflow:hidden}
+.viewport{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .main-split-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* THREE-COLUMN LAYOUT */
@@ -143,6 +167,36 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
 /* FRAMES */
 .frames-scroll{flex:1;overflow-y:auto}
+.frames-tabs{display:flex;gap:6px;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.ftab{font-size:10.5px;color:var(--t3);padding:3px 8px;border:1px solid var(--border);border-radius:999px;cursor:pointer;user-select:none}
+.ftab.on{color:var(--t1);border-color:var(--blue-b);background:rgba(91,159,214,.12)}
+.eventloop-scroll{flex:1;overflow-y:auto;padding:10px;font-family:var(--mono);font-size:11px;color:var(--t2)}
+.el-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(255,255,255,0.05)}
+.el-k{color:var(--t4)}
+.el-v{color:var(--t2);text-align:right;word-break:break-all}
+.el-chip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;border:1px solid var(--border);font-size:10px;color:var(--t3)}
+.el-chip.micro{border-color:rgba(147,197,253,.35);color:#93c5fd}
+.el-chip.macro{border-color:rgba(134,239,172,.25);color:#86efac}
+.el-chip.render{border-color:rgba(245,158,11,.35);color:var(--amber)}
+.el-edge{padding:4px 0;color:var(--t3)}
+.el-edge strong{color:var(--t1)}
+.scope-card{padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:10px}
+.scope-h{display:flex;justify-content:space-between;gap:10px;color:var(--t1);font-weight:700}
+.scope-sub{margin-top:3px;color:var(--t4);font-size:10.5px}
+.scope-vars{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.sv{padding:2px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--t2);font-size:10.5px}
+.sv.let{border-color:rgba(245,158,11,.35);color:var(--amber)}
+.sv.const{border-color:rgba(147,197,253,.25);color:#93c5fd}
+.sv.var{border-color:rgba(134,239,172,.25);color:#86efac}
+.sv.param{border-color:rgba(217,70,239,.25);color:#e9d5ff}
+.gbox{padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:10px}
+.gtitle{display:flex;justify-content:space-between;gap:10px;color:var(--t1);font-weight:700}
+.gpre{margin-top:8px;white-space:pre-wrap;color:var(--t2);font-size:11px;line-height:1.5}
+.gsvg{width:100%;height:260px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.06));margin-top:10px}
+.gnode{fill:rgba(91,159,214,.16);stroke:rgba(91,159,214,.55);stroke-width:1.2;cursor:pointer}
+.gnode.cur{fill:rgba(245,158,11,.14);stroke:rgba(245,158,11,.6)}
+.glabel{font-family:var(--mono);font-size:10.5px;fill:rgba(240,240,245,.92);pointer-events:none}
+.gedge{stroke:rgba(240,240,245,.25);stroke-width:1.2;fill:none;marker-end:url(#garrow)}
 .depth-meter{padding:6px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);flex-shrink:0}
 .depth-track{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
 .depth-fill{height:100%;border-radius:3px;background:var(--purple);transition:width .2s}
@@ -192,9 +246,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .v-int,.v-float{color:var(--amber)}
 .v-str{color:var(--green)}
 .v-bool,.v-None{color:var(--blue)}
+.v-tdz{color:var(--amber);font-weight:700;border:1px dashed rgba(245,158,11,.55);padding:0 4px;border-radius:6px;font-size:11px}
 .v-ref{color:var(--blue);cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted}
 .v-fn{color:var(--t3)}
 .v-trunc{color:var(--t4);font-style:italic}
+.v-mut{animation:flash-change .5s ease}
+
+.hint{margin-left:6px;font-size:9px;padding:1px 6px;border:1px solid var(--border);border-radius:999px;color:var(--t4);text-transform:uppercase;letter-spacing:.06em}
+.hint-tdz{border-color:rgba(245,158,11,.35);color:var(--amber)}
+.hint-hoist{border-color:rgba(147,197,253,.25);color:#93c5fd}
 
 /* SVG ARROWS OVERLAY */
 #arrows-svg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200}
@@ -361,6 +421,49 @@ canvas.chart{display:block;border-radius:var(--radius)}
   .pg-output-col { width: 100% !important; height: 40vh; }
 }
 
+/* --- BASE VIZ LAYOUT (DESKTOP-FIRST) --- */
+.viz2{display:flex;flex:1;overflow:hidden}
+.viz-left{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);min-width:0;height:100%}
+.viz-right{width:46%;min-width:420px;display:flex;flex-direction:column;overflow:hidden;height:100%}
+.viz-editor{flex:1;min-height:0;overflow:hidden}
+.CodeMirror{height:100%}
+.CodeMirror-scroll{min-height:100%}
+.CodeMirror-gutters{min-height:100%}
+.viz-right-top{flex:1;display:flex;overflow:hidden;border-bottom:1px solid var(--border);min-height:0}
+.viz-right-bot{flex:1;overflow:hidden;background:var(--bg);min-height:140px}
+.viz-left-insights{flex:none;overflow:hidden;border-top:1px solid var(--border);background:var(--bg);min-height:0}
+.ins-drawer{height:100%;display:flex;flex-direction:column;min-height:0}
+.viz-left-insights.ins-collapsed .ins-body{display:none}
+.viz-left-insights.ins-collapsed{min-height:34px}
+.ins-hdr{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0}
+.ins-title{font-size:11px;font-weight:700;color:var(--t2)}
+.ins-tabs{display:flex;gap:6px;margin-left:6px;flex-wrap:wrap}
+.ins-tab{font-size:11px;color:var(--t3);padding:4px 10px;border:1px solid var(--border2);border-radius:999px;background:transparent;cursor:pointer}
+.ins-tab:hover{color:var(--t2);border-color:var(--t4)}
+.ins-tab.on{color:var(--t1);border-color:var(--blue-b);background:rgba(91,159,214,.12)}
+.ins-collapse{margin-left:auto}
+.ins-body{flex:1;min-height:0;overflow:auto;padding:10px}
+.ins-card{border:1px solid var(--border);border-radius:12px;background:var(--s1);overflow:hidden}
+.ins-card-h{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
+.ins-pre{padding:10px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:pre-wrap}
+.ins-text{padding:10px;font-size:12px;color:var(--t2);line-height:1.55}
+.ins-empty{color:var(--t4);font-style:italic}
+.viz-right-bot-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;height:100%;min-height:0;padding:10px;box-sizing:border-box}
+.tile{min-width:0;min-height:0;display:flex;flex-direction:column}
+.tile .panel{display:flex;flex-direction:column;height:100%;margin-bottom:0}
+.tile .panel-b{flex:1;min-height:0;overflow:auto}
+.tilemax .tile{display:none}
+.tilemax .tile.max{display:flex;grid-column:1 / -1;grid-row:1 / -1}
+.panel-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+.picon{border:1px solid var(--border2);background:transparent;color:var(--t3);border-radius:8px;padding:2px 7px;font-size:11px;cursor:pointer}
+.picon:hover{border-color:var(--t4);color:var(--t2);background:rgba(255,255,255,.03)}
+/* Panel nav removed (no tabs). */
+.panel{border:1px solid var(--border);border-radius:12px;background:var(--s1);overflow:hidden}
+.panel-h{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--t2);font-weight:600}
+.panel-b{padding:10px}
+.right-col{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.right-col + .right-col{border-left:1px solid var(--border)}
+
 /* --- RESPONSIVE MOBILE FIXES --- */
 @media (max-width: 850px) {
   /* Toolbar Wrap */
@@ -392,6 +495,13 @@ canvas.chart{display:block;border-radius:var(--radius)}
     flex: none !important; 
     border-bottom: 3px solid var(--border); 
   }
+  /* 2-pane viz stacks on mobile */
+  .viz2{flex-direction:column}
+  .viz-left{border-right:none;border-bottom:1px solid var(--border);min-height:50vh}
+  .viz-right{width:100%;min-width:0}
+  .viz-right-top{flex:0 0 auto;flex-direction:column}
+  .right-col + .right-col{border-left:none;border-top:1px solid var(--border)}
+  .viz-right-bot{padding:8px}
   
   /* Compare Mode Stack */
   .cmp-side { 
@@ -454,31 +564,31 @@ canvas.chart{display:block;border-radius:var(--radius)}
 
     <div class="sep"></div>
 
-    <button class="btn" id="theme-toggle" title="Toggle Dark/Light Mode" style="padding: 4px 8px">🌓</button>
+    <div class="toolgrp">
+      <button class="btn icon ghost" id="theme-toggle" title="Theme">🌓</button>
+      <select class="sel" id="examples" onchange="loadExample()">
+        <option value="">examples…</option>
+      </select>
+      <select class="sel" id="main-lang" onchange="setMainLang(this.value)">
+        <option value="python">🐍 Python</option>
+        <option value="javascript">🟨 JavaScript</option>
+      </select>
+    </div>
+
     <div class="sep"></div>
 
-    <select id="examples" onchange="loadExample()" style="background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t2);padding:4px 7px;font-size:12px;cursor:pointer">
-      <option value="">examples…</option>
-      <option value="sort">recursive sort</option>
-      <option value="fib">fibonacci</option>
-      <option value="bsearch">binary search</option>
-      <option value="bfs">BFS graph</option>
-      <option value="class">class & objects</option>
-      <option value="closure">closure</option>
-      <option value="gen">generator</option>
-    </select>
-    <button class="btn" onclick="toggleEditor()" title="E">✎ edit</button>
-    <button class="btn btn-blue" id="btn-run" disabled onclick="runCode()" title="R">▶ run</button>
-    <div class="sep"></div>
+    <div class="toolgrp">
+      <button class="btn icon ghost" onclick="toggleEditor()" title="Show/hide editor">✎</button>
+      <button class="btn btn-blue" id="btn-run" disabled onclick="runCode()" title="Run (R)">▶ run</button>
+    </div>
 
-    <button class="btn" id="btn-prev" disabled onclick="go(-1)" title="←">←</button>
-    <button class="btn" id="btn-sover" disabled onclick="stepOver()" title="Step Over">⤵ over</button>
-    <button class="btn" id="btn-sout" disabled onclick="stepOut()" title="Step Out">⤴ out</button>
-    <button class="btn" id="btn-ncall" disabled onclick="jumpToEv('call')" title="Next Call">call↓</button>
-    <button class="btn" id="btn-nret" disabled onclick="jumpToEv('return')" title="Next Return">ret↓</button>
-    <button class="btn" id="btn-next" disabled onclick="go(1)" title="→">→</button>
-    <button class="btn btn-green" id="btn-play" disabled onclick="togglePlay()" title="Space">▶</button>
-    <div class="sep"></div>
+    <div class="toolgrp">
+      <button class="btn icon" id="btn-prev" disabled onclick="go(-1)" title="Prev (←)">←</button>
+      <button class="btn" id="btn-sover" disabled onclick="stepOver()" title="Step Over">over</button>
+      <button class="btn" id="btn-sout" disabled onclick="stepOut()" title="Step Out">out</button>
+      <button class="btn icon" id="btn-next" disabled onclick="go(1)" title="Next (→)">→</button>
+      <button class="btn btn-green icon" id="btn-play" disabled onclick="togglePlay()" title="Play/Pause (Space)">▶</button>
+    </div>
 
     <div class="scrub-wrap">
       <span style="font-size:10px;color:var(--t4)">0</span>
@@ -498,11 +608,11 @@ canvas.chart{display:block;border-radius:var(--radius)}
 
     <span class="step-ctr" id="step-ctr">—</span>
     <span class="badge" id="ev-badge" style="display:none"></span>
-    <div class="sep"></div>
-
-    <button class="btn" onclick="exportPNG()" title="Save screenshot">⬇ PNG</button>
-    <button class="btn" onclick="exportJSON()" title="Export trace">⬇ JSON</button>
-    <button class="btn" onclick="shareTrace()" title="Share link">🔗 share</button>
+    <div class="more">
+      <button class="btn icon" onclick="exportPNG()" title="PNG">⬇</button>
+      <button class="btn icon" onclick="exportJSON()" title="JSON">⎘</button>
+      <button class="btn icon" onclick="shareTrace()" title="Share link">🔗</button>
+    </div>
   </div>
 
 
@@ -511,79 +621,134 @@ canvas.chart{display:block;border-radius:var(--radius)}
 
     <div class="mtab" onclick="switchMode('compare')" data-mode="compare">Compare</div>
 
-    <div class="mtab" onclick="switchMode('complexity')" data-mode="complexity">Complexity</div>
-
-    <div class="mtab" onclick="switchMode('slides')" data-mode="slides">Slides</div>
-
-    <div class="mtab" onclick="switchMode('quiz')" data-mode="quiz">Quiz</div>
-
-    <div class="mtab" onclick="switchMode('embed')" data-mode="embed">Embed</div>
-
     <div class="mtab" onclick="switchMode('playground')" data-mode="playground">🌐 Playground</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <select class="sel" id="more-modes" onchange="switchMode(this.value); this.value='';" title="More">
+        <option value="">More…</option>
+        <option value="complexity">Complexity</option>
+        <option value="slides">Slides</option>
+        <option value="quiz">Quiz</option>
+        <option value="embed">Embed</option>
+      </select>
+    </div>
+    <!-- Lenses removed: right panel shows all sections together -->
 
   </div>
 
 
   <div class="main-split-wrap">
-  <div class="editor-section" id="editor-section">
-    <div class="ph" style="border-top:none"><div class="phd" style="background:var(--t3)"></div>
-editor <button class="btn btn-s" style="margin-left:auto;padding:2px 8px;font-size:10px" onclick="toggleEditor()">hide</button></div>
-
-    <textarea id="cm-textarea"># Haki Visualization Example
-def factorial(n):
-    if n == 0: return 1
-    return n * factorial(n-1)
-
-print(factorial(5))</textarea>
-  </div>
-
-
   <div class="viewport" id="viewport">
 
   <!-- VISUALIZE VIEW -->
   <div class="view" id="view-viz">
-    <div class="col-code">
-      <div class="ph"><div class="phd" style="background:var(--blue)"></div>
-code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click line # to set breakpoint</span></div>
-
-      <div class="code-view" id="code-view" onmousemove="handleCodeHover(event)" onmouseleave="hideTooltip()"></div>
-
-      <div class="hm-legend" id="hm-legend" style="display:none"><div class="hm-grad"></div>
-<span>execution frequency</span></div>
-
-      <div id="step-info-box" style="display:none;white-space:pre;font-family:var(--mono);font-size:10px;padding:8px;background:var(--s1);border-top:1px solid var(--border);color:var(--t3)"></div>
-
-      <div id="narrative-wrap" style="padding:10px;background:var(--s1);border-top:1px solid var(--border);flex-shrink:0;display:none">
-        <div style="font-size:9.5px;text-transform:uppercase;color:var(--blue);margin-bottom:4px;font-weight:600;letter-spacing:.05em">Narrative</div>
-
-        <div id="narrative-text" style="font-size:12px;color:var(--t2);line-height:1.5"></div>
-
+    <div class="viz2">
+      <div class="viz-left">
+        <div class="ph"><div class="phd" style="background:var(--blue)"></div>
+code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">edit + run · click gutter to set breakpoint</span></div>
+        <div class="viz-editor">
+          <!-- CodeMirror attaches to this textarea -->
+          <textarea id="cm-textarea"></textarea>
+        </div>
+        <div class="viz-left-insights">
+          <div class="ins-drawer">
+            <div class="ins-hdr">
+              <span class="ins-title">Insights</span>
+              <div class="ins-tabs">
+                <button class="ins-tab on" id="ins-tab-step" onclick="setInsightsTab('step')">Step</button>
+                <button class="ins-tab" id="ins-tab-nar" onclick="setInsightsTab('nar')">Narrative</button>
+                <button class="ins-tab" id="ins-tab-diff" onclick="setInsightsTab('diff')">Changes</button>
+              </div>
+              <button class="btn icon ghost ins-collapse" id="ins-toggle" onclick="toggleInsights()" title="Collapse/expand">▾</button>
+            </div>
+            <div class="ins-body">
+              <div class="ins-card" id="ins-step">
+                <div class="ins-card-h"><span>Step</span><span id="diff-sub"></span></div>
+                <div class="ins-pre" id="step-info-box"></div>
+              </div>
+              <div class="ins-card" id="ins-nar" style="display:none;margin-top:10px">
+                <div class="ins-card-h"><span>Narrative</span><span>why this ran</span></div>
+                <div class="ins-text" id="narrative-text"></div>
+              </div>
+              <div class="ins-card" id="ins-diff" style="display:none;margin-top:10px">
+                <div class="ins-card-h"><span>What Changed</span><span>diff</span></div>
+                <div class="diff-panel" id="diff-panel" style="display:block;border-top:none;background:transparent;border:none;padding:0">
+                  <div class="diff-body" id="diff-body" style="padding:10px"></div>
+                </div>
+                <div class="annot-wrap"><span class="annot-lbl">📎 note:</span><input class="annot-input" id="annot-input" placeholder="annotate this step…" oninput="saveAnnotation()"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="annot-wrap"><span class="annot-lbl">📎 note:</span><input class="annot-input" id="annot-input" placeholder="annotate this step…" oninput="saveAnnotation()"></div>
+      <div class="viz-right">
+        <div class="viz-right-top">
+          <div class="right-col">
+            <div class="ph"><div class="phd" style="background:var(--purple)"></div>frames · call stack</div>
+            <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div></div></div>
+            <div id="stack-bc" style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10.5px;color:var(--t3);white-space:nowrap;overflow:auto"></div>
+            <div class="frames-scroll" id="frames-scroll"></div>
+          </div>
+          <div class="right-col">
+            <div class="ph"><div class="phd" style="background:var(--amber)"></div>heap objects</div>
+            <div class="heap-scroll" id="heap-scroll"></div>
+          </div>
+        </div>
 
+        <div class="viz-right-bot">
+          <div class="viz-right-bot-grid" id="rightbot-grid">
+            <div class="tile" data-tile="eventloop">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>Event Loop</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">async timeline</span>
+                    <button class="picon" onclick="toggleTileMax('eventloop')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="eventloop-scroll" style="padding:0"></div></div>
+              </div>
+            </div>
+            <div class="tile" data-tile="scope">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>Scope</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">lexical chain</span>
+                    <button class="picon" onclick="toggleTileMax('scope')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="scope-scroll" style="padding:0"></div></div>
+              </div>
+            </div>
+            <div class="tile" data-tile="graphs">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>Graphs</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">call graph + CFG</span>
+                    <button class="picon" onclick="toggleTileMax('graphs')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="graph-scroll" style="padding:0"></div></div>
+              </div>
+            </div>
+            <div class="tile" data-tile="focus">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>Focus</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">free vars + shadowing</span>
+                    <button class="picon" onclick="toggleTileMax('focus')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="focus-scroll" style="padding:0"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="col-frames">
-      <div class="ph"><div class="phd" style="background:var(--purple)"></div>
-frames · call stack</div>
-
-      <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div>
-</div>
-</div>
-
-      <div class="frames-scroll" id="frames-scroll"></div>
-
-    </div>
-
-    <div class="col-heap">
-      <div class="ph"><div class="phd" style="background:var(--amber)"></div>
-heap objects <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spacing:0;margin-left:4px">click card for history · hover ref for arrow</span></div>
-
-      <div class="heap-scroll" id="heap-scroll"></div>
-
-    </div>
-
   </div>
 
 
@@ -1034,8 +1199,39 @@ for v in countdown(5):
 print(list(squares(4)))`
 };
 
+const JS_STARTER_MERGESORT = `// JavaScript — merge sort (recursion)\nfunction merge(left, right) {\n  const out = [];\n  let i = 0;\n  let j = 0;\n  while (i < left.length && j < right.length) {\n    if (left[i] <= right[j]) out.push(left[i++]);\n    else out.push(right[j++]);\n  }\n  while (i < left.length) out.push(left[i++]);\n  while (j < right.length) out.push(right[j++]);\n  return out;\n}\n\nfunction mergeSort(arr) {\n  if (arr.length <= 1) return arr;\n  const mid = Math.floor(arr.length / 2);\n  const left = mergeSort(arr.slice(0, mid));\n  const right = mergeSort(arr.slice(mid));\n  return merge(left, right);\n}\n\nconst data = [3, 1, 4, 1, 5, 9, 2, 6];\nconsole.log(\"in:\", data.join(\", \"));\nconsole.log(\"out:\", mergeSort(data).join(\", \"));\n`;
+
+const JS_LESSONS = {
+  merge: JS_STARTER_MERGESORT,
+  micro: `// Microtasks vs macrotasks\nconsole.log('A');\nsetTimeout(() => console.log('timeout'), 0);\nqueueMicrotask(() => console.log('microtask'));\nPromise.resolve().then(() => console.log('promise.then'));\nconsole.log('B');\n`,
+  closure: `// Closure in a loop (var vs let)\nconst fns = [];\nfor (var i = 0; i < 3; i++) {\n  fns.push(() => console.log('var i =', i));\n}\nfor (let j = 0; j < 3; j++) {\n  fns.push(() => console.log('let j =', j));\n}\n\nfns.forEach(fn => fn());\n`,
+  this: `// this binding: method vs plain call vs bind\n'use strict';\nconst obj = {\n  x: 10,\n  getX() { return this.x; }\n};\n\nconst f = obj.getX;\nconsole.log('method:', obj.getX());\ntry { console.log('plain:', f()); } catch (e) { console.log('plain threw:', e.message); }\nconsole.log('bound:', f.bind(obj)());\n`,
+  proto: `// Prototype property lookup\nfunction A() {}\nA.prototype.p = 1;\nconst a = new A();\na.q = 2;\nconsole.log('a.q', a.q);\nconsole.log('a.p', a.p);\nconsole.log('a.missing', a.missing);\n`,
+};
+
+const EXAMPLE_MENU = {
+  python: [
+    { id: 'sort', label: 'recursive sort' },
+    { id: 'fib', label: 'fibonacci' },
+    { id: 'bsearch', label: 'binary search' },
+    { id: 'bfs', label: 'BFS graph' },
+    { id: 'class', label: 'class & objects' },
+    { id: 'closure', label: 'closure' },
+    { id: 'gen', label: 'generator' },
+  ],
+  javascript: [
+    { id: 'merge', label: 'merge sort' },
+    { id: 'micro', label: 'micro vs macro' },
+    { id: 'closure', label: 'closure in loop' },
+    { id: 'this', label: 'this binding' },
+    { id: 'proto', label: 'prototype lookup' },
+  ]
+};
+
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let pyodide = null, editor = null, cmpEditorA = null, cmpEditorB = null, splitMain = null, splitBottom = null, splitEditor = null;
+let splitRight = null;
+let splitLeft = null;
 let lastEditorSize = [20, 80], lastBottomSize = [75, 25];
 let steps = [], idx = 0, timer = null;
 let breakpoints = new Set();
@@ -1047,6 +1243,10 @@ let prevHeapIds = new Set();
 let quizState = {qi:0, score:0, answered:false};
 let slideIdx = 0;
 let cmpSteps = {a:[], b:[]};
+let insightsTab = localStorage.getItem('haki-insights-tab') || 'step';
+let insightsCollapsed = (localStorage.getItem('haki-insights-collapsed') || '0') === '1';
+let insightsPinnedOpen = (localStorage.getItem('haki-insights-pinned-open') || '1') === '1';
+let _insightsLastOpenSizes = null;
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1067,31 +1267,84 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   loadFromUrl();
 
+  // `file://` runs in a unique opaque origin in modern browsers; some features
+  // (iframes, cross-origin embeds, URL sharing) will be limited. GitHub Pages or
+  // a tiny local server avoids this.
+  if (window.location.protocol === 'file:') {
+    showBanner("⚠ Open via GitHub Pages or a local server (file:// has browser security limits).", 'amber');
+  }
+
   editor = CodeMirror.fromTextArea(document.getElementById('cm-textarea'), {
     mode:'python', theme:'default', lineNumbers:true, matchBrackets:true,
     autoCloseBrackets:true, indentUnit:4, tabSize:4, indentWithTabs:false,
+    gutters: ["CodeMirror-linenumbers", "execpoint", "breakpoints"],
     extraKeys:{"Ctrl-Space":"autocomplete","Tab": cm => {
       if (cm.somethingSelected()) cm.indentSelection("add");
       else cm.replaceSelection("    ");
     }},
     hintOptions:{completeSingle:false}
   });
-  // Split.js Init
-  splitMain = Split(['.col-code', '.col-frames', '.col-heap'], {
-    sizes: [33, 33, 34],
-    minSize: 200,
+  editor.on('gutterClick', (cm, line, gutter) => {
+    if (gutter === 'breakpoints' || gutter === 'CodeMirror-linenumbers') toggleBP(line + 1);
+  });
+  attachEditorHoverPeek();
+  if (!editor.getValue().trim()) {
+    editor.setValue(`# Haki Visualization Example\n\ndef factorial(n):\n    if n == 0: return 1\n    return n * factorial(n-1)\n\nprint(factorial(5))\n`);
+  }
+  // Main language selector (Python/JS) shares the same visualization UI.
+  const ml = document.getElementById('main-lang');
+  if (ml) {
+    ml.value = mainLang;
+    setMainLang(ml.value);
+  }
+  refreshExamplesMenu();
+  // Split.js Init (2-pane viz: editor | panels)
+  splitMain = Split(['.viz-left', '.viz-right'], {
+    sizes: [54, 46],
+    minSize: [320, 420],
     gutterSize: 6,
     onDrag: () => drawArrows(),
     onDragEnd: () => drawArrows()
   });
-
-  splitEditor = Split(['#editor-section', '#viewport'], {
+  splitEditor = null;
+  // Left pane vertical resize: editor vs insights strip
+  splitLeft = Split(['.viz-editor', '.viz-left-insights'], {
     direction: 'vertical',
-    sizes: [20, 80],
-    minSize: 0,
+    sizes: [86, 14],
+    minSize: [260, 34],
     gutterSize: 6,
-    onDrag: () => drawArrows()
+    onDrag: () => { try { if (editor) editor.refresh(); } catch(_) {} },
+    onDragEnd: () => { try { if (editor) editor.refresh(); } catch(_) {} }
   });
+  // Prevent flex from overriding Split's explicit heights.
+  try {
+    const ve = document.querySelector('.viz-editor');
+    const vi = document.querySelector('.viz-left-insights');
+    if (ve) ve.style.flex = 'none';
+    if (vi) vi.style.flex = 'none';
+  } catch(_) {}
+  // Insights drawer initial state (persisted).
+  try {
+    setInsightsTab(insightsTab);
+    if (insightsCollapsed) collapseInsights(true);
+  } catch(_) {}
+  // Right pane vertical resize: top (stack+heap) vs bottom (other panels)
+  splitRight = Split(['.viz-right-top', '.viz-right-bot'], {
+    direction: 'vertical',
+    sizes: [56, 44],
+    minSize: [220, 160],
+    gutterSize: 6,
+    onDrag: () => drawArrows(),
+    onDragEnd: () => drawArrows()
+  });
+  // Ensure flex-basis doesn't fight Split's inline sizes.
+  try {
+    const rt = document.querySelector('.viz-right-top');
+    const rb = document.querySelector('.viz-right-bot');
+    if (rt) rt.style.flex = 'none';
+    if (rb) rb.style.flex = 'none';
+  } catch(_) {}
+  setTimeout(() => { try { if (editor) editor.refresh(); } catch(_) {} }, 50);
 
   splitBottom = Split(['#cmp-workspace', '#cmp-bottom-bar'], {
     direction: 'vertical',
@@ -1130,26 +1383,142 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
+function setMainLang(lang) {
+  lastMainLang = mainLang;
+  mainLang = lang === 'javascript' ? 'javascript' : 'python';
+  const ex = document.getElementById('examples');
+  if (ex) ex.disabled = false;
+  refreshExamplesMenu();
+  if (editor) editor.setOption('mode', mainLang === 'javascript' ? 'javascript' : 'python');
+  const runBtn = document.getElementById('btn-run');
+  if (runBtn) runBtn.disabled = (mainLang === 'python' && !pyodide);
+  // Clear stale visualization hints when switching languages.
+  codeHints = null;
+  jsAnalysis = null;
+  applyHintsToEditor();
+  if (editor && mainLang === 'javascript' && lastMainLang !== 'javascript') {
+    const cur = editor.getValue() || '';
+    // If user hasn't typed JS yet (still on Python example), switch to the JS demo.
+    if (/\bdef\s+/.test(cur) || /\bprint\(/.test(cur) || cur.trim().length === 0) {
+      editor.setValue(JS_STARTER_MERGESORT);
+    }
+  }
+}
+
 // ─── EXAMPLES ────────────────────────────────────────────────────────────────
 function loadExample() {
   const exEl = document.getElementById('examples');
   if (!exEl) return;
   const k = exEl.value;
-  if (!k || !EXAMPLES[k]) return;
-  editor.setValue(EXAMPLES[k]);
+  if (!k) return;
+  if (mainLang === 'javascript') {
+    if (!JS_LESSONS[k]) return;
+    editor.setValue(JS_LESSONS[k]);
+  } else {
+    if (!EXAMPLES[k]) return;
+    editor.setValue(EXAMPLES[k]);
+  }
   exEl.value = '';
+  codeHints = null; jsAnalysis = null;
+  applyHintsToEditor();
+}
+
+function refreshExamplesMenu() {
+  const exEl = document.getElementById('examples');
+  if (!exEl) return;
+  const keep = exEl.value;
+  exEl.innerHTML = '<option value="">examples…</option>';
+  const items = EXAMPLE_MENU[mainLang] || [];
+  items.forEach(it => {
+    const opt = document.createElement('option');
+    opt.value = it.id;
+    opt.textContent = it.label;
+    exEl.appendChild(opt);
+  });
+  exEl.value = keep && items.some(i => i.id === keep) ? keep : '';
 }
 
 // ─── EDITOR TOGGLE ───────────────────────────────────────────────────────────
 function toggleEditor() {
-  if (!splitEditor) return;
-  const isShut = splitEditor.getSizes()[0] < 2;
+  if (!splitMain) return;
+  const sizes = splitMain.getSizes();
+  const isShut = sizes[0] < 5;
   if (isShut) {
-    splitEditor.setSizes(lastEditorSize);
+    splitMain.setSizes(lastEditorSize && lastEditorSize.length === 2 ? lastEditorSize : [54, 46]);
   } else {
-    lastEditorSize = splitEditor.getSizes();
-    splitEditor.setSizes([0, 100]);
+    lastEditorSize = sizes;
+    splitMain.setSizes([0, 100]);
   }
+  try { if (editor) editor.refresh(); } catch(_) {}
+}
+
+// ─── INSIGHTS DRAWER ─────────────────────────────────────────────────────────
+function setInsightsTab(tab) {
+  insightsTab = tab === 'nar' ? 'nar' : tab === 'diff' ? 'diff' : 'step';
+  localStorage.setItem('haki-insights-tab', insightsTab);
+
+  const step = document.getElementById('ins-step');
+  const nar = document.getElementById('ins-nar');
+  const diff = document.getElementById('ins-diff');
+  if (step) step.style.display = insightsTab === 'step' ? 'block' : 'none';
+  if (nar) nar.style.display = insightsTab === 'nar' ? 'block' : 'none';
+  if (diff) diff.style.display = insightsTab === 'diff' ? 'block' : 'none';
+
+  const bStep = document.getElementById('ins-tab-step');
+  const bNar = document.getElementById('ins-tab-nar');
+  const bDiff = document.getElementById('ins-tab-diff');
+  if (bStep) bStep.classList.toggle('on', insightsTab === 'step');
+  if (bNar) bNar.classList.toggle('on', insightsTab === 'nar');
+  if (bDiff) bDiff.classList.toggle('on', insightsTab === 'diff');
+}
+
+function collapseInsights(skipPersist) {
+  const wrap = document.querySelector('.viz-left-insights');
+  const btn = document.getElementById('ins-toggle');
+  if (wrap) wrap.classList.add('ins-collapsed');
+  if (btn) btn.textContent = '▸';
+  insightsCollapsed = true;
+  insightsPinnedOpen = false;
+  if (!skipPersist) localStorage.setItem('haki-insights-collapsed', '1');
+  if (!skipPersist) localStorage.setItem('haki-insights-pinned-open', '0');
+  try {
+    if (splitLeft) {
+      _insightsLastOpenSizes = splitLeft.getSizes();
+      splitLeft.setSizes([96, 4]);
+    }
+  } catch(_) {}
+  try { if (editor) editor.refresh(); } catch(_) {}
+}
+
+function expandInsights(skipPersist) {
+  const wrap = document.querySelector('.viz-left-insights');
+  const btn = document.getElementById('ins-toggle');
+  if (wrap) wrap.classList.remove('ins-collapsed');
+  if (btn) btn.textContent = '▾';
+  insightsCollapsed = false;
+  insightsPinnedOpen = true;
+  if (!skipPersist) localStorage.setItem('haki-insights-collapsed', '0');
+  if (!skipPersist) localStorage.setItem('haki-insights-pinned-open', '1');
+  try {
+    if (splitLeft) {
+      const sizes = (_insightsLastOpenSizes && _insightsLastOpenSizes.length === 2) ? _insightsLastOpenSizes : [78, 22];
+      splitLeft.setSizes(sizes);
+    }
+  } catch(_) {}
+  try { if (editor) editor.refresh(); } catch(_) {}
+}
+
+function toggleInsights() {
+  if (insightsCollapsed) expandInsights(false);
+  else collapseInsights(false);
+}
+
+function ensureInsightsOpen(reason) {
+  // Auto-open after a run unless the user pinned it closed.
+  if (insightsCollapsed && !insightsPinnedOpen) return;
+  if (insightsCollapsed) expandInsights(true);
+  // Default to step view after each run so users land on the current state.
+  if (reason === 'run') setInsightsTab('step');
 }
 
 // ─── DRAWER MECHANICS ────────────────────────────────────────────────────────
@@ -1171,7 +1540,6 @@ function toggleDrawer() {
 
 // ─── RUN ─────────────────────────────────────────────────────────────────────
 async function runCode() {
-  if (!pyodide) return;
   stopTimer();
   const code = editor.getValue();
   if (!code.trim()) return;
@@ -1181,6 +1549,11 @@ async function runCode() {
     runBtn.disabled = true;
   }
   try {
+    if (mainLang === 'javascript') {
+      await runJsTraceMain(code);
+      return;
+    }
+    if (!pyodide) return;
     const raw = await pyodide.runPythonAsync(`_run(${JSON.stringify(code)})`);
     const res = JSON.parse(raw);
     steps = res.steps;
@@ -1192,6 +1565,7 @@ async function runCode() {
     buildCodeView();
     enableControls();
     render();
+    ensureInsightsOpen('run');
     
     // Visualize mode console handling (since drawer is gone)
     const con = document.getElementById('bc-stdout');
@@ -1203,9 +1577,52 @@ async function runCode() {
     const runBtn = document.getElementById('btn-run');
     if (runBtn) {
       runBtn.textContent = '▶ run';
-      runBtn.disabled = false;
+      runBtn.disabled = (mainLang === 'python' && !pyodide);
     }
   }
+}
+
+function runJsTraceMain(code) {
+  return new Promise((resolve) => {
+    const workerSrc = buildJsTracerWorker(code);
+    const blob = new Blob([workerSrc], { type:'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    const worker = new Worker(url);
+    worker.onmessage = (e) => {
+      URL.revokeObjectURL(url);
+      if (!e.data.ok) {
+        alert("Error during execution:\n" + e.data.err);
+        resolve();
+        return;
+      }
+      steps = e.data.steps || [];
+      codeHints = e.data.hints || null;
+      jsAnalysis = e.data.analysis || null;
+      idx = 0;
+      codeLines = code.split('\n');
+      annotations.clear();
+      buildHeatmap();
+      maxDepth = Math.max(...steps.map(s => (s.frames || []).length), 1);
+      buildCodeView();
+      enableControls();
+      render();
+      ensureInsightsOpen('run');
+      try { if (editor) editor.refresh(); } catch(_) {}
+
+      const con = document.getElementById('bc-stdout');
+      if (con) {
+        const out = (e.data.stdout || '').trim();
+        con.innerHTML = out ? `<pre style="margin:0;color:var(--t2)">${esc(out)}</pre>` : '<div style="color:var(--t4);font-style:italic">—</div>';
+      }
+      resolve();
+    };
+    worker.onerror = (e) => {
+      URL.revokeObjectURL(url);
+      alert("Worker Error: " + e.message);
+      resolve();
+    };
+    worker.postMessage(code);
+  });
 }
 
 function enableControls() {
@@ -1268,38 +1685,85 @@ function heatColor(count, max) {
 
 // ─── CODE VIEW ───────────────────────────────────────────────────────────────
 function buildCodeView() {
-  const cv = document.getElementById('code-view');
-  cv.innerHTML = '';
-  const max = Math.max(...Object.values(heatmap), 1);
-  codeLines.forEach((line, i) => {
-    const ln = i + 1;
-    const row = document.createElement('div');
-    row.className = 'cl' + (breakpoints.has(ln) ? ' bp-set' : '');
-    row.dataset.ln = ln;
-    const heat = document.createElement('div');
-    heat.className = 'heat-bar';
-    if (heatmap[ln]) heat.style.background = heatColor(heatmap[ln], max);
-    const lnEl = document.createElement('span');
-    lnEl.className = 'ln';
-    lnEl.textContent = ln;
-    lnEl.title = heatmap[ln] ? `executed ${heatmap[ln]}x` : '';
-    lnEl.onclick = (e) => { e.stopPropagation(); toggleBP(ln); };
-    const lt = document.createElement('span');
-    lt.className = 'lt';
-    lt.textContent = line || ' ';
-    row.appendChild(heat);
-    row.appendChild(lnEl);
-    row.appendChild(lt);
-    cv.appendChild(row);
+  // Legacy static code view removed; we now highlight directly in CodeMirror.
+  // Keep this function as a no-op because other code paths still call it.
+  if (editor) {
+    // Refresh breakpoints gutter markers after loading from URL.
+    breakpoints.forEach(ln => {
+      const mk = document.createElement('div');
+      mk.style.cssText = 'width:10px;height:10px;border-radius:50%;background:rgba(245,158,11,.95);box-shadow:0 0 0 2px rgba(245,158,11,.25)';
+      editor.setGutterMarker(Math.max(0, ln - 1), 'breakpoints', mk);
+    });
+    applyHintsToEditor();
+  }
+}
+
+function applyHintsToEditor() {
+  if (!editor) return;
+  // Clear old widgets
+  hintBookmarks.forEach(b => { try { b.clear(); } catch(_) {} });
+  hintBookmarks = [];
+  if (!codeHints) return;
+  Object.keys(codeHints).forEach(k => {
+    const ln = +k;
+    if (!ln || ln < 1) return;
+    const h = codeHints[ln];
+    const badges = [];
+    if (h.tdz) badges.push({ cls: 'tdz', text: 'TDZ' });
+    if (h.hoist) badges.push({ cls: 'hoist', text: 'HOIST' });
+    if (!badges.length) return;
+
+    const line = ln - 1;
+    const lineText = editor.getLine(line) || '';
+    const wrap = document.createElement('span');
+    wrap.className = 'cm-hint';
+    badges.forEach(b => {
+      const s = document.createElement('span');
+      s.className = 'cm-badge ' + b.cls;
+      s.textContent = b.text;
+      wrap.appendChild(s);
+    });
+    // Put the badges at the end of the line.
+    const bm = editor.setBookmark({ line, ch: lineText.length }, { widget: wrap, insertLeft: true });
+    hintBookmarks.push(bm);
   });
 }
 
 function toggleBP(ln) {
   if (breakpoints.has(ln)) breakpoints.delete(ln);
   else breakpoints.add(ln);
-  document.querySelectorAll('.cl').forEach(el => {
-    el.classList.toggle('bp-set', breakpoints.has(+el.dataset.ln));
+  if (editor) {
+    const line = Math.max(0, ln - 1);
+    const mk = document.createElement('div');
+    mk.style.cssText = 'width:10px;height:10px;border-radius:50%;background:rgba(245,158,11,.95);box-shadow:0 0 0 2px rgba(245,158,11,.25)';
+    editor.setGutterMarker(line, 'breakpoints', breakpoints.has(ln) ? mk : null);
+  }
+}
+
+function switchFramesTab(tab) {
+  const stack = document.getElementById('frames-scroll');
+  const loop = document.getElementById('eventloop-scroll');
+  const scope = document.getElementById('scope-scroll');
+  const graph = document.getElementById('graph-scroll');
+  const tabs = {
+    stack: { el: stack, tab: document.getElementById('ftab-stack') },
+    loop:  { el: loop,  tab: document.getElementById('ftab-loop') },
+    scope: { el: scope, tab: document.getElementById('ftab-scope') },
+    graph: { el: graph, tab: document.getElementById('ftab-graph') },
+  };
+  if (!tabs.stack.el || !tabs.loop.el || !tabs.scope.el || !tabs.graph.el) return;
+  (Object.keys(tabs)).forEach(k => {
+    const on = k === tab;
+    tabs[k].el.style.display = on ? 'block' : 'none';
+    if (tabs[k].tab) tabs[k].tab.classList.toggle('on', on);
   });
+  render();
+}
+
+function applyLens(lens) {
+  // Lens UI removed in favor of showing all right-side panels together.
+  // Keep function as a no-op to avoid breaking older UI hooks.
+  currentLens = 'all';
 }
 
 // ─── HEAP COLLECTION ─────────────────────────────────────────────────────────
@@ -1328,6 +1792,7 @@ function rv(val) {
   if (!val) return '<span class="v-trunc">—</span>';
   const t = val.t;
   if (t==='None')  return '<span class="v-None">None</span>';
+  if (t==='tdz')   return '<span class="v-tdz">TDZ</span>';
   if (t==='bool')  return `<span class="v-bool">${esc(val.v)}</span>`;
   if (t==='int')   return `<span class="v-int">${val.v}</span>`;
   if (t==='float') return `<span class="v-float">${val.v}</span>`;
@@ -1347,44 +1812,316 @@ function render() {
   if (!steps.length) return;
   const s = steps[idx];
   const prevS = idx > 0 ? steps[idx-1] : null;
-
-  // code highlight
-  document.querySelectorAll('.cl').forEach(el => {
-    const ln = +el.dataset.ln;
-    el.classList.remove('hi-line','hi-call','hi-return','hi-error','hi-exception','hi-exec');
-    // remove old return annotations
-    el.querySelectorAll('.ret-ann').forEach(x=>x.remove());
-    if (ln === s.line) {
-      const cls = s.ev==='return'?'hi-return':s.ev==='call'?'hi-call':s.ev==='error'||s.ev==='exception'?'hi-error':'hi-line';
-      el.classList.add(cls);
-      el.scrollIntoView({block:'nearest',behavior:'smooth'});
-    }
-  });
-
-  // return value annotation on caller line
-  if (s.ev==='return' && s.ret && idx>0) {
-    const caller = steps.slice(0,idx).reverse().find(st=>st.frames.length < s.frames.length);
-    if (caller && caller.line > 0) {
-      const callerEl = document.querySelector(`.cl[data-ln="${caller.line}"] .lt`);
-      if (callerEl) {
-        const ann = document.createElement('span');
-        ann.className = 'ret-ann';
-        ann.textContent = `↩ ${renderVal(s.ret)}`;
-        callerEl.appendChild(ann);
-      }
-    }
-  }
+  highlightEditorLine(s.line, s.ev);
 
   renderFrames(s, prevS);
   renderHeap(s, prevS);
+  renderEventLoop(s);
+  renderScopePanel(s);
+  renderGraphsPanel(s);
   renderDepthMeter(s);
   renderStdout();
   renderStepInfo(s);
+  renderDiffPanel(s, prevS);
   updateScrub();
   updateBadge(s);
   updateAnnotation();
   drawArrows();
   updateSlide();
+}
+
+let _cmHiHandle = null;
+function highlightEditorLine(line, ev) {
+  if (!editor || !line || line < 1) return;
+  try {
+    if (_cmHiHandle !== null) editor.removeLineClass(_cmHiHandle, 'wrap', 'cm-exec-line');
+  } catch(_) {}
+  _cmHiHandle = line - 1;
+  const cls = ev === 'return' ? 'cm-exec-ret' : ev === 'call' ? 'cm-exec-call' : (ev === 'error' || ev === 'exception') ? 'cm-exec-err' : 'cm-exec-line';
+  editor.addLineClass(_cmHiHandle, 'wrap', cls);
+  // Exec dot gutter marker
+  try {
+    if (execMarkerLine !== null) editor.setGutterMarker(execMarkerLine, 'execpoint', null);
+    execMarkerLine = _cmHiHandle;
+    const dot = document.createElement('div');
+    dot.className = 'cm-exec-dot';
+    editor.setGutterMarker(execMarkerLine, 'execpoint', dot);
+  } catch(_) {}
+  editor.scrollIntoView({ line: _cmHiHandle, ch: 0 }, 80);
+}
+
+function renderDiffPanel(s, prevS) {
+  const panel = document.getElementById('diff-panel');
+  const body = document.getElementById('diff-body');
+  const sub = document.getElementById('diff-sub');
+  if (!panel || !body || !s) return;
+
+  const chips = [];
+  // Locals diff (current frame)
+  const curF = s.frames && s.frames.length ? s.frames[s.frames.length - 1] : null;
+  const prevF = prevS && prevS.frames && prevS.frames.length ? prevS.frames[prevS.frames.length - 1] : null;
+  if (curF) {
+    const changed = [];
+    Object.keys(curF.locals || {}).forEach(k => {
+      const a = curF.locals[k];
+      const b = prevF && prevF.locals ? prevF.locals[k] : undefined;
+      if (JSON.stringify(a) !== JSON.stringify(b)) changed.push(k);
+    });
+    if (changed.length) {
+      const first = changed[0];
+      chips.push(`<span class="diff-pill chg" style="cursor:pointer" onclick="focusVar('${esc(first)}')">locals: ${changed.slice(0,6).join(', ')}${changed.length>6?'…':''}</span>`);
+    }
+  }
+
+  // Heap diff
+  try {
+    const heap = collectHeap(s.frames || []);
+    const prevHeap = prevS ? collectHeap(prevS.frames || []) : new Map();
+    let newCount = 0, chgCount = 0;
+    heap.forEach((v, id) => {
+      if (!prevHeap.has(id)) newCount++;
+      else if (JSON.stringify(prevHeap.get(id)) !== JSON.stringify(v)) chgCount++;
+    });
+    if (newCount) chips.push(`<span class="diff-pill new" style="cursor:pointer" onclick="flashHeap()">heap new: ${newCount}</span>`);
+    if (chgCount) chips.push(`<span class="diff-pill chg" style="cursor:pointer" onclick="flashHeap()">heap changed: ${chgCount}</span>`);
+  } catch(_) {}
+
+  // Async deltas
+  if (s.async) {
+    const mq = (s.async.macroQ || []).length;
+    const uq = (s.async.microQ || []).length;
+    const prevMq = prevS && prevS.async ? (prevS.async.macroQ || []).length : 0;
+    const prevUq = prevS && prevS.async ? (prevS.async.microQ || []).length : 0;
+    const dm = mq - prevMq;
+    const du = uq - prevUq;
+    if (dm || du) chips.push(`<span class="diff-pill chg" style="cursor:pointer" onclick="scrollToPanel('eventloop-scroll')">queues: macro ${dm>=0?'+':''}${dm} · micro ${du>=0?'+':''}${du}</span>`);
+    if (s.async.last) chips.push(`<span class="diff-pill" style="cursor:pointer" onclick="scrollToPanel('eventloop-scroll')">ran: #${s.async.last.id} (${esc(s.async.last.via||'')})</span>`);
+  }
+
+  // Property access
+  if (s.prop) chips.push(`<span class="diff-pill" style="cursor:pointer" onclick="scrollToPanel('heap-scroll')">prop: ${esc(s.prop.op)} .${esc(String(s.prop.prop))}</span>`);
+
+  // Show/Hide based on lens
+  const show = currentLens === 'all' || currentLens === 'objects' || currentLens === 'async' || currentLens === 'scopes' || currentLens === 'graphs';
+  panel.style.display = show ? 'block' : 'none';
+  if (sub) sub.textContent = `step ${idx+1}/${steps.length}`;
+  body.innerHTML = chips.join('') || '<span style="color:var(--t4)">no visible changes</span>';
+}
+
+function scrollToPanel(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function focusVar(varName) {
+  const fb = document.getElementById('frames-scroll');
+  if (!fb || !varName) return;
+  const rows = fb.querySelectorAll('td.vk');
+  let found = null;
+  rows.forEach(r => {
+    if (found) return;
+    if ((r.textContent || '').trim() === varName) found = r;
+  });
+  if (found) {
+    const tr = found.closest('tr');
+    if (tr) tr.classList.add('flash');
+    found.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { try { if (tr) tr.classList.remove('flash'); } catch(_) {} }, 700);
+  }
+}
+
+function flashHeap() {
+  const hs = document.getElementById('heap-scroll');
+  if (!hs) return;
+  hs.querySelectorAll('.ho').forEach(el => el.classList.add('flash'));
+  setTimeout(() => { try { hs.querySelectorAll('.ho').forEach(el => el.classList.remove('flash')); } catch(_) {} }, 700);
+  hs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderScopePanel(s) {
+  const el = document.getElementById('scope-scroll');
+  if (!el) return;
+  if (mainLang !== 'javascript') {
+    el.innerHTML = '<div style="color:var(--t4)">scope viewer is available for JavaScript runs</div>';
+    return;
+  }
+  if (!jsAnalysis || !jsAnalysis.scopes) {
+    el.innerHTML = '<div style="color:var(--t4)">no scope analysis yet (run JS code)</div>';
+    return;
+  }
+  const frame = s && s.frames && s.frames.length ? s.frames[s.frames.length - 1] : null;
+  const fn = frame ? frame.fn : '<global>';
+  const line = frame ? frame.line : (s ? s.line : 1);
+  const chain = (jsAnalysis.scopeChainByFn && jsAnalysis.scopeChainByFn[fn]) ? jsAnalysis.scopeChainByFn[fn] : [];
+  if (!chain.length) {
+    el.innerHTML = '<div style="color:var(--t4)">no scope chain found for this frame</div>';
+    return;
+  }
+  const cards = chain.map((sc, i) => {
+    const title = sc.kind || 'scope';
+    const sub = `fn: ${esc(fn)} · line: ${line} · depth: ${i}`;
+    const vars = (sc.vars || []).map(v => `<span class="sv ${esc(v.kind||'var')}">${esc(v.name)}<span style="color:var(--t4)">${v.kind ? `:${esc(v.kind)}` : ''}</span></span>`).join('') || '<span style="color:var(--t4)">—</span>';
+    return `<div class="scope-card">
+      <div class="scope-h"><span>${esc(title)}</span><span style="color:var(--t4)">${esc(sc.label||'')}</span></div>
+      <div class="scope-sub">${sub}</div>
+      <div class="scope-vars">${vars}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = cards;
+}
+
+function renderGraphsPanel(s) {
+  const el = document.getElementById('graph-scroll');
+  if (!el) return;
+  if (mainLang !== 'javascript') {
+    el.innerHTML = '<div style="color:var(--t4)">graphs are available for JavaScript runs</div>';
+    return;
+  }
+  if (!jsAnalysis) {
+    el.innerHTML = '<div style="color:var(--t4)">no graph analysis yet (run JS code)</div>';
+    return;
+  }
+  const call = jsAnalysis.callGraphText || '—';
+  const curFn = s && s.frames && s.frames.length ? s.frames[s.frames.length-1].fn : '<global>';
+  const focus = graphFocusFn || curFn;
+  const cfg = jsAnalysis.cfgTextByFn ? (jsAnalysis.cfgTextByFn[focus] || '—') : '—';
+  const free = jsAnalysis.freevarsByFn && jsAnalysis.freevarsByFn[focus] ? jsAnalysis.freevarsByFn[focus] : [];
+  const shadow = jsAnalysis.shadowByFn && jsAnalysis.shadowByFn[focus] ? jsAnalysis.shadowByFn[focus] : [];
+  const freeHtml = free.length ? free.map(n=>`<span class="sv var">${esc(n)}</span>`).join('') : '<span style="color:var(--t4)">—</span>';
+  const shadowHtml = shadow.length ? shadow.slice(0,8).map(x=>`<div style="color:var(--amber)">shadow: ${esc(x.name)} (${esc(x.kind)}) @ line ${x.line}</div>`).join('') : '<div style="color:var(--t4)">—</div>';
+  const cfgEdges = (jsAnalysis.cfgEdgesByFn && jsAnalysis.cfgEdgesByFn[focus]) ? jsAnalysis.cfgEdgesByFn[focus] : [];
+  const cfgLines = String(cfg || '').split('\n').filter(Boolean);
+  const cfgNodes = cfgLines.map(line => {
+    const m = line.match(/^#(\\d+) \\(line (\\d+)\\):\\s*(.*)$/);
+    if (!m) return null;
+    return { id: +m[1], line: +m[2], label: m[3] };
+  }).filter(Boolean);
+  const curLine = s && s.line ? s.line : 1;
+  const curNode = cfgNodes.findLast ? cfgNodes.findLast(n => n.line <= curLine) : (cfgNodes.slice().reverse().find(n => n.line <= curLine) || null);
+  el.innerHTML = `
+    <div class="gbox">
+      <div class="gtitle"><span>Call Graph (static)</span><span style="color:var(--t4)">click a function name</span></div>
+      <div class="gpre">${esc(call).split('\\n').map(line=>{
+        const m = line.match(/^([^\\s]+)\\s+->\\s+([^\\s(]+)/);
+        if (!m) return esc(line);
+        const from = m[1], to = m[2];
+        const tail = line.slice((from + ' -> ' + to).length);
+        return `<span style="cursor:pointer;color:var(--blue)" onclick="graphFocusFn='${esc(from)}';render();">${esc(from)}</span> -> <span style="cursor:pointer;color:var(--blue)" onclick="graphFocusFn='${esc(to)}';render();">${esc(to)}</span>${esc(tail)}`;
+      }).join('\\n')}</div>
+    </div>
+    <div class="gbox">
+      <div class="gtitle"><span>Focus</span><span style="color:var(--t4)">${esc(focus)}</span></div>
+      <div style="color:var(--t4);font-size:10.5px;margin-top:6px">free vars (closure-ish)</div>
+      <div class="scope-vars" style="margin-top:6px">${freeHtml}</div>
+      <div style="color:var(--t4);font-size:10.5px;margin-top:10px">shadowing (risk)</div>
+      <div style="margin-top:6px">${shadowHtml}</div>
+    </div>
+    <div class="gbox">
+      <div class="gtitle"><span>CFG (focus function)</span><span style="color:var(--t4)">approx</span></div>
+      <div class="gpre">${esc(cfg)}</div>
+      ${cfgNodes.length ? `<svg class="gsvg" viewBox="0 0 800 260" preserveAspectRatio="none">
+        <defs>
+          <marker id="garrow" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+            <polygon points="0 0,7 2.5,0 5" fill="rgba(240,240,245,.3)"></polygon>
+          </marker>
+        </defs>
+        ${(() => {
+          const padX = 30, padY = 18;
+          const gapX = 150, gapY = 44;
+          const cols = 5;
+          const pos = new Map();
+          cfgNodes.forEach((n, i) => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const x = padX + col * gapX;
+            const y = padY + row * gapY;
+            pos.set(n.id, { x, y });
+          });
+          const edgesSvg = cfgEdges.map(e => {
+            const a = pos.get(e.from), b = pos.get(e.to);
+            if (!a || !b) return '';
+            const x1 = a.x + 22, y1 = a.y;
+            const x2 = b.x - 22, y2 = b.y;
+            const cx1 = x1 + (x2 - x1) * 0.4;
+            const cx2 = x1 + (x2 - x1) * 0.6;
+            return `<path class="gedge" d="M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}"></path>`;
+          }).join('');
+          const nodesSvg = cfgNodes.map(n => {
+            const p = pos.get(n.id);
+            const isCur = curNode && n.id === curNode.id;
+            const label = `#${n.id} ${n.label}`;
+            return `
+              <circle class="gnode${isCur?' cur':''}" cx="${p.x}" cy="${p.y}" r="18" onclick="alert('CFG node ${n.id} @ line ${n.line}: ${n.label}')"></circle>
+              <text class="glabel" x="${p.x + 26}" y="${p.y + 3}">${esc(label).slice(0,40)}</text>
+            `;
+          }).join('');
+          return edgesSvg + nodesSvg;
+        })()}
+      </svg>` : ''}
+    </div>
+  `;
+
+  // Also render Focus tile content (if present)
+  const focusEl = document.getElementById('focus-scroll');
+  if (focusEl) {
+    focusEl.innerHTML = `
+      <div class="gbox">
+        <div class="gtitle"><span>Function</span><span style="color:var(--t4)">${esc(focus)}</span></div>
+        <div style="color:var(--t4);font-size:10.5px;margin-top:6px">free vars (closure-ish)</div>
+        <div class="scope-vars" style="margin-top:6px">${freeHtml}</div>
+        <div style="color:var(--t4);font-size:10.5px;margin-top:10px">shadowing (risk)</div>
+        <div style="margin-top:6px">${shadowHtml}</div>
+      </div>
+    `;
+  }
+}
+
+function toggleTileMax(tile) {
+  const grid = document.getElementById('rightbot-grid');
+  if (!grid) return;
+  const tiles = grid.querySelectorAll('.tile');
+  const already = grid.classList.contains('tilemax');
+  const cur = grid.querySelector('.tile.max');
+  if (already && cur && cur.dataset.tile === tile) {
+    grid.classList.remove('tilemax');
+    cur.classList.remove('max');
+    return;
+  }
+  tiles.forEach(t => t.classList.remove('max'));
+  const target = grid.querySelector(`.tile[data-tile="${tile}"]`);
+  if (!target) return;
+  target.classList.add('max');
+  grid.classList.add('tilemax');
+}
+
+function renderEventLoop(s) {
+  const el = document.getElementById('eventloop-scroll');
+  if (!el) return;
+  if (!s || !s.async) {
+    el.innerHTML = '<div style="color:var(--t4)">no event loop data (run JS code that schedules async work)</div>';
+    return;
+  }
+  const a = s.async;
+  const chips = (list) => (list||[]).slice(0, 8).map(t => {
+    const cls = t.kind === 'micro' ? 'micro' : t.kind === 'render' ? 'render' : 'macro';
+    return `<span class="el-chip ${cls}">#${t.id} ${esc(t.label||t.kind||'task')}</span>`;
+  }).join('');
+
+  const edges = (a.edges||[]).slice(-12).map(e => {
+    return `<div class="el-edge"><strong>#${e.from}</strong> → <strong>#${e.to}</strong> <span style="color:var(--t4)">${esc(e.via||'')}</span></div>`;
+  }).join('') || '<div style="color:var(--t4)">no async edges yet</div>';
+
+  el.innerHTML = `
+    <div class="el-row"><div class="el-k">current task</div><div class="el-v">${a.cur ? `#${a.cur} (${esc(a.curKind||'')})` : '—'}</div></div>
+    <div class="el-row"><div class="el-k">macro queue</div><div class="el-v">${(a.macroQ||[]).length}</div></div>
+    <div style="padding:6px 0 10px">${chips(a.macroQ)}</div>
+    <div class="el-row"><div class="el-k">micro queue</div><div class="el-v">${(a.microQ||[]).length}</div></div>
+    <div style="padding:6px 0 10px">${chips(a.microQ)}</div>
+    <div class="el-row"><div class="el-k">unhandled</div><div class="el-v">${(a.unhandled||[]).length}</div></div>
+    <div style="padding-top:8px;color:var(--t4);font-size:10px;text-transform:uppercase;letter-spacing:.08em">causality (recent)</div>
+    ${edges}
+  `;
 }
 
 function renderVal(val) {
@@ -1401,6 +2138,15 @@ function renderFrames(s, prevS) {
   const fb = document.getElementById('frames-scroll');
   if (!s.frames.length) { fb.innerHTML = '<div class="empty-frames">call stack empty</div>'; return; }
   fb.innerHTML = '';
+  const bc = document.getElementById('stack-bc');
+  if (bc) {
+    const parts = s.frames.map((f, i) => {
+      const cur = i === s.frames.length - 1;
+      const name = f.fn === '<module>' ? 'global' : f.fn;
+      return `<span style="cursor:pointer;color:${cur ? 'var(--t1)' : 'var(--blue)'}" onclick="focusFrame(${i})">${esc(name)}</span>`;
+    });
+    bc.innerHTML = parts.join('<span style="color:var(--t4)">  ›  </span>') || '<span style="color:var(--t4)">—</span>';
+  }
   s.frames.forEach((f, fi) => {
     const cur = fi === s.frames.length - 1;
     const mod = f.fn === '<module>';
@@ -1414,19 +2160,22 @@ function renderFrames(s, prevS) {
     if (f.is_gen) badges.push('<span class="badge badge-green" style="font-size:8.5px">gen</span>');
     if (f.is_coro) badges.push('<span class="badge badge-purple" style="font-size:8.5px">async</span>');
     if (f.freevars&&f.freevars.length) badges.push('<span class="badge badge-amber" style="font-size:8.5px">closure</span>');
+    const thisLine = (mainLang === 'javascript' && f.thisVal) ? `<span class="fh-line" style="margin-left:8px;color:var(--t4)">this(${esc(f.thisKind||'call')}): ${renderVal(f.thisVal)}</span>` : '';
     fh.innerHTML = `<span class="fh-name${mod?' mod-fn':''}">${esc(mod?'global scope':f.fn)}</span><div class="fh-badges">${badges.join('')}</div>
-<span class="fh-line">line ${f.line}</span>`;
+<span class="fh-line">line ${f.line}</span>${thisLine}`;
     block.appendChild(fh);
 
     const keys = Object.keys(f.locals);
+    const prevF = prevS && prevS.frames && prevS.frames[fi] ? prevS.frames[fi] : null;
     if (keys.length) {
       const tbl = document.createElement('table');
       tbl.className = 'vt';
       keys.forEach(k => {
         const isFree = f.freevars && f.freevars.includes(k);
+        const changed = prevF && prevF.locals && JSON.stringify(prevF.locals[k]) !== JSON.stringify(f.locals[k]);
         const tr = document.createElement('tr');
         if (cur && s.ev==='return' && s.ret && fi===s.frames.length-1) tr.className='ret-val-row';
-        tr.innerHTML = `<td class="vk" onclick="showVarTimeline('${esc(k)}',${fi})" title="click to see timeline">${esc(k)}${isFree?'<sup class="freevar-tag">free</sup>':''}</td><td class="vv">${rv(f.locals[k])}</td>`;
+        tr.innerHTML = `<td class="vk" onclick="showVarTimeline('${esc(k)}',${fi})" title="click to see timeline">${esc(k)}${isFree?'<sup class="freevar-tag">free</sup>':''}</td><td class="vv${changed?' v-mut':''}">${rv(f.locals[k])}</td>`;
         tbl.appendChild(tr);
       });
       if (cur && s.ev==='return' && s.ret) {
@@ -1442,6 +2191,18 @@ function renderFrames(s, prevS) {
 
     fb.appendChild(block);
   });
+}
+
+function focusFrame(frameIdx) {
+  const fb = document.getElementById('frames-scroll');
+  if (!fb) return;
+  const blocks = fb.querySelectorAll('.frame-block');
+  const el = blocks[frameIdx];
+  if (el) {
+    el.classList.add('flash');
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { try { el.classList.remove('flash'); } catch(_) {} }, 700);
+  }
 }
 
 // ─── HEAP ────────────────────────────────────────────────────────────────────
@@ -1553,6 +2314,7 @@ function renderStepInfo(s) {
   let info = `event:  ${s.ev}\nfn:     ${fn}\nline:   ${s.line}\nframes: ${s.frames.length}`;
   if (s.exc) info += `\nerror:  ${s.exc}`;
   if (s.ret) info += `\nreturn: ${renderVal(s.ret)}`;
+  if (s.prop) info += `\nprop:   ${s.prop.op} .${s.prop.prop} (${s.prop.found?'found':'miss'})`;
   const ann = annotations.get(idx);
   if (ann) info += `\nnote:   ${ann}`;
   const infoBox = document.getElementById('step-info-box');
@@ -1560,62 +2322,54 @@ function renderStepInfo(s) {
 
   // Narrative Layer
   const nt = document.getElementById('narrative-text');
-  const nw = document.getElementById('narrative-wrap');
   const prevS = idx > 0 ? steps[idx-1] : null;
 
   let nar = "";
-  if (s.ev === 'call') {
-    nar = `Calling function <strong style="color:var(--purple)">${esc(s.fn)}</strong>. Python creates a new frame on the stack for this call.`;
+  if (s.ev === 'microtask' || s.ev === 'macrotask' || s.ev === 'unhandledrejection') {
+    const a = s.async || {};
+    const last = a.last || null;
+    if (s.ev === 'unhandledrejection') {
+      const u = (a.unhandled || []).slice(-1)[0];
+      nar = `JavaScript raised an <strong style="color:var(--red)">unhandled promise rejection</strong>${u && u.msg ? `: <span style="color:var(--t2)">${esc(u.msg)}</span>` : ''}. Add <code>.catch(...)</code> or a <code>try/catch</code> around <code>await</code>.`;
+    } else if (last) {
+      const q = last.kind === 'micro' ? 'microtask queue' : 'macrotask queue';
+      const cause = last.from ? ` because <strong>#${last.from}</strong> scheduled it via <strong>${esc(last.via || '')}</strong>` : '';
+      nar = `Running <strong>#${last.id}</strong> (<span style="color:var(--t3)">${esc(last.label||'task')}</span>) from the <strong>${q}</strong>${cause}.`;
+    } else {
+      nar = `JavaScript is running an async callback scheduled earlier (task queues drained when the call stack became empty).`;
+    }
+  } else if (s.ev === 'call') {
+    nar = `Calling function <strong style="color:var(--purple)">${esc(s.fn)}</strong>. ${mainLang === 'javascript' ? 'JavaScript pushes a new frame on the call stack for this call.' : 'Python creates a new frame on the stack for this call.'}`;
+  } else if (s.ev === 'get' || s.ev === 'set') {
+    if (s.prop) {
+      const chain = (s.prop.chain || []).map(p => p.owns ? `${p.name} (owns)` : `${p.name}`).join(' → ');
+      nar = `Property <strong>.${esc(s.prop.prop)}</strong> ${s.prop.op === 'get' ? 'read' : 'write'} (${s.prop.found ? 'resolved' : 'not found'}) via prototype chain: <span style="color:var(--t3)">${esc(chain || '—')}</span>.`;
+    } else {
+      nar = `A property was ${s.ev === 'get' ? 'read' : 'written'}.`;
+    }
   } else if (s.ev === 'return') {
     nar = `Function <span style="color:var(--purple)">${esc(s.fn)}</span> is finishing. It's returning <strong style="color:var(--green)">${esc(renderVal(s.ret))}</strong> to where it was called.`;
   } else if (s.ev === 'exception' || s.ev === 'error') {
-    nar = `An error occurred: <strong style="color:var(--red)">${esc(s.exc || "Something went wrong")}</strong>. Python stops normal execution and starts "bubbling up" the error.`;
+    nar = `An error occurred: <strong style="color:var(--red)">${esc(s.exc || "Something went wrong")}</strong>. ${mainLang === 'javascript' ? 'JavaScript stops normal execution and unwinds the stack until a handler catches it.' : 'Python stops normal execution and starts "bubbling up" the error.'}`;
   } else if (prevS && s.line !== prevS.line) {
     if (s.line < prevS.line && s.fn === prevS.fn) {
-        nar = `Continuing the loop or recurring. Python jumps back to line ${s.line}.`;
+        nar = `Continuing the loop or recurring. ${mainLang === 'javascript' ? 'Execution jumps back' : 'Python jumps back'} to line ${s.line}.`;
     } else {
-        nar = `Python moves to the next instruction at line ${s.line}.`;
+        nar = `${mainLang === 'javascript' ? 'Execution moves to the next instruction' : 'Python moves to the next instruction'} at line ${s.line}.`;
     }
   } else {
-    nar = `Python is currently executing line ${s.line} in ${esc(fn)}.`;
+    nar = `${mainLang === 'javascript' ? 'JavaScript is currently executing' : 'Python is currently executing'} line ${s.line} in ${esc(fn)}.`;
   }
 
-  nt.innerHTML = nar;
-  nw.style.display = 'block';
+  if (nt) nt.innerHTML = nar || `<span class="ins-empty">—</span>`;
 }
 
 // ─── TOOLTIPS ────────────────────────────────────────────────────────────────
-function handleCodeHover(e) {
-  const el = e.target.closest('.lt');
-  if (!el) return hideTooltip();
-  const ln = +el.closest('.cl').dataset.ln;
-  const s = steps[idx];
-  if (!s || !s.frames.length) return hideTooltip();
-
-  // Simple heuristic: find if cursor is over a word that exists in locals
-  const rect = el.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  // This is a rough estimation since we don't have perfect font metrics
-  const charWidth = 7.5; // average for mono 12.5px
-  const charIdx = Math.floor(x / charWidth);
-  const text = el.textContent;
-
-  // Find word at character index
-  const match = text.slice(0, charIdx).match(/(\w+)$/);
-  const match2 = text.slice(charIdx).match(/^(\w+)/);
-  const word = (match ? match[1] : "") + (match2 ? match2[1] : "");
-
-  if (word && s.frames[s.frames.length-1].locals[word]) {
-    const val = s.frames[s.frames.length-1].locals[word];
-    showTooltip(e.clientX, e.clientY, `${word} = ${renderVal(val)}`);
-  } else {
-    hideTooltip();
-  }
-}
-
+let _lastHoverKey = '';
 function showTooltip(x, y, txt) {
   const tt = document.getElementById('tooltip');
-  tt.textContent = txt;
+  if (!tt) return;
+  tt.innerHTML = txt;
   tt.style.display = 'block';
   tt.style.left = (x + 10) + 'px';
   tt.style.top = (y - 25) + 'px';
@@ -1623,6 +2377,39 @@ function showTooltip(x, y, txt) {
 function hideTooltip() {
   const tt = document.getElementById('tooltip');
   if (tt) tt.style.display = 'none';
+}
+
+function resolutionForVar(varName, step) {
+  if (!step || !step.frames || !step.frames.length) return 'unknown';
+  const cur = step.frames[step.frames.length - 1];
+  if (cur.locals && cur.locals[varName] !== undefined) return 'local';
+  if (cur.free && cur.free[varName] !== undefined) return 'freevar';
+  if (mainLang === 'javascript' && jsAnalysis && jsAnalysis.freevarsByFn && jsAnalysis.freevarsByFn[cur.fn]) {
+    if (jsAnalysis.freevarsByFn[cur.fn].includes(varName)) return 'freevar';
+  }
+  return 'unknown';
+}
+
+function attachEditorHoverPeek() {
+  if (!editor) return;
+  editor.on('mouseout', () => { _lastHoverKey = ''; hideTooltip(); });
+  editor.on('mousemove', (cm, e) => {
+    if (!steps.length) return;
+    const pos = cm.coordsChar({ left: e.clientX, top: e.clientY });
+    const tok = cm.getTokenAt(pos);
+    const word = tok && /^\w+$/.test(tok.string) ? tok.string : '';
+    if (!word) { _lastHoverKey = ''; hideTooltip(); return; }
+    const step = steps[idx];
+    const res = resolutionForVar(word, step);
+    if (res === 'unknown') { _lastHoverKey = ''; hideTooltip(); return; }
+    const cur = step.frames[step.frames.length - 1];
+    const val = (cur.locals && cur.locals[word] !== undefined) ? cur.locals[word] : (cur.free ? cur.free[word] : undefined);
+    const key = word + ':' + res + ':' + idx;
+    if (key === _lastHoverKey) return;
+    _lastHoverKey = key;
+    const resLbl = res === 'local' ? 'local' : 'closure/freevar';
+    showTooltip(e.clientX, e.clientY, `<div style="font-family:var(--mono);font-size:11px"><strong style="color:var(--t1)">${esc(word)}</strong> <span style="color:var(--t4)">(${esc(resLbl)})</span><div style="margin-top:4px;color:var(--t2)">${esc(renderVal(val))}</div></div>`);
+  });
 }
 
 // ─── BADGE ───────────────────────────────────────────────────────────────────
@@ -1780,7 +2567,27 @@ function showObjHistory(id) {
   const title = document.getElementById('modal-title');
   if (title) title.textContent = `Object history — id:${id} (${history.length} steps)`;
   if (body) {
-    body.innerHTML = history.map(h=>{
+    const latest = history.length ? history[history.length - 1].val : null;
+    let protoHtml = '';
+    if (latest && latest.proto && latest.proto.length) {
+      const own = latest.attrs ? Object.keys(latest.attrs) : (latest.items ? latest.items.map((_,i)=>String(i)) : []);
+      const chain = latest.proto.map((p, i) => {
+        const props = (p.props || []).slice(0, 18).join(', ');
+        return `<div style="padding:6px 0;border-bottom:1px dashed rgba(255,255,255,.06)">
+  <div style="display:flex;justify-content:space-between;gap:10px"><span style="color:var(--t2)">${esc(p.name || 'Object')}</span><span style="color:var(--t4)">level ${i+1}</span></div>
+  <div style="color:var(--t4);font-size:10.5px;margin-top:2px">props: ${esc(props || '—')}</div>
+</div>`;
+      }).join('');
+      protoHtml = `<div style="padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:10px">
+  <div style="display:flex;justify-content:space-between;gap:10px">
+    <strong style="color:var(--t1)">Prototype Chain</strong>
+    <span style="color:var(--t4);font-size:10px">conceptual</span>
+  </div>
+  <div style="color:var(--t4);font-size:10.5px;margin-top:6px">own keys: ${esc(own.slice(0,24).join(', ') || '—')}</div>
+  <div style="margin-top:8px">${chain}</div>
+</div>`;
+    }
+    body.innerHTML = protoHtml + history.map(h=>{
       const v=h.val;
       const summary = v.items ? `[${v.items.map(x=>Array.isArray(x)?`${renderVal(x[0])}:${renderVal(x[1])}`:renderVal(x)).join(', ')}]` : (v.attrs?JSON.stringify(Object.fromEntries(Object.entries(v.attrs).map(([k,vv])=>[k,renderVal(vv)]))):v.r||v.t);
       return `<div class="mh-entry"><span class="mh-step">step ${h.step+1}</span><span class="mh-val">${esc(summary)}</span></div>
@@ -1912,7 +2719,10 @@ function shareTrace() {
     theme: document.body.classList.contains('theme-dark') ? 'dark' : 'light'
   };
   const blob = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
-  const url = window.location.origin + window.location.pathname + '?h=' + blob;
+  const base = (window.location.origin && window.location.origin !== 'null')
+    ? (window.location.origin + window.location.pathname)
+    : window.location.href.split('?')[0].split('#')[0];
+  const url = base + '?h=' + blob;
   
   navigator.clipboard.writeText(url).then(() => {
     showBanner('🔗 Share link copied to clipboard!', 'green');
@@ -2517,7 +3327,7 @@ const PG_LANGS = [
   { id:'python',     label:'🐍 Python',     cm:'python',     engine:'pyodide',  color:'#3b82f6',
     starter:`# Python — runs via Pyodide in the browser\nname = "World"\nprint(f"Hello, {name}!")\n\n# Click '📊 Visualize' to step through execution` },
   { id:'javascript', label:'🟨 JavaScript', cm:'javascript',  engine:'worker',   color:'#f59e0b',
-    starter:`// JavaScript — runs in a sandboxed Web Worker\nfunction greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nconsole.log(greet("World"));\n\nconst nums = [3,1,4,1,5,9,2,6];\nnums.sort((a,b) => a-b);\nconsole.log("Sorted:", nums.join(", "));` },
+    starter:`// JavaScript — runs in a sandboxed Web Worker\n// Try stepping through: macrotasks (setTimeout), microtasks (Promise.then/queueMicrotask), and async/await.\n\nfunction later(ms, v) {\n  return new Promise(resolve => setTimeout(() => resolve(v), ms));\n}\n\nasync function main() {\n  console.log(\"start\");\n\n  queueMicrotask(() => console.log(\"microtask: queueMicrotask\"));\n  Promise.resolve().then(() => console.log(\"microtask: Promise.then\"));\n\n  setTimeout(() => console.log(\"macrotask: setTimeout 0\"), 0);\n\n  const x = await later(10, 42);\n  console.log(\"after await:\", x);\n\n  console.log(\"end\");\n}\n\nmain();` },
   { id:'typescript', label:'🔷 TypeScript', cm:'javascript',  engine:'judge0',   color:'#3b82f6', j0id:74,
     starter:`// TypeScript — compiled & run via Judge0\nfunction greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n\nconsole.log(greet("World"));\n\nconst nums: number[] = [3,1,4,1,5,9,2,6];\nnums.sort((a,b) => a-b);\nconsole.log("Sorted:", nums.join(", "));` },
   { id:'go',         label:'🔵 Go',         cm:'go',          engine:'judge0',   color:'#14b8a6', j0id:60,
@@ -2805,6 +3615,15 @@ const PG_VIZ_MAP = {
 
 let pgSqlVizSteps = [];
 let pgSqlVizIdx   = 0;
+let codeHints = null; // optional per-line hints (JS hoisting/TDZ)
+let mainLang = 'python';
+let lastMainLang = 'python';
+let jsAnalysis = null; // JS-only static analysis (scopes, call graph, cfg)
+let graphFocusFn = null;
+let currentLens = 'all';
+let lastSplitSizes = null;
+let hintBookmarks = [];
+let execMarkerLine = null;
 
 function pgVisualizeLang() {
   const lang = pgCurrentLang;
@@ -2830,6 +3649,8 @@ function pgRunJsTrace(code) {
        return;
     }
     steps = e.data.steps;
+    codeHints = e.data.hints || null;
+    jsAnalysis = e.data.analysis || null;
     idx = 0;
     codeLines = code.split('\n');
     annotations.clear();
@@ -2845,6 +3666,13 @@ function pgRunJsTrace(code) {
     buildCodeView();
     enableControls();
     render();
+    try { if (editor) editor.refresh(); } catch(_) {}
+
+    const con = document.getElementById('bc-stdout');
+    if (con) {
+      const out = (e.data.stdout || '').trim();
+      con.innerHTML = out ? `<pre style="margin:0;color:var(--t2)">${esc(out)}</pre>` : '<div style="color:var(--t4);font-style:italic">—</div>';
+    }
   };
   worker.onerror = e => {
     URL.revokeObjectURL(url);
@@ -3033,12 +3861,124 @@ function jsTracerWorkerWrapper() {
           return;
         }
 
-        const insertions = [];
-        let _nextObjId = 1;
-
-        function insert(pos, str) {
-          insertions.push({ pos, str });
+        // Per-line conceptual hints (not a full static analysis).
+        const hints = {};
+        function hintLine(ln, k) {
+          if (!ln || ln < 1) return;
+          if (!hints[ln]) hints[ln] = {};
+          hints[ln][k] = true;
         }
+
+        // Very small static analyzer: builds a scope chain (function + block scopes),
+        // a simple call graph (identifier calls), and an approximate CFG per function.
+        const analysis = {
+          scopes: [],
+          scopeChainByFn: {},
+          freevarsByFn: {},
+          shadowByFn: {},
+          callEdges: [],
+          cfgByFn: {},
+          cfgEdgesByFn: {},
+        };
+        const fnStack = ['<global>'];
+        const scopeStack = [{ fn: '<global>', kind: 'global', label: 'global', vars: [], decl: new Set(), uses: new Set() }];
+        const fnDeclared = { '<global>': new Set() };
+        const fnUses = { '<global>': new Set() };
+        const fnShadow = { '<global>': [] }; // array of {name, kind, line}
+
+        function curFn() { return fnStack[fnStack.length - 1] || '<global>'; }
+        function pushScope(kind, label) {
+          scopeStack.push({ fn: curFn(), kind, label: label || '', vars: [], decl: new Set(), uses: new Set() });
+        }
+        function popScope() { return scopeStack.pop(); }
+        function addVar(name, kind) {
+          if (!name) return;
+          const sc = scopeStack[scopeStack.length - 1];
+          if (!sc) return;
+          sc.vars.push({ name, kind });
+          sc.decl.add(name);
+          const fn = curFn();
+          if (!fnDeclared[fn]) fnDeclared[fn] = new Set();
+          fnDeclared[fn].add(name);
+        }
+        function identName(n) { return n && n.type === 'Identifier' ? n.name : null; }
+        function fmtVars(vars) {
+          const uniq = new Map();
+          (vars || []).forEach(v => { if (!uniq.has(v.name + ':' + v.kind)) uniq.set(v.name + ':' + v.kind, v); });
+          return Array.from(uniq.values());
+        }
+        function rebuildChains() {
+          // Build per-function chain (outer to inner) from collected scopes.
+          const byFn = {};
+          analysis.scopes.forEach(sc => {
+            if (!byFn[sc.fn]) byFn[sc.fn] = [];
+            byFn[sc.fn].push(sc);
+          });
+          Object.keys(byFn).forEach(fn => {
+            // Preserve original order by depth
+            analysis.scopeChainByFn[fn] = byFn[fn].map(sc => ({ kind: sc.kind, label: sc.label, vars: sc.vars }));
+          });
+        }
+        function addCfgNode(fn, line, label) {
+          if (!analysis.cfgByFn[fn]) analysis.cfgByFn[fn] = [];
+          if (!analysis.cfgEdgesByFn[fn]) analysis.cfgEdgesByFn[fn] = [];
+          const nodes = analysis.cfgByFn[fn];
+          const id = nodes.length + 1;
+          nodes.push({ id, line, label });
+          if (nodes.length > 1) {
+            analysis.cfgEdgesByFn[fn].push({ from: nodes[nodes.length - 2].id, to: id, kind: 'next' });
+          }
+          return id;
+        }
+        function buildCfgText(fn) {
+          const nodes = analysis.cfgByFn[fn] || [];
+          if (!nodes.length) return '';
+          return nodes.map(n => `#${n.id} (line ${n.line}): ${n.label}`).join('\n');
+        }
+        function isRefIdent(node) {
+          if (!node || node.type !== 'Identifier') return false;
+          const p = node.parent;
+          if (!p) return true;
+          // declarations
+          if (p.type === 'VariableDeclarator' && p.id === node) return false;
+          if ((p.type === 'FunctionDeclaration' || p.type === 'FunctionExpression') && p.id === node) return false;
+          if ((p.type === 'ClassDeclaration' || p.type === 'ClassExpression') && p.id === node) return false;
+          if ((p.type === 'CatchClause') && p.param === node) return false;
+          // params
+          if ((p.type === 'FunctionDeclaration' || p.type === 'FunctionExpression' || p.type === 'ArrowFunctionExpression') && (p.params || []).includes(node)) return false;
+          // property keys / member props
+          if (p.type === 'MemberExpression' && p.property === node && !p.computed) return false;
+          if (p.type === 'Property' && p.key === node && !p.computed) return false;
+          if (p.type === 'MethodDefinition' && p.key === node && !p.computed) return false;
+          if (p.type === 'LabeledStatement' && p.label === node) return false;
+          if (p.type === 'BreakStatement' && p.label === node) return false;
+          if (p.type === 'ContinueStatement' && p.label === node) return false;
+          return true;
+        }
+        function recordUse(name) {
+          if (!name) return;
+          const fn = curFn();
+          if (!fnUses[fn]) fnUses[fn] = new Set();
+          fnUses[fn].add(name);
+          const sc = scopeStack[scopeStack.length - 1];
+          if (sc) sc.uses.add(name);
+        }
+        function computeFreevars() {
+          Object.keys(fnUses).forEach(fn => {
+            const uses = fnUses[fn] || new Set();
+            const decl = fnDeclared[fn] || new Set();
+            const builtins = new Set(['console','Math','Number','String','Boolean','Array','Object','Promise','setTimeout','queueMicrotask','JSON','Date','RegExp','Error','Map','Set','WeakMap','WeakSet','Symbol']);
+            const free = [];
+            uses.forEach(n => { if (!decl.has(n) && !builtins.has(n)) free.push(n); });
+            analysis.freevarsByFn[fn] = free.sort();
+            analysis.shadowByFn[fn] = (fnShadow[fn] || []);
+          });
+        }
+
+        let _nextObjId = 1;
+        // NOTE: Previous versions used string-insertion instrumentation. That approach
+        // is too brittle for safe MemberExpression/CallExpression rewriting (and breaks `this`).
+        // We now generate instrumented code via AST transform + codegen (astring).
 
         // Simple AST walker
         function walk(node, visitor) {
@@ -3064,94 +4004,426 @@ function jsTracerWorkerWrapper() {
         walk(ast, {
           enter: (node) => {
             const type = node.type;
-            const bodyLoc = node.body ? node.body.loc : node.loc;
-            
-            // Block single-statement consequents
-            let needsBlock = false;
-            if (node.parent) {
-               const pt = node.parent.type;
-               if ((pt === 'IfStatement' || pt === 'ForStatement' || pt === 'WhileStatement' || pt === 'ForInStatement' || pt === 'ForOfStatement') && type !== 'BlockStatement') {
-                  if (node === node.parent.consequent || node === node.parent.alternate || node === node.parent.body) {
-                     needsBlock = true;
-                     insert(node.start, "{ ");
-                  }
-               }
-            }
+            // NOTE: runtime instrumentation is done via AST transform + codegen below.
+            // This `walk(ast, ...)` pass is for static analysis (scopes/calls/cfg/hints) only.
 
-            // Statements: Before they execute
-            if (
-              type.endsWith('Statement') || type === 'VariableDeclaration'
-            ) {
-              if (type !== 'BlockStatement' && node.parent?.type !== 'ForStatement' && node.parent?.type !== 'ForInStatement' && node.parent?.type !== 'ForOfStatement') {
-                const line = node.loc.start.line;
-                insert(node.start, "__step__(" + line + ", 'line');\n");
-              }
-            }
-
-            // Track variables inside function parameters
+            // Scope tracking (approx)
             if (type === 'FunctionDeclaration' || type === 'FunctionExpression' || type === 'ArrowFunctionExpression') {
-              const fnName = node.id ? node.id.name : '<anonymous>';
-              const line = node.loc.start.line;
-
-              if (node.body.type !== 'BlockStatement') {
-                 let pre = "{ __enter__(" + line + ", '" + fnName + "'); ";
-                 node.params.forEach(p => {
-                    if (p.type === 'Identifier') pre += "__var__('" + p.name + "', " + p.name + "); ";
-                 });
-                 pre += "let _ret = ";
-                 insert(node.body.start, pre);
-                 insert(node.body.end, "; __exit__(" + node.body.loc.end.line + "); return _ret; }");
-              } else {
-                 let pre = "__enter__(" + line + ", '" + fnName + "');\n";
-                 node.params.forEach(p => {
-                    if (p.type === 'Identifier') {
-                      pre += "__var__('" + p.name + "', " + p.name + ");\n";
-                    }
-                 });
-                 insert(node.body.start + 1, pre);
-                 insert(node.body.end - 1, "\n__exit__(" + node.loc.end.line + ");\n");
+              const fnName = node.id && node.id.name ? node.id.name : '<anonymous>';
+              fnStack.push(fnName);
+              pushScope('function', fnName);
+              if (!fnDeclared[fnName]) fnDeclared[fnName] = new Set();
+              if (!fnUses[fnName]) fnUses[fnName] = new Set();
+              if (!fnShadow[fnName]) fnShadow[fnName] = [];
+              (node.params || []).forEach(p => { const n = identName(p); if (n) addVar(n, 'param'); });
+            }
+            if (type === 'BlockStatement') {
+              pushScope('block', 'block');
+            }
+            if (type === 'VariableDeclaration') {
+              const kind = node.kind || 'var';
+              (node.declarations || []).forEach(d => {
+                const n = d && d.id ? identName(d.id) : null;
+                if (n) {
+                  // Shadowing (approx): if any outer scope already declared this name.
+                  const outerHas = scopeStack.slice(0, -1).some(sc => sc && sc.decl && sc.decl.has(n));
+                  if (outerHas) {
+                    const fn = curFn();
+                    if (!fnShadow[fn]) fnShadow[fn] = [];
+                    fnShadow[fn].push({ name: n, kind, line: node.loc && node.loc.start ? node.loc.start.line : -1 });
+                  }
+                  addVar(n, kind);
+                }
+              });
+            }
+            if (type === 'Identifier' && isRefIdent(node)) {
+              recordUse(node.name);
+            }
+            if (type === 'CallExpression') {
+              if (node.callee && node.callee.type === 'Identifier') {
+                analysis.callEdges.push({ from: curFn(), to: node.callee.name, line: node.loc && node.loc.start ? node.loc.start.line : -1 });
               }
             }
-
-            // Return exits frame
-            if (type === 'ReturnStatement') {
-               insert(node.start, "__exit__(" + node.loc.start.line + ");\n");
+            if (type.endsWith('Statement') && node.loc && node.loc.start) {
+              const fn = curFn();
+              const ln = node.loc.start.line;
+              if (type === 'IfStatement') addCfgNode(fn, ln, 'if (...)');
+              else if (type === 'WhileStatement') addCfgNode(fn, ln, 'while (...)');
+              else if (type === 'ForStatement') addCfgNode(fn, ln, 'for (...)');
+              else if (type === 'ReturnStatement') addCfgNode(fn, ln, 'return');
+              else if (type === 'ExpressionStatement') addCfgNode(fn, ln, 'expr');
             }
 
-            // Variable Declarations
-            if (type === 'VariableDeclaration') {
-                if (node.parent && !node.parent.type.startsWith('For')) {
-                    let vars = "";
-                    node.declarations.forEach(d => {
-                        if (d.id.type === 'Identifier') vars += "__var__('" + d.id.name + "', " + d.id.name + "); ";
-                    });
-                    if (vars) insert(node.end, "; " + vars + "\n");
-                }
+            // Temporal Dead Zone (approx):
+            // For `let/const x = <init>`, mark `x` as TDZ just before running the declaration,
+            // then the usual __var__ at the end of the statement overwrites it with the real value.
+            if (type === 'VariableDeclaration' && (node.kind === 'let' || node.kind === 'const')) {
+              hintLine(node.loc.start.line, 'tdz');
             }
 
-            // Assignments
-            if (type === 'AssignmentExpression' && node.left.type === 'Identifier') {
-               insert(node.start, "(");
-               insert(node.end, ", __var__('" + node.left.name + "', " + node.left.name + "), " + node.left.name + ")");
+            if (type === 'VariableDeclaration' && node.kind === 'var') {
+              hintLine(node.loc.start.line, 'hoist');
             }
 
-            if (needsBlock) {
-                 insert(node.end, " }");
+            // Property access tracing (get/set) is intentionally disabled in the string-insertion
+            // instrumenter because it cannot safely rewrite `obj.prop`/`obj[prop]` without
+            // breaking syntax or call semantics (e.g. `obj.method()` binding).
+            // We'll re-enable this when we switch to an AST transform + codegen path.
+          }
+          ,exit: (node) => {
+            const type = node.type;
+            if (type === 'BlockStatement') {
+              const sc = popScope();
+              if (sc) analysis.scopes.push({ fn: sc.fn, kind: sc.kind, label: sc.label, vars: fmtVars(sc.vars) });
+            }
+            if (type === 'FunctionDeclaration' || type === 'FunctionExpression' || type === 'ArrowFunctionExpression') {
+              const sc = popScope();
+              if (sc) analysis.scopes.push({ fn: sc.fn, kind: sc.kind, label: sc.label, vars: fmtVars(sc.vars) });
+              fnStack.pop();
             }
           }
         });
 
-        insertions.sort((a,b) => b.pos - a.pos);
-        let instrumented = code;
-        for (const ins of insertions) {
-           instrumented = instrumented.slice(0, ins.pos) + ins.str + instrumented.slice(ins.pos);
+        // Flush any remaining scopes (global)
+        while (scopeStack.length) {
+          const sc = scopeStack.pop();
+          if (sc) analysis.scopes.push({ fn: sc.fn, kind: sc.kind, label: sc.label, vars: fmtVars(sc.vars) });
         }
+        rebuildChains();
+        computeFreevars();
+
+        function lit(v) { return { type: 'Literal', value: v }; }
+        function id(n) { return { type: 'Identifier', name: n }; }
+        function call(callee, args) { return { type: 'CallExpression', callee, arguments: args }; }
+        function exprStmt(e) { return { type: 'ExpressionStatement', expression: e }; }
+        function arr(xs) { return { type: 'ArrayExpression', elements: xs }; }
+        function member(obj, prop, computed) { return { type: 'MemberExpression', object: obj, property: prop, computed: !!computed, optional: false }; }
+
+        function cloneNode(n) { return n; } // acorn nodes are plain; we rebuild only where needed.
+
+        function transformExpr(node, ctx) {
+          if (!node || typeof node !== 'object') return node;
+          const t = node.type;
+          if (t === 'Identifier') {
+            // Wrap identifier reads so we can surface closure/freevar values in the UI.
+            // This is an approximation: we only know values when the identifier is actually read.
+            if (ctx && ctx.isLhs) return node;
+            if (!isRefIdent(node)) return node;
+            // Never wrap write contexts that require an assignable LHS (e.g. `i++`).
+            // Wrapping here would produce invalid syntax like `__read__(...)++`.
+            const p = node.parent;
+            if (p && p.type === 'UpdateExpression' && p.argument === node) return node;
+            const ln = node.loc && node.loc.start ? node.loc.start.line : 1;
+            return call(id('__read__'), [lit(node.name), node, lit(ln)]);
+          }
+          if (t === 'MemberExpression') {
+            const obj = transformExpr(node.object, { parentType: 'MemberExpression.object' });
+            const prop = node.computed ? transformExpr(node.property, { parentType: 'MemberExpression.property' }) : node.property;
+            // Skip LHS; handled elsewhere.
+            if (ctx && (ctx.isLhs || ctx.isCalleeMember)) return { ...node, object: obj, property: prop };
+            const ln = node.loc && node.loc.start ? node.loc.start.line : 1;
+            const propArg = node.computed ? prop : lit(node.property.name);
+            const kind = node.computed ? 'bracket' : 'dot';
+            return call(id('__get__'), [obj, propArg, lit(ln), lit(kind)]);
+          }
+          if (t === 'CallExpression') {
+            // Preserve `this` for obj.method(...) calls.
+            if (node.callee && node.callee.type === 'MemberExpression') {
+              const cal = node.callee;
+              const ln = node.loc && node.loc.start ? node.loc.start.line : 1;
+              const obj = transformExpr(cal.object, { parentType: 'CallExpression.callee' });
+              const propArg = cal.computed ? transformExpr(cal.property, { parentType: 'MemberExpression.property' }) : lit(cal.property.name);
+              const kind = cal.computed ? 'bracket' : 'dot';
+              const args = (node.arguments || []).map(a => transformExpr(a, { parentType: 'CallExpression.arg' }));
+              return call(id('__mcall__'), [obj, propArg, lit(ln), lit(kind), arr(args)]);
+            }
+            return { ...node, callee: transformExpr(node.callee, { parentType: 'CallExpression.callee' }), arguments: (node.arguments || []).map(a => transformExpr(a, { parentType: 'CallExpression.arg' })) };
+          }
+          if (t === 'AssignmentExpression') {
+            // Property write: obj.prop = rhs
+            if (node.left && node.left.type === 'MemberExpression') {
+              const left = node.left;
+              const ln = node.loc && node.loc.start ? node.loc.start.line : 1;
+              const obj = transformExpr(left.object, { parentType: 'AssignmentExpression.left', isLhs: true });
+              const propArg = left.computed ? transformExpr(left.property, { parentType: 'MemberExpression.property' }) : lit(left.property.name);
+              const kind = left.computed ? 'bracket' : 'dot';
+              const rhs = transformExpr(node.right, { parentType: 'AssignmentExpression.right' });
+              return call(id('__set__'), [obj, propArg, rhs, lit(ln), lit(kind)]);
+            }
+            return { ...node, left: transformExpr(node.left, { parentType: 'AssignmentExpression.left', isLhs: true }), right: transformExpr(node.right, { parentType: 'AssignmentExpression.right' }) };
+          }
+          if (t === 'BinaryExpression' || t === 'LogicalExpression') {
+            return { ...node, left: transformExpr(node.left, ctx), right: transformExpr(node.right, ctx) };
+          }
+          if (t === 'UnaryExpression' || t === 'UpdateExpression') {
+            return { ...node, argument: transformExpr(node.argument, ctx) };
+          }
+          if (t === 'ReturnStatement') {
+            return { ...node, argument: transformExpr(node.argument, ctx) };
+          }
+          if (t === 'ArrayExpression') {
+            return { ...node, elements: (node.elements || []).map(e => transformExpr(e, ctx)) };
+          }
+          if (t === 'ObjectExpression') {
+            return { ...node, properties: (node.properties || []).map(p => {
+              if (!p || p.type !== 'Property') return p;
+              return { ...p, value: transformExpr(p.value, ctx) };
+            }) };
+          }
+          if (t === 'ConditionalExpression') {
+            return { ...node, test: transformExpr(node.test, ctx), consequent: transformExpr(node.consequent, ctx), alternate: transformExpr(node.alternate, ctx) };
+          }
+          return node;
+        }
+
+        function collectDeclNamesFromPattern(pat, out) {
+          if (!pat) return;
+          if (pat.type === 'Identifier') out.push(pat.name);
+          else if (pat.type === 'ArrayPattern') (pat.elements || []).forEach(e => collectDeclNamesFromPattern(e, out));
+          else if (pat.type === 'ObjectPattern') (pat.properties || []).forEach(pr => {
+            if (pr && pr.type === 'Property') collectDeclNamesFromPattern(pr.value, out);
+            if (pr && pr.type === 'RestElement') collectDeclNamesFromPattern(pr.argument, out);
+          });
+          else if (pat.type === 'RestElement') collectDeclNamesFromPattern(pat.argument, out);
+          else if (pat.type === 'AssignmentPattern') collectDeclNamesFromPattern(pat.left, out);
+        }
+
+        function instrumentStmtList(list, fnName, thisKind) {
+          const out = [];
+          (list || []).forEach(st => {
+            if (!st) return;
+            const ln = st.loc && st.loc.start ? st.loc.start.line : 1;
+            out.push(exprStmt(call(id('__step__'), [lit(ln), lit('line')])));
+
+            // TDZ marker (approx) for let/const with init.
+            if (st.type === 'VariableDeclaration' && (st.kind === 'let' || st.kind === 'const')) {
+              (st.declarations || []).forEach(d => {
+                if (d && d.id && d.init) {
+                  const names = [];
+                  collectDeclNamesFromPattern(d.id, names);
+                  names.forEach(n => out.push(exprStmt(call(id('__tdz__'), [lit(n)]))));
+                }
+              });
+            }
+
+            let inst = st;
+            if (st.type === 'BlockStatement') {
+              inst = { ...st, body: instrumentStmtList(st.body, fnName, thisKind) };
+            } else if (st.type === 'ExpressionStatement') {
+              inst = { ...st, expression: transformExpr(st.expression, { parentType: 'ExpressionStatement' }) };
+            } else if (st.type === 'IfStatement') {
+              inst = { ...st,
+                test: transformExpr(st.test, {}),
+                consequent: st.consequent && st.consequent.type === 'BlockStatement'
+                  ? { ...st.consequent, body: instrumentStmtList(st.consequent.body, fnName, thisKind) }
+                  : st.consequent,
+                alternate: st.alternate && st.alternate.type === 'BlockStatement'
+                  ? { ...st.alternate, body: instrumentStmtList(st.alternate.body, fnName, thisKind) }
+                  : st.alternate
+              };
+            } else if (st.type === 'ReturnStatement') {
+              inst = { ...st, argument: transformExpr(st.argument, {}) };
+            } else if (st.type === 'VariableDeclaration') {
+              inst = { ...st, declarations: (st.declarations || []).map(d => ({ ...d, init: transformExpr(d.init, {}) })) };
+            } else if (st.type === 'FunctionDeclaration') {
+              inst = instrumentFunctionLike(st, st.id && st.id.name ? st.id.name : '<anonymous>');
+            } else {
+              // best effort transform expressions in a few common statement types
+              if (st.test) inst = { ...inst, test: transformExpr(st.test, {}) };
+              if (st.update) inst = { ...inst, update: transformExpr(st.update, {}) };
+              if (st.init && typeof st.init === 'object') inst = { ...inst, init: transformExpr(st.init, {}) };
+            }
+
+            out.push(inst);
+
+            // Var tracking after statement for simple cases
+            if (st.type === 'VariableDeclaration') {
+              const names = [];
+              (st.declarations || []).forEach(d => collectDeclNamesFromPattern(d.id, names));
+              names.forEach(n => out.push(exprStmt(call(id('__var__'), [lit(n), id(n)]))));
+            }
+            if (st.type === 'ExpressionStatement') {
+              const ex = st.expression;
+              if (ex && ex.type === 'AssignmentExpression' && ex.left && ex.left.type === 'Identifier') {
+                out.push(exprStmt(call(id('__var__'), [lit(ex.left.name), id(ex.left.name)])));
+              }
+              if (ex && ex.type === 'UpdateExpression' && ex.argument && ex.argument.type === 'Identifier') {
+                out.push(exprStmt(call(id('__var__'), [lit(ex.argument.name), id(ex.argument.name)])));
+              }
+            }
+          });
+          return out;
+        }
+
+        function instrumentFunctionLike(fnNode, nameHint) {
+          const fnName = nameHint || (fnNode.id && fnNode.id.name) || '<anonymous>';
+          const ln = fnNode.loc && fnNode.loc.start ? fnNode.loc.start.line : 1;
+          const endLn = fnNode.loc && fnNode.loc.end ? fnNode.loc.end.line : ln;
+          const isArrow = fnNode.type === 'ArrowFunctionExpression';
+          const kind = isArrow ? 'arrow' : 'call';
+          // Ensure block body
+          let body = fnNode.body;
+          if (body.type !== 'BlockStatement') {
+            body = { type: 'BlockStatement', body: [{ type: 'ReturnStatement', argument: transformExpr(body, {}) }] };
+          }
+          const enter = exprStmt(call(id('__enter__'), [lit(ln), lit(fnName), id('this'), lit(kind)]));
+          const finallyBlock = { type: 'BlockStatement', body: [exprStmt(call(id('__exit__'), [lit(endLn)]))] };
+          const tryStmt = {
+            type: 'TryStatement',
+            block: { type: 'BlockStatement', body: instrumentStmtList(body.body, fnName, kind) },
+            handler: null,
+            finalizer: finallyBlock
+          };
+          const newBody = { type: 'BlockStatement', body: [enter, tryStmt] };
+          return { ...fnNode, id: fnNode.id, body: newBody };
+        }
+
+        function gen(node) {
+          if (!node) return '';
+          if (Array.isArray(node)) return node.map(gen).join('');
+          switch (node.type) {
+            case 'Program':
+              return (node.body || []).map(s => gen(s) + '\n').join('');
+            case 'BlockStatement':
+              return '{\n' + (node.body || []).map(s => gen(s) + '\n').join('') + '}\n';
+            case 'ExpressionStatement':
+              return gen(node.expression) + ';';
+            case 'EmptyStatement':
+              return ';';
+            case 'DebuggerStatement':
+              return 'debugger;';
+            case 'ReturnStatement':
+              return 'return' + (node.argument ? ' ' + gen(node.argument) : '') + ';';
+            case 'BreakStatement':
+              return 'break' + (node.label ? ' ' + gen(node.label) : '') + ';';
+            case 'ContinueStatement':
+              return 'continue' + (node.label ? ' ' + gen(node.label) : '') + ';';
+            case 'ThrowStatement':
+              return 'throw ' + gen(node.argument) + ';';
+            case 'IfStatement':
+              return 'if (' + gen(node.test) + ') ' + gen(node.consequent) + (node.alternate ? ' else ' + gen(node.alternate) : '');
+            case 'WhileStatement':
+              return 'while (' + gen(node.test) + ') ' + gen(node.body);
+            case 'DoWhileStatement':
+              return 'do ' + gen(node.body) + ' while (' + gen(node.test) + ');';
+            case 'ForStatement':
+              return 'for (' + (node.init ? gen(node.init).replace(/;$/, '') : '') + '; ' + (node.test ? gen(node.test) : '') + '; ' + (node.update ? gen(node.update) : '') + ') ' + gen(node.body);
+            case 'ForOfStatement':
+              return 'for (' + gen(node.left).replace(/;$/, '') + ' of ' + gen(node.right) + ') ' + gen(node.body);
+            case 'ForInStatement':
+              return 'for (' + gen(node.left).replace(/;$/, '') + ' in ' + gen(node.right) + ') ' + gen(node.body);
+            case 'VariableDeclaration':
+              return node.kind + ' ' + (node.declarations || []).map(gen).join(', ') + ';';
+            case 'VariableDeclarator':
+              return gen(node.id) + (node.init ? ' = ' + gen(node.init) : '');
+            case 'FunctionDeclaration':
+              return 'function ' + gen(node.id) + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body);
+            case 'FunctionExpression':
+              return '(function' + (node.id ? ' ' + gen(node.id) : '') + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body) + ')';
+            case 'ArrowFunctionExpression':
+              return '(' + (node.params || []).map(gen).join(', ') + ') => ' + (node.body.type === 'BlockStatement' ? gen(node.body) : gen(node.body));
+            case 'TryStatement':
+              return 'try ' + gen(node.block) + (node.handler ? ' catch (' + gen(node.handler.param) + ') ' + gen(node.handler.body) : '') + (node.finalizer ? ' finally ' + gen(node.finalizer) : '');
+            case 'Identifier':
+              return node.name;
+            case 'Literal':
+              return typeof node.value === 'string' ? JSON.stringify(node.value) : String(node.raw ?? node.value);
+            case 'ThisExpression':
+              return 'this';
+            case 'ArrayExpression':
+              return '[' + (node.elements || []).map(e => e ? gen(e) : '').join(', ') + ']';
+            case 'ObjectExpression':
+              return '{' + (node.properties || []).map(gen).join(', ') + '}';
+            case 'Property': {
+              const k = node.computed ? '[' + gen(node.key) + ']' : gen(node.key);
+              if (node.kind === 'get') return 'get ' + k + '() ' + gen(node.value.body);
+              if (node.kind === 'set') return 'set ' + k + '(' + (node.value.params || []).map(gen).join(', ') + ') ' + gen(node.value.body);
+              return k + ': ' + gen(node.value);
+            }
+            case 'MemberExpression':
+              return gen(node.object) + (node.computed ? '[' + gen(node.property) + ']' : '.' + gen(node.property));
+            case 'CallExpression':
+              return gen(node.callee) + '(' + (node.arguments || []).map(gen).join(', ') + ')';
+            case 'NewExpression':
+              return 'new ' + gen(node.callee) + '(' + (node.arguments || []).map(gen).join(', ') + ')';
+            case 'AwaitExpression':
+              return 'await ' + gen(node.argument);
+            case 'AssignmentExpression':
+              return '(' + gen(node.left) + ' ' + node.operator + ' ' + gen(node.right) + ')';
+            case 'BinaryExpression':
+            case 'LogicalExpression':
+              return '(' + gen(node.left) + ' ' + node.operator + ' ' + gen(node.right) + ')';
+            case 'UnaryExpression':
+              return '(' + node.operator + (node.prefix ? '' : ' ') + gen(node.argument) + ')';
+            case 'UpdateExpression':
+              return node.prefix ? '(' + node.operator + gen(node.argument) + ')' : '(' + gen(node.argument) + node.operator + ')';
+            case 'ConditionalExpression':
+              return '(' + gen(node.test) + ' ? ' + gen(node.consequent) + ' : ' + gen(node.alternate) + ')';
+            case 'SequenceExpression':
+              return '(' + (node.expressions || []).map(gen).join(', ') + ')';
+            case 'TemplateLiteral': {
+              const parts = [];
+              for (let i = 0; i < node.quasis.length; i++) {
+                parts.push(node.quasis[i].value.raw.replace(/`/g, '\\`'));
+                if (node.expressions[i]) parts.push('${' + gen(node.expressions[i]) + '}');
+              }
+              return '`' + parts.join('') + '`';
+            }
+            case 'TaggedTemplateExpression':
+              return gen(node.tag) + gen(node.quasi);
+            default:
+              throw new Error('Unsupported syntax in offline mode: ' + node.type);
+          }
+        }
+
+        // Instrument top-level program
+        const prog = { ...ast, body: instrumentStmtList(ast.body, '<global>', 'call') };
+        // Also instrument function expressions/arrow functions nested in expressions by a second traversal.
+        function deepInstrumentFunctions(n) {
+          if (!n || typeof n !== 'object') return n;
+          if (Array.isArray(n)) return n.map(deepInstrumentFunctions);
+          if (n.type === 'FunctionExpression' || n.type === 'ArrowFunctionExpression') {
+            return instrumentFunctionLike(n, n.id && n.id.name ? n.id.name : '<anonymous>');
+          }
+          const out = { ...n };
+          Object.keys(out).forEach(k => {
+            // Acorn nodes in this worker have a `parent` pointer (added by our walker),
+            // which creates cycles; skip it during deep transforms.
+            if (k === 'loc' || k === 'start' || k === 'end' || k === 'parent') return;
+            out[k] = deepInstrumentFunctions(out[k]);
+          });
+          return out;
+        }
+        const instrumented = gen(deepInstrumentFunctions(prog));
 
         // 3. Execution Environment
         const _steps = [];
-        const _frames = [{ fn: '<global>', locals: {} }];
-        const _heap = new Map();
+        const _frames = [{ fn: '<global>', line: 1, locals: {}, free: {} }];
         let _stepCount = 0;
+
+        // Async/event-loop tracing (conceptual; uses wrappers around native scheduling).
+        let _taskId = 1;
+        let _curTask = null;
+        let _curKind = null;
+        let _lastRan = null; // {id, kind, label, from, via}
+        const _macroQ = [];
+        const _microQ = [];
+        const _edges = [];
+        const _unhandled = [];
+        let _lastProp = null; // {op, obj, prop, via, line}
+
+        function _snapAsync() {
+          const slim = (t) => ({ id: t.id, kind: t.kind, label: t.label });
+          return {
+            cur: _curTask,
+            curKind: _curKind,
+            last: _lastRan,
+            macroQ: _macroQ.slice(0, 30).map(slim),
+            microQ: _microQ.slice(0, 30).map(slim),
+            edges: _edges.slice(-80),
+            unhandled: _unhandled.slice(-20),
+          };
+        }
 
         function _pyTutorSerialize(val, seen) {
            if (val === null) return { t: 'None', v: null };
@@ -3160,16 +4432,32 @@ function jsTracerWorkerWrapper() {
            if (typeof val === 'number') return { t: val % 1 === 0 ? 'int' : 'float', v: val };
            if (typeof val === 'string') return { t: 'str', v: val };
            if (typeof val === 'function') return { t: 'fn', r: val.name || '<anonymous>' };
+           if (val && val.__haki_tdz === true) return { t: 'tdz', v: null };
            if (typeof val === 'object') {
                if (seen.has(val)) return { t: Array.isArray(val)? 'list':'dict', id: seen.get(val) };
                const id = _nextObjId++;
                seen.set(val, id);
+               // Prototype chain (conceptual) for "complete internals" explanation.
+               // We do not attempt to serialize prototypes as full heap objects (too noisy);
+               // instead we capture constructor names and own property names at each level.
+               let proto = [];
+               try {
+                 let p = Object.getPrototypeOf(val);
+                 let depth = 0;
+                 while (p && depth++ < 6) {
+                   const ctor = (p && p.constructor && p.constructor.name) ? p.constructor.name : 'Object';
+                   let props = [];
+                   try { props = Object.getOwnPropertyNames(p).slice(0, 32); } catch(_) {}
+                   proto.push({ name: ctor, props });
+                   p = Object.getPrototypeOf(p);
+                 }
+               } catch(_) {}
                if (Array.isArray(val)) {
-                   return { t: 'list', id, items: val.map(v => _pyTutorSerialize(v, seen)) };
+                   return { t: 'list', id, proto, items: val.map(v => _pyTutorSerialize(v, seen)) };
                } else {
                    const attrs = {};
                    for (const k in val) attrs[k] = _pyTutorSerialize(val[k], seen);
-                   return { t: 'dict', id, attrs };
+                   return { t: 'dict', id, proto, attrs };
                }
            }
            return { t: '?', v: String(val) };
@@ -3177,13 +4465,73 @@ function jsTracerWorkerWrapper() {
 
         function __step__(line, ev) {
           if (_stepCount++ > 1000) throw new Error("Trace limit exceeded");
+          if (_frames.length) _frames[_frames.length - 1].line = line;
           const seen = new Map();
           const framesCopy = _frames.map(f => {
              const localsCopy = {};
              for (const k in f.locals) localsCopy[k] = _pyTutorSerialize(f.locals[k], seen);
-             return { fn: f.fn, locals: localsCopy };
+             const freeCopy = {};
+             if (f.free) for (const k in f.free) freeCopy[k] = _pyTutorSerialize(f.free[k], seen);
+             return { fn: f.fn, line: f.line, locals: localsCopy, free: freeCopy, thisKind: f.thisKind || 'call', thisVal: _pyTutorSerialize(f.thisVal, seen) };
           });
-          _steps.push({ line, ev, fn: _frames[_frames.length-1].fn, frames: framesCopy, mem: { heap: seen.size * 64 } });
+          _steps.push({ line, ev, fn: _frames[_frames.length-1].fn, frames: framesCopy, mem: { heap: seen.size * 64 }, async: _snapAsync(), prop: _lastProp });
+          _lastProp = null;
+        }
+
+        function __tdz__(name) {
+          // TDZ is a runtime state that exists before initialization; we represent it with a sentinel.
+          // Note: this is an approximation for visualization (real TDZ can also include "before declaration").
+          if (_frames.length > 0) {
+            _frames[_frames.length - 1].locals[name] = { __haki_tdz: true };
+          }
+        }
+
+        function __lookup__(obj, prop) {
+          // Prototype chain property resolution (conceptual).
+          // Returns {found:boolean, chain:[{name, owns:boolean}]} where chain[0] is the receiver.
+          const chain = [];
+          try {
+            let cur = obj;
+            let depth = 0;
+            while (cur && depth++ < 8) {
+              const ctor = (cur.constructor && cur.constructor.name) ? cur.constructor.name : 'Object';
+              let owns = false;
+              try { owns = Object.prototype.hasOwnProperty.call(cur, prop); } catch(_) {}
+              chain.push({ name: ctor, owns });
+              if (owns) return { found: true, chain };
+              cur = Object.getPrototypeOf(cur);
+            }
+          } catch(_) {}
+          return { found: false, chain };
+        }
+
+        function __get__(obj, prop, line, via) {
+          try {
+            const lk = __lookup__(obj, prop);
+            _lastProp = { op: 'get', prop, via: via || '', found: lk.found, chain: lk.chain, line };
+          } catch(_) {}
+          try { __step__(line || (_frames[_frames.length-1].line||1), 'get'); } catch(_) {}
+          // Preserve JS semantics: use Reflect.get so getters run with correct receiver.
+          return Reflect.get(obj, prop);
+        }
+        function __set__(obj, prop, val, line, via) {
+          try {
+            const lk = __lookup__(obj, prop);
+            _lastProp = { op: 'set', prop, via: via || '', found: lk.found, chain: lk.chain, line };
+          } catch(_) {}
+          try { __step__(line || (_frames[_frames.length-1].line||1), 'set'); } catch(_) {}
+          Reflect.set(obj, prop, val);
+          return val;
+        }
+
+        function __mcall__(obj, prop, line, via, args) {
+          try {
+            const lk = __lookup__(obj, prop);
+            _lastProp = { op: 'call', prop: String(prop), via: via || '', found: lk.found, chain: lk.chain, line };
+          } catch(_) {}
+          try { __step__(line || (_frames[_frames.length-1].line||1), 'callprop'); } catch(_) {}
+          const fn = Reflect.get(obj, prop);
+          return Reflect.apply(fn, obj, args || []);
         }
 
         function __var__(name, val) {
@@ -3192,8 +4540,21 @@ function jsTracerWorkerWrapper() {
           }
         }
 
-        function __enter__(line, fnName) {
-          _frames.push({ fn: fnName, locals: {} });
+        function __read__(name, val, line) {
+          // Record values of freevars/outer bindings when they're actually read.
+          // This enables hover-peek for closure variables without trying to introspect lexical envs.
+          if (_frames.length > 0) {
+            const fr = _frames[_frames.length - 1];
+            if (!fr.locals || fr.locals[name] === undefined) {
+              if (!fr.free) fr.free = {};
+              fr.free[name] = val;
+            }
+          }
+          return val;
+        }
+
+        function __enter__(line, fnName, thisVal, thisKind) {
+          _frames.push({ fn: fnName, line, locals: {}, free: {}, thisVal, thisKind: thisKind || 'call' });
           __step__(line, 'call');
         }
 
@@ -3202,14 +4563,97 @@ function jsTracerWorkerWrapper() {
           _frames.pop();
         }
 
+        const _stdout = [];
         const console = {
-          log: (...args) => {}
+          log: (...args) => {
+            try { _stdout.push(args.map(a => typeof a === 'string' ? a : JSON.stringify(a)).join(' ')); }
+            catch(_) { _stdout.push(args.map(String).join(' ')); }
+          }
+        };
+
+        // Wrap async scheduling APIs to build an event-loop timeline + causality edges.
+        const _nativeSetTimeout = self.setTimeout ? self.setTimeout.bind(self) : null;
+        const _nativeQueueMicrotask = self.queueMicrotask ? self.queueMicrotask.bind(self) : null;
+        const _nativeThen = Promise && Promise.prototype && Promise.prototype.then ? Promise.prototype.then : null;
+
+        function _newTask(kind, label) {
+          const via = label || kind;
+          const t = { id: _taskId++, kind, label: label || kind, from: _curTask, via };
+          if (t.from) _edges.push({ from: t.from, to: t.id, via });
+          if (kind === 'micro') _microQ.push(t);
+          else _macroQ.push(t);
+          return t;
+        }
+
+        function _wrapTaskCb(task, cb) {
+          if (typeof cb !== 'function') return cb;
+          return function(...args) {
+            const prevTask = _curTask, prevKind = _curKind;
+            _curTask = task.id; _curKind = task.kind;
+            _lastRan = { id: task.id, kind: task.kind, label: task.label, from: task.from || null, via: task.via || task.label || task.kind };
+            // callback entry is a conceptual step boundary
+            try { __step__(_frames[_frames.length-1].line || 1, task.kind === 'micro' ? 'microtask' : 'macrotask'); }
+            catch(_) {}
+            try { return cb.apply(this, args); }
+            finally {
+              // remove from queue if still present
+              const q = task.kind === 'micro' ? _microQ : _macroQ;
+              const idx = q.findIndex(x => x.id === task.id);
+              if (idx >= 0) q.splice(idx, 1);
+              if (task.kind === 'macro') {
+                // synthetic render tick between macrotasks
+                _edges.push({ from: task.id, to: task.id, via: 'render-tick' });
+              }
+              _curTask = prevTask; _curKind = prevKind;
+            }
+          };
+        }
+
+        if (_nativeSetTimeout) {
+          self.setTimeout = (cb, ms, ...rest) => {
+            const task = _newTask('macro', `setTimeout(${Number(ms)||0})`);
+            return _nativeSetTimeout(_wrapTaskCb(task, cb), ms, ...rest);
+          };
+        }
+        if (_nativeQueueMicrotask) {
+          self.queueMicrotask = (cb) => {
+            const task = _newTask('micro', 'queueMicrotask');
+            return _nativeQueueMicrotask(_wrapTaskCb(task, cb));
+          };
+        }
+        if (_nativeThen) {
+          Promise.prototype.then = function(onFulfilled, onRejected) {
+            const t1 = _newTask('micro', 'Promise.then');
+            const t2 = _newTask('micro', 'Promise.catch');
+            return _nativeThen.call(this, _wrapTaskCb(t1, onFulfilled), _wrapTaskCb(t2, onRejected));
+          };
+        }
+        self.onunhandledrejection = (ev) => {
+          try {
+            const msg = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : 'unhandledrejection';
+            _unhandled.push({ at: _curTask, msg });
+            __step__(_frames[_frames.length-1].line || 1, 'unhandledrejection');
+          } catch(_) {}
         };
 
         try {
-          const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', instrumented);
-          runner(console, __step__, __enter__, __exit__, __var__);
-          postMessage({ ok: true, steps: _steps });
+          const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', '__tdz__', '__read__', '__get__', '__set__', '__mcall__', instrumented);
+          runner(console, __step__, __enter__, __exit__, __var__, __tdz__, __read__, __get__, __set__, __mcall__);
+          // Pretty-print static graphs for UI.
+          const uniqEdges = new Map();
+          (analysis.callEdges || []).forEach(e => {
+            const k = `${e.from}->${e.to}`;
+            if (!uniqEdges.has(k)) uniqEdges.set(k, []);
+            uniqEdges.get(k).push(e.line);
+          });
+          const callGraphText = Array.from(uniqEdges.entries()).map(([k, lines]) => {
+            const [from, to] = k.split('->');
+            const ls = lines.filter(x => x > 0).slice(0, 6).join(',');
+            return `${from} -> ${to}${ls ? ` (lines ${ls})` : ''}`;
+          }).join('\n') || '—';
+          const cfgTextByFn = {};
+          Object.keys(analysis.cfgByFn || {}).forEach(fn => { cfgTextByFn[fn] = buildCfgText(fn) || '—'; });
+          postMessage({ ok: true, steps: _steps, hints, stdout: _stdout.join('\n'), analysis: { scopes: analysis.scopes, scopeChainByFn: analysis.scopeChainByFn, freevarsByFn: analysis.freevarsByFn, shadowByFn: analysis.shadowByFn, callGraphText, cfgTextByFn, cfgEdgesByFn: analysis.cfgEdgesByFn } });
         } catch(e) {
           postMessage({ ok: false, err: e.message });
         }
