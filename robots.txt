@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://amit-devb.github.io/haki/sitemap.xml
