@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Haki — Python Visualizer</title>
+<title>Haki — Code Visualizer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233b82f6'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='52' height='52' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 28c6-10 22-10 28 0-2 10-8 18-14 18S20 38 18 28Z' fill='rgba(255,255,255,0.92)'/%3E%3Ccircle cx='26.5' cy='32.5' r='3' fill='%23111627'/%3E%3Ccircle cx='37.5' cy='32.5' r='3' fill='%23111627'/%3E%3Cpath d='M22 42c6 4 14 4 20 0' stroke='rgba(17,22,39,0.7)' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%233b82f6'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='6' y='6' width='52' height='52' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 28c6-10 22-10 28 0-2 10-8 18-14 18S20 38 18 28Z' fill='rgba(255,255,255,0.92)'/%3E%3Ccircle cx='26.5' cy='32.5' r='3' fill='%23111627'/%3E%3Ccircle cx='37.5' cy='32.5' r='3' fill='%23111627'/%3E%3Cpath d='M22 42c6 4 14 4 20 0' stroke='rgba(17,22,39,0.7)' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#3b82f6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -17,17 +20,28 @@
   --red: #ef4444; --red-l: rgba(239, 68, 68, 0.12); --red-b: rgba(239, 68, 68, 0.25);
   --purple: #8b5cf6; --purple-l: rgba(139, 92, 246, 0.12); --purple-b: rgba(139, 92, 246, 0.25);
   --teal: #14b8a6; --teal-l: rgba(20, 184, 166, 0.1);
-  --radius: 8px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --ring: 0 0 0 3px rgba(59, 130, 246, 0.18);
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --sans: 'Inter', -apple-system, system-ui, sans-serif;
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.theme-dark {
-  --bg: #0c0c0e; --s1: #16161a; --s2: #1e1e24; --s3: #26262e; --s4: #2e2e38;
-  --t1: #f1f1f3; --t2: #a1a1aa; --t3: #71717a; --t4: #3f3f46;
-  --border: rgba(255, 255, 255, 0.06); --border2: rgba(255, 255, 255, 0.1);
-  --shadow: 0 4px 12px rgba(0,0,0,0.5);
+  /* VS Code-like dark */
+  --bg: #1e1e1e;
+  --s1: #252526;
+  --s2: #2d2d30;
+  --s3: #333337;
+  --s4: #3c3c3c;
+  --t1: #d4d4d4;
+  --t2: rgba(212,212,212,.78);
+  --t3: rgba(212,212,212,.52);
+  --t4: rgba(212,212,212,.32);
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.10);
+  --shadow: 0 10px 30px rgba(0,0,0,0.60);
 }
 
 body.theme-light {
@@ -50,8 +64,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
 /* LAYOUT */
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
-.toolbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:40px}
-.logo{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:5px;margin-right:4px}
+.toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:44px}
+.toolbar.premium{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,0)) , var(--s1);backdrop-filter:blur(10px);border-bottom:1px solid var(--border2)}
+.toolbar.premium .logo{letter-spacing:.01em}
+.toolbar.premium .sel{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,0)), var(--s3)}
+.toolbar.premium .btn{box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.theme-light .toolbar.premium .btn{box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.logo{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;margin-right:4px}
+.logo svg{width:18px;height:18px;flex-shrink:0}
 .logo em{color:var(--blue);font-style:normal}
 .sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
 .toolgrp{display:flex;align-items:center;gap:6px}
@@ -59,12 +79,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .btn.icon{padding:4px 8px}
 .btn.ghost{background:transparent;box-shadow:none}
 .btn.ghost:hover:not(:disabled){background:var(--s2);transform:none}
-.sel{background:var(--s3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--t2);padding:4px 7px;font-size:11.5px;cursor:pointer}
+.sel{background:var(--s3);border:1px solid var(--border2);border-radius:12px;color:var(--t2);padding:5px 9px;font-size:11.5px;cursor:pointer;transition:var(--transition)}
+.sel:focus-visible{outline:none;box-shadow:var(--ring);border-color:rgba(59,130,246,.35)}
 .more{margin-left:auto;display:flex;align-items:center;gap:8px}
-.btn{padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--s2);color:var(--t1);font-size:11.5px;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
+.btn{padding:5px 11px;border-radius:12px;border:1px solid var(--border2);background:var(--s2);color:var(--t1);font-size:11.5px;cursor:pointer;transition:var(--transition);white-space:nowrap;font-family:inherit;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow)}
 .btn:hover:not(:disabled){background:var(--s3);transform:translateY(-1px);border-color:var(--t4)}
 .btn:active:not(:disabled){background:var(--s4);transform:translateY(0)}
 .btn:disabled{opacity:.3;cursor:default;box-shadow:none}
+.btn:focus-visible{outline:none;box-shadow:var(--shadow), var(--ring)}
 .btn-blue{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)}
 .btn-blue:hover:not(:disabled){background:var(--blue);color:#fff;border-color:var(--blue)}
 .btn-green{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
@@ -87,6 +109,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .marker-call{color:var(--purple);background:var(--purple)}
 .marker-ret{color:var(--green);background:var(--green)}
 .marker-err{color:var(--red);background:var(--red)}
+.marker-await{color:var(--purple);background:var(--purple)}
+.marker-switch{color:var(--green);background:var(--green)}
+.marker-timeout{color:var(--amber);background:var(--amber)}
+.marker-micro{color:var(--blue);background:var(--blue)}
+.marker-macro{color:var(--amber);background:var(--amber)}
+.marker-unhandled{color:var(--red);background:var(--red)}
 .scrub-wrap input{width:100%;accent-color:var(--blue);height:3px;background:var(--s3);border-radius:2px;cursor:pointer}
 .step-ctr{font-size:10.5px;color:var(--t3);font-family:var(--mono);white-space:nowrap}
 
@@ -103,6 +131,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .diff-pill.chg{border-color:rgba(245,158,11,.35);color:var(--amber)}
 .diff-pill.new{border-color:rgba(134,239,172,.25);color:#86efac}
 .flash{animation:flash-change .6s ease}
+.cm-await-spotlight{background:rgba(139,92,246,.14) !important}
 .cm-exec-line{background:rgba(91,159,214,.16)}
 .cm-exec-call{background:rgba(217,70,239,.14)}
 .cm-exec-ret{background:rgba(34,197,94,.14)}
@@ -125,9 +154,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .CodeMirror-hints{background:var(--s2);border:1px solid var(--border2);border-radius:var(--radius)}
 .CodeMirror-hint{color:var(--t2);padding:3px 10px;font-family:var(--mono);font-size:12px}
 .CodeMirror-hint-active{background:var(--blue-l);color:var(--blue)}
-.cm-keyword{color:#d4926a}.cm-def{color:var(--blue)}.cm-variable{color:var(--t1)}
+.cm-keyword{color:#7a88a8}.cm-def{color:var(--blue)}.cm-variable{color:var(--t1)}
 .cm-string{color:var(--green)}.cm-number{color:var(--amber)}.cm-comment{color:var(--t3)}
 .cm-operator{color:var(--t2)}.cm-builtin{color:var(--teal)}.cm-error{color:var(--red)}
+
+/* Dark theme CodeMirror palette (subtle, low-neon) */
+body.theme-dark .cm-keyword{color:#7aa2f7}
+body.theme-dark .cm-def{color:#7dcfff}
+body.theme-dark .cm-builtin{color:#9ece6a}
+body.theme-dark .cm-string{color:#a6e3a1}
+body.theme-dark .cm-number{color:#ff9e64}
+body.theme-dark .cm-comment{color:rgba(212,212,212,.45)}
+body.theme-dark .cm-operator{color:rgba(212,212,212,.75)}
 
 /* MAIN VIEWS */
 .view{height:100%;display:flex;overflow:hidden;background:var(--bg)}
@@ -142,7 +180,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .col-heap{display:flex;flex-direction:column;min-width:200px;overflow:hidden}
 
 /* PANEL HEADERS */
-.ph{padding:8px 14px;background:linear-gradient(to right, var(--s1), var(--s2));border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ph{padding:8px 14px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,0)), linear-gradient(to right, var(--s1), var(--s2));border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:8px;flex-shrink:0}
 .phd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
 /* CODE VIEW */
@@ -180,6 +218,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .el-chip.render{border-color:rgba(245,158,11,.35);color:var(--amber)}
 .el-edge{padding:4px 0;color:var(--t3)}
 .el-edge strong{color:var(--t1)}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;color:var(--t3);user-select:none}
+.toggle input{accent-color:var(--blue)}
+.tl-wrap{display:flex;flex-direction:column;gap:8px;padding-top:6px}
+.tl-card{border:1px solid var(--border);border-radius:12px;background:var(--s2);padding:8px 10px}
+.tl-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tl-name{font-family:var(--mono);font-size:11px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-sub{margin-top:6px;color:var(--t4);font-family:var(--mono);font-size:10px;display:flex;flex-wrap:wrap;gap:6px}
+.tl-pill{padding:1px 7px;border-radius:999px;border:1px solid var(--border2);font-size:10px}
+.tl-run{border-color:rgba(134,239,172,.35);color:#86efac}
+.tl-wait{border-color:rgba(147,197,253,.35);color:#93c5fd}
+.tl-done{border-color:rgba(245,158,11,.35);color:var(--amber)}
 .scope-card{padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:10px}
 .scope-h{display:flex;justify-content:space-between;gap:10px;color:var(--t1);font-weight:700}
 .scope-sub{margin-top:3px;color:var(--t4);font-size:10.5px}
@@ -235,10 +284,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .ht-set,.ht-frozenset{}.ht-set .ho-hdr,.ht-frozenset .ho-hdr{background:var(--teal-l);color:var(--teal)}
 .ht-obj .ho-hdr{background:var(--s3);color:var(--t2)}
 .ho-body{padding:4px 0}
-.hr{display:flex;align-items:baseline;gap:4px;padding:1px 8px;line-height:1.55}
+.hr{display:flex;align-items:baseline;gap:6px;padding:1px 8px;line-height:1.55}
 .hi{color:var(--t4);min-width:16px;text-align:right;font-size:10px;flex-shrink:0}
-.hk{color:var(--amber)}
-.hv{color:var(--t1);flex:1;word-break:break-all}
+.hk{color:var(--amber);flex:1;min-width:0;overflow-wrap:anywhere;display:block}
+.hv{color:var(--t1);flex:0 1 45%;min-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 .ho-empty{padding:5px 8px;font-size:10.5px;color:var(--t4)}
 .empty-heap{padding:10px;font-size:11.5px;color:var(--t3);font-family:var(--mono)}
 
@@ -261,6 +310,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 
 /* TOOLTIP */
 #tooltip{position:fixed;background:rgba(30, 30, 36, 0.95);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:var(--radius);padding:6px 10px;font-family:var(--mono);font-size:11px;color:var(--t1);z-index:300;pointer-events:none;white-space:nowrap;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.4);border-top:1px solid rgba(255,255,255,0.1)}
+#toast-wrap{position:fixed;right:12px;top:64px;display:flex;flex-direction:column;gap:8px;z-index:260;pointer-events:none}
+.toast{min-width:220px;max-width:320px;padding:9px 11px;border-radius:12px;background:rgba(255,255,255,0.92);border:1px solid rgba(0,0,0,0.08);box-shadow:0 10px 26px rgba(0,0,0,.12);color:#111827;font-size:11.25px;line-height:1.35;backdrop-filter:blur(10px);transform:translateY(-4px);opacity:0;animation:toastIn .18s ease forwards}
+.theme-dark #toast-wrap .toast{background:rgba(30,41,59,0.92);border-color:rgba(147,197,253,0.28);box-shadow:0 12px 30px rgba(0,0,0,.42);color:rgba(255,255,255,.96)}
+.theme-dark #toast-wrap .toast .k{color:rgba(240,240,245,.55)}
+.theme-light #toast-wrap .toast .k{color:rgba(17,24,39,.55)}
+.toast:hover{opacity:1}
+@keyframes toastIn{to{transform:translateY(0);opacity:1}}
+.toast .k{font-family:var(--mono);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.toast.good{border-color:rgba(134,239,172,.25)}
+.toast.warn{border-color:rgba(245,158,11,.35)}
+.toast.info{border-color:rgba(147,197,253,.25)}
+.tl-card.flash{animation:flash-change .55s ease}
+#footer{position:fixed;left:0;right:0;bottom:0;height:26px;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--s1);border-top:1px solid var(--border);color:var(--t3);font-size:11px;z-index:250;pointer-events:none}
+#footer strong{color:var(--t1)}
+#footer code{font-family:var(--mono);font-size:10.5px;color:var(--t2)}
 
 /* BOTTOM BAR */
 .bottom-bar{flex-shrink:0;background:var(--s1);display:flex;flex-direction:column;min-height:32px;overflow:hidden}
@@ -292,6 +356,22 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .vt-box{background:var(--s2);border:1px solid var(--border2);border-radius:8px;width:560px;max-height:60vh;overflow:hidden;display:flex;flex-direction:column}
 .vt-hdr{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:500;gap:8px}
 .vt-body{padding:12px;flex:1;overflow:auto}
+
+/* FIX DIFF MODAL */
+#fix-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:400}
+#fix-modal.show{display:flex}
+.fix-box{background:var(--s2);border:1px solid var(--border2);border-radius:10px;width:min(860px,92vw);max-height:70vh;overflow:hidden;display:flex;flex-direction:column}
+.fix-hdr{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;gap:8px}
+.fix-body{padding:12px;flex:1;overflow:auto;font-family:var(--mono);font-size:11.5px;line-height:1.55;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.06))}
+.dline{display:flex;gap:10px;white-space:pre}
+.dtag{width:16px;flex-shrink:0;text-align:center;color:var(--t4)}
+.dtext{flex:1;min-width:0;overflow-wrap:anywhere}
+.dadd{background:rgba(16,185,129,.18);border-left:3px solid rgba(16,185,129,.75)}
+.ddel{background:rgba(239,68,68,.16);border-left:3px solid rgba(239,68,68,.75)}
+.dadd .dtag{color:rgba(16,185,129,.95);font-weight:700}
+.ddel .dtag{color:rgba(239,68,68,.95);font-weight:700}
+.theme-light .dline{color:#111827}
+.theme-dark .dline{color:rgba(240,240,245,.95)}
 
 /* QUIZ MODE */
 #view-quiz{flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px}
@@ -443,7 +523,8 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .ins-tab.on{color:var(--t1);border-color:var(--blue-b);background:rgba(91,159,214,.12)}
 .ins-collapse{margin-left:auto}
 .ins-body{flex:1;min-height:0;overflow:auto;padding:10px}
-.ins-card{border:1px solid var(--border);border-radius:12px;background:var(--s1);overflow:hidden}
+.ins-card{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--s1);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.theme-light .ins-card{box-shadow:0 10px 30px rgba(0,0,0,.05)}
 .ins-card-h{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
 .ins-pre{padding:10px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:pre-wrap}
 .ins-text{padding:10px;font-size:12px;color:var(--t2);line-height:1.55}
@@ -455,10 +536,12 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .tilemax .tile{display:none}
 .tilemax .tile.max{display:flex;grid-column:1 / -1;grid-row:1 / -1}
 .panel-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
-.picon{border:1px solid var(--border2);background:transparent;color:var(--t3);border-radius:8px;padding:2px 7px;font-size:11px;cursor:pointer}
+.picon{border:1px solid var(--border2);background:transparent;color:var(--t3);border-radius:10px;padding:3px 8px;font-size:11px;cursor:pointer;transition:var(--transition)}
 .picon:hover{border-color:var(--t4);color:var(--t2);background:rgba(255,255,255,.03)}
+.picon:focus-visible{outline:none;box-shadow:var(--ring)}
 /* Panel nav removed (no tabs). */
-.panel{border:1px solid var(--border);border-radius:12px;background:var(--s1);overflow:hidden}
+.panel{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--s1);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.theme-light .panel{box-shadow:0 10px 30px rgba(0,0,0,.05)}
 .panel-h{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--t2);font-weight:600}
 .panel-b{padding:10px}
 .right-col{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
@@ -537,6 +620,7 @@ canvas.chart{display:block;border-radius:var(--radius)}
 </svg>
 
 <div id="tooltip"></div>
+<div id="toast-wrap"></div>
 
 <div id="modal"><div class="modal-box"><div class="modal-hdr"><span id="modal-title">Object history</span><span class="modal-close" onclick="closeModal()">✕</span></div>
 <div class="modal-body" id="modal-body"></div>
@@ -546,6 +630,13 @@ canvas.chart{display:block;border-radius:var(--radius)}
 <div id="vt-modal"><div class="vt-box"><div class="vt-hdr"><span id="vt-title">Variable timeline</span><span class="modal-close" onclick="document.getElementById('vt-modal').classList.remove('show')">✕</span></div>
 <div class="vt-body" id="vt-body"></div>
 </div>
+</div>
+
+<div id="fix-modal">
+  <div class="fix-box">
+    <div class="fix-hdr"><span id="fix-title">Fix changes</span><span class="modal-close" onclick="closeFixModal()">✕</span></div>
+    <div class="fix-body" id="fix-body"></div>
+  </div>
 </div>
 
 
@@ -559,20 +650,43 @@ canvas.chart{display:block;border-radius:var(--radius)}
   <div class="pg-viz-body" id="pg-viz-body"></div>
 </div>
 <div class="app">
-  <div class="toolbar">
-    <div class="logo">🥷 <em>Haki</em> Visualizer</div>
+  <div class="toolbar premium">
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="hakiLogoG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#3b82f6"/>
+            <stop offset="1" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <rect x="6" y="6" width="52" height="52" rx="16" fill="url(#hakiLogoG)"/>
+        <path d="M18 28c6-10 22-10 28 0-2 10-8 18-14 18S20 38 18 28Z" fill="rgba(255,255,255,0.92)"/>
+        <circle cx="26.5" cy="32.5" r="3" fill="#111627"/>
+        <circle cx="37.5" cy="32.5" r="3" fill="#111627"/>
+        <path d="M22 42c6 4 14 4 20 0" stroke="rgba(17,22,39,0.7)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <em>Haki</em> Visualizer
+    </div>
 
     <div class="sep"></div>
 
     <div class="toolgrp">
       <button class="btn icon ghost" id="theme-toggle" title="Theme">🌓</button>
-      <select class="sel" id="examples" onchange="loadExample()">
-        <option value="">examples…</option>
-      </select>
       <select class="sel" id="main-lang" onchange="setMainLang(this.value)">
         <option value="python">🐍 Python</option>
         <option value="javascript">🟨 JavaScript</option>
       </select>
+      <select class="sel" id="examples" onchange="loadExample()">
+        <option value="">examples…</option>
+      </select>
+      <label class="toggle" title="Kid-friendly narration">
+        <input type="checkbox" id="story-toggle">
+        story
+      </label>
+      <label class="toggle" title="Tiny popups while stepping">
+        <input type="checkbox" id="ach-toggle">
+        achievements
+      </label>
     </div>
 
     <div class="sep"></div>
@@ -591,14 +705,14 @@ canvas.chart{display:block;border-radius:var(--radius)}
     </div>
 
     <div class="scrub-wrap">
-      <span style="font-size:10px;color:var(--t4)">0</span>
+    <span style="font-size:10px;color:var(--t4)" id="scrub-min">start</span>
       <div class="scrub-track-wrap">
         <input type="range" id="scrub" min="0" max="0" value="0" oninput="scrubTo(+this.value)">
         <div class="scrub-markers" id="scrub-markers"></div>
 
       </div>
 
-      <span style="font-size:10px;color:var(--t4)" id="scrub-max">0</span>
+    <span style="font-size:10px;color:var(--t4)" id="scrub-max">end</span>
     </div>
 
     <div class="speed-wrap">
@@ -666,7 +780,7 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
                 <div class="ins-pre" id="step-info-box"></div>
               </div>
               <div class="ins-card" id="ins-nar" style="display:none;margin-top:10px">
-                <div class="ins-card-h"><span>Narrative</span><span>why this ran</span></div>
+                <div class="ins-card-h"><span>Narrative</span><span id="nar-mode">why this ran</span></div>
                 <div class="ins-text" id="narrative-text"></div>
               </div>
               <div class="ins-card" id="ins-diff" style="display:none;margin-top:10px">
@@ -955,6 +1069,11 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
 </div>
  <!-- end app -->
 
+<div id="footer">
+  <span><strong>Tip:</strong> hover <code>→ list[...]</code> to highlight + draw a line. click to pin.</span>
+  <span style="margin-left:auto">GitHub Pages · no server</span>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
@@ -990,6 +1109,7 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
 // ─── PYTHON TRACER ───────────────────────────────────────────────────────────
 const PY_TRACER = `
 import sys, json, io as _io
+import threading as _threading
 
 _steps = []
 _buf = _io.StringIO()
@@ -1035,8 +1155,29 @@ def _tr(frame, event, arg):
                 try: locs[k]=_sv(v)
                 except: locs[k]={'t':'?'}
         fl=f.f_code.co_flags
+        # Globals: keep small + relevant (skip modules/dunders) to avoid noise.
+        g = {}
+        try:
+            for kk,vv in list(f.f_globals.items()):
+                if kk.startswith('__'): continue
+                if kk in ('__builtins__',): continue
+                # Prefer showing non-module values (kids can read these).
+                try:
+                    import types as _types
+                    if isinstance(vv, _types.ModuleType):
+                        continue
+                except: pass
+                try:
+                    g[kk] = _sv(vv)
+                except:
+                    g[kk] = {'t':'?'}
+                if len(g) >= 30: break
+        except:
+            g = {}
+
         frames.append({'fn':f.f_code.co_name,'line':f.f_lineno,'locals':locs,
-            'freevars':list(f.f_code.co_freevars),'is_gen':bool(fl&0x20),'is_coro':bool(fl&0x100)})
+            'freevars':list(f.f_code.co_freevars),'cellvars':list(f.f_code.co_cellvars),
+            'globals':g,'is_gen':bool(fl&0x20),'is_coro':bool(fl&0x100)})
         f=f.f_back
     frames.reverse()
     
@@ -1055,6 +1196,64 @@ def _tr(frame, event, arg):
         mem = {'heap': 0}
 
     step={'ev':event,'line':frame.f_lineno,'fn':frame.f_code.co_name,'frames':frames,'out':_buf.getvalue(),'mem':mem}
+    try:
+        ct = _threading.current_thread()
+        step['thread'] = {'id': ct.ident, 'name': ct.name}
+    except:
+        pass
+
+    # Best-effort asyncio introspection.
+    # (FastAPI/Starlette are async-first, but on GitHub Pages we run Python via Pyodide,
+    # so we visualize asyncio directly without hosting a server.)
+    try:
+        import asyncio as _asyncio
+        # Optional request context (set by user code via contextvars).
+        try:
+            import contextvars as _contextvars
+            _rid_var = _contextvars.ContextVar('_haki_request_id')  # default-less
+            try:
+                _rid = _rid_var.get()
+            except Exception:
+                _rid = None
+        except Exception:
+            _rid = None
+        try:
+            t = _asyncio.current_task()
+        except Exception:
+            t = None
+        try:
+            loop = _asyncio.get_running_loop()
+            lt = loop.time()
+        except Exception:
+            loop = None
+            lt = None
+        tasks = []
+        if loop is not None:
+            for tt in list(_asyncio.all_tasks(loop))[:30]:
+                try:
+                    coro = tt.get_coro()
+                    cname = getattr(coro, '__qualname__', None) or getattr(coro, '__name__', None) or type(coro).__name__
+                except Exception:
+                    cname = '?'
+                try:
+                    state = 'done' if tt.done() else ('cancelled' if tt.cancelled() else 'pending')
+                except Exception:
+                    state = '?'
+                try:
+                    nm = tt.get_name()
+                except Exception:
+                    nm = None
+                tasks.append({'id': id(tt), 'name': nm, 'coro': str(cname)[:80], 'state': state})
+        step['async'] = {
+            'py': True,
+            'cur': (id(t) if t else None),
+            'curName': (t.get_name() if t and hasattr(t, 'get_name') else None),
+            'loopTime': lt,
+            'tasks': tasks,
+            'req': _rid,
+        }
+    except Exception:
+        pass
     if event=='return' and arg is not None:
         try: step['ret']=_sv(arg)
         except: pass
@@ -1069,7 +1268,22 @@ def _run(code):
     _steps=[]
     _buf=_io.StringIO()
     old=sys.stdout
+    olde=getattr(sys,'stderr',None)
     sys.stdout=_buf
+    try:
+        if olde is not None: sys.stderr=_buf
+    except: pass
+    try:
+        import warnings as _warnings
+        _old_show = _warnings.showwarning
+        def _sw(message, category, filename, lineno, file=None, line=None):
+            try:
+                _buf.write(f"{category.__name__}: {message}\\n")
+            except:
+                pass
+        _warnings.showwarning = _sw
+    except:
+        _old_show = None
     try:
         sys.settrace(_tr)
         exec(compile(code,'<usr>','exec'),{'__builtins__':__builtins__,'__name__':'__main__'})
@@ -1078,10 +1292,145 @@ def _run(code):
     finally:
         sys.settrace(None)
         sys.stdout=old
+        try:
+            if olde is not None: sys.stderr=olde
+        except: pass
+        try:
+            if _old_show is not None:
+                import warnings as _warnings
+                _warnings.showwarning = _old_show
+        except: pass
+    return json.dumps({'steps':_steps,'truncated':len(_steps)>=_MAX})
+
+async def _run_async(code, auto_main=False):
+    global _steps,_buf
+    _steps=[]
+    _buf=_io.StringIO()
+    old=sys.stdout
+    olde=getattr(sys,'stderr',None)
+    sys.stdout=_buf
+    try:
+        if olde is not None: sys.stderr=_buf
+    except: pass
+    try:
+        import warnings as _warnings
+        _old_show = _warnings.showwarning
+        def _sw(message, category, filename, lineno, file=None, line=None):
+            try:
+                _buf.write(f"{category.__name__}: {message}\\n")
+            except:
+                pass
+        _warnings.showwarning = _sw
+    except:
+        _old_show = None
+
+    g = {'__builtins__': __builtins__, '__name__': '__main__'}
+    try:
+        sys.settrace(_tr)
+        exec(compile(code,'<usr>','exec'), g)
+        if auto_main:
+            try:
+                import inspect as _inspect
+                if 'main' in g and _inspect.iscoroutinefunction(g['main']):
+                    await g['main']()
+            except Exception as e:
+                _steps.append({'ev':'error','line':-1,'fn':'','frames':[],'out':_buf.getvalue(),'exc':repr(e)})
+    except Exception as e:
+        _steps.append({'ev':'error','line':-1,'fn':'','frames':[],'out':_buf.getvalue(),'exc':repr(e)})
+    finally:
+        sys.settrace(None)
+        sys.stdout=old
+        try:
+            if olde is not None: sys.stderr=olde
+        except: pass
+        try:
+            if _old_show is not None:
+                import warnings as _warnings
+                _warnings.showwarning = _old_show
+        except: pass
     return json.dumps({'steps':_steps,'truncated':len(_steps)>=_MAX})
 
 def _run_n(code, var, val):
     return _run(f"{var} = {repr(val)}\\n" + code)
+
+# Lightweight Python CFG builder (approx).
+def _py_cfg(code):
+    import ast, json
+    try:
+        tree = ast.parse(code)
+    except Exception as e:
+        return json.dumps({'ok':False,'err':repr(e),'cfgTextByFn':{},'cfgEdgesByFn':{}})
+
+    def node_label(n):
+        t = type(n).__name__
+        if isinstance(n, ast.If):
+            return f"If"
+        if isinstance(n, (ast.For, ast.AsyncFor)):
+            return "For"
+        if isinstance(n, ast.While):
+            return "While"
+        if isinstance(n, ast.Return):
+            return "Return"
+        if isinstance(n, ast.Assign):
+            return "Assign"
+        if isinstance(n, ast.Await):
+            return "Await"
+        if isinstance(n, ast.Expr):
+            return "Expr"
+        return t
+
+    def build_for_body(stmts):
+        nodes = []
+        edges = []
+        nid = 1
+        stmt_to_id = {}
+        for st in stmts:
+            stmt_to_id[id(st)] = nid
+            ln = getattr(st, 'lineno', 1)
+            nodes.append({'id': nid, 'line': ln, 'label': node_label(st)})
+            nid += 1
+        # sequential edges
+        for i in range(len(nodes)-1):
+            edges.append({'from': nodes[i]['id'], 'to': nodes[i+1]['id'], 'via': 'next'})
+        return nodes, edges, stmt_to_id
+
+    def add_branch_edges(stmts, stmt_to_id, edges):
+        # Add simple branch edges for if/loops to first body stmt and to fallthrough.
+        for idx, st in enumerate(stmts):
+            sid = stmt_to_id.get(id(st))
+            if not sid: continue
+            next_id = stmt_to_id.get(id(stmts[idx+1])) if idx+1 < len(stmts) else None
+            if isinstance(st, ast.If):
+                if st.body:
+                    edges.append({'from': sid, 'to': stmt_to_id.get(id(st.body[0]), sid), 'via': 'true'})
+                if st.orelse:
+                    edges.append({'from': sid, 'to': stmt_to_id.get(id(st.orelse[0]), sid), 'via': 'false'})
+                elif next_id:
+                    edges.append({'from': sid, 'to': next_id, 'via': 'false'})
+            elif isinstance(st, (ast.For, ast.AsyncFor, ast.While)):
+                if st.body:
+                    edges.append({'from': sid, 'to': stmt_to_id.get(id(st.body[0]), sid), 'via': 'loop'})
+                if next_id:
+                    edges.append({'from': sid, 'to': next_id, 'via': 'done'})
+        return edges
+
+    cfgTextByFn = {}
+    cfgEdgesByFn = {}
+
+    def build_fn(name, body):
+        nodes, edges, stmt_to_id = build_for_body(body)
+        edges = add_branch_edges(body, stmt_to_id, edges)
+        text = "\\n".join([f"#{n['id']} (line {n['line']}): {n['label']}" for n in nodes]) or "—"
+        cfgTextByFn[name] = text
+        cfgEdgesByFn[name] = edges
+
+    # module-level cfg
+    build_fn('<global>', getattr(tree, 'body', []))
+    for n in tree.body:
+        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            build_fn(n.name, n.body)
+
+    return json.dumps({'ok':True,'cfgTextByFn':cfgTextByFn,'cfgEdgesByFn':cfgEdgesByFn})
 `;
 
 // ─── EXAMPLES ────────────────────────────────────────────────────────────────
@@ -1197,6 +1546,220 @@ for v in countdown(5):
     print(v)
 
 print(list(squares(4)))`
+,
+asyncio:`import asyncio
+
+async def worker(name, delay):
+    print(f"{name}: start (sleep {delay})")
+    await asyncio.sleep(delay)
+    print(f"{name}: end")
+    return name
+
+async def main():
+    # Create tasks so they run concurrently on the event loop.
+    t1 = asyncio.create_task(worker("A", 0.05), name="task-A")
+    t2 = asyncio.create_task(worker("B", 0.02), name="task-B")
+    t3 = asyncio.create_task(worker("C", 0.01), name="task-C")
+    out = await asyncio.gather(t1, t2, t3)
+    print("gather:", out)
+`
+,
+asgi:`import asyncio
+import contextvars
+
+# This is the simplest “FastAPI/Starlette-like” idea, without a server:
+# - Many requests arrive.
+# - One event loop runs them.
+# - Each request "waits" (I/O) and later continues.
+#
+# In Haki, the Event Loop panel shows which request/task is currently running.
+
+_haki_request_id = contextvars.ContextVar('_haki_request_id')
+
+async def app(scope, receive, send):
+    # "Middleware"
+    await send(("log", f"🧢 Request {scope['rid']}: hello"))
+    # "Endpoint"
+    await send(("log", f"🍪 Request {scope['rid']}: waiting for cookies (await)"))
+    await asyncio.sleep(scope["wait"])  # pretend DB/network wait
+    await send(("log", f"🍪 Request {scope['rid']}: got cookies, packing response"))
+    # "Response"
+    await send(("response", 200, f"ok {scope['rid']}"))
+
+async def handle_request(rid, wait):
+    token = _haki_request_id.set(rid)
+    try:
+        scope = {"type": "http", "rid": rid, "wait": wait}
+
+        async def receive():
+            return {"type": "http.request"}
+
+        async def send(msg):
+            kind = msg[0]
+            if kind == "log":
+                print(msg[1])
+            else:
+                # Keep it 5-year-old simple: only show status + rid.
+                _, status, body = msg
+                print(f"📦 Request {rid}: done ({status})")
+                return body
+
+        return await app(scope, receive, send)
+    finally:
+        _haki_request_id.reset(token)
+
+async def main():
+    # Three requests so it stays easy to follow.
+    tasks = [
+        asyncio.create_task(handle_request("A", 0.05), name="req-A"),
+        asyncio.create_task(handle_request("B", 0.02), name="req-B"),
+        asyncio.create_task(handle_request("C", 0.01), name="req-C"),
+    ]
+    await asyncio.gather(*tasks)
+`
+,
+asgi_block:`import asyncio
+import contextvars
+import time
+
+_haki_request_id = contextvars.ContextVar('_haki_request_id')
+
+async def app(scope, receive, send):
+    rid = scope["rid"]
+    await send(("log", f"🧢 Request {rid}: hello"))
+    if rid == "B":
+        # BAD: blocks the whole event loop (no one else can run).
+        await send(("log", f"🧱 Request {rid}: blocking work (time.sleep)"))
+        time.sleep(0.08)
+        await send(("log", f"🧱 Request {rid}: unblocked"))
+    await send(("log", f"🍪 Request {rid}: waiting (await)"))
+    await asyncio.sleep(scope["wait"])
+    await send(("response", 200, f"ok {rid}"))
+
+async def handle_request(rid, wait):
+    token = _haki_request_id.set(rid)
+    try:
+        scope = {"type": "http", "rid": rid, "wait": wait}
+        async def receive(): return {"type": "http.request"}
+        async def send(msg):
+            if msg[0] == "log": print(msg[1])
+            else: print(f"📦 Request {rid}: done (200)")
+        return await app(scope, receive, send)
+    finally:
+        _haki_request_id.reset(token)
+
+async def main():
+    tasks = [
+        asyncio.create_task(handle_request("A", 0.05), name="req-A"),
+        asyncio.create_task(handle_request("B", 0.01), name="req-B"),
+        asyncio.create_task(handle_request("C", 0.02), name="req-C"),
+    ]
+    await asyncio.gather(*tasks)
+`
+,
+asgi_mw:`import asyncio
+import contextvars
+
+_haki_request_id = contextvars.ContextVar('_haki_request_id')
+
+def wrap(mw_name, inner):
+    async def _mw(scope, receive, send):
+        rid = scope["rid"]
+        print(f"🧩 {mw_name} enter ({rid})")
+        try:
+            return await inner(scope, receive, send)
+        finally:
+            print(f"🧩 {mw_name} exit  ({rid})")
+    return _mw
+
+async def endpoint(scope, receive, send):
+    rid = scope["rid"]
+    print(f"🎯 endpoint ({rid}): start")
+    await asyncio.sleep(scope["wait"])
+    print(f"🎯 endpoint ({rid}): end")
+    await send(("response", 200, "ok"))
+
+async def handle_request(rid, wait):
+    token = _haki_request_id.set(rid)
+    try:
+        scope = {"type": "http", "rid": rid, "wait": wait}
+        async def receive(): return {"type": "http.request"}
+        async def send(msg):
+            if msg[0] == "response": print(f"📦 Request {rid}: done (200)")
+        app = wrap("mw-1", wrap("mw-2", endpoint))
+        return await app(scope, receive, send)
+    finally:
+        _haki_request_id.reset(token)
+
+async def main():
+    await asyncio.gather(
+        asyncio.create_task(handle_request("A", 0.03), name="req-A"),
+        asyncio.create_task(handle_request("B", 0.01), name="req-B"),
+        asyncio.create_task(handle_request("C", 0.02), name="req-C"),
+    )
+`
+,
+asgi_cancel:`import asyncio
+import contextvars
+
+_haki_request_id = contextvars.ContextVar('_haki_request_id')
+
+async def app(scope, receive, send):
+    rid = scope["rid"]
+    print(f"🧢 Request {rid}: start")
+    await asyncio.sleep(scope["wait"])
+    await send(("response", 200, "ok"))
+
+async def handle_request(rid, wait, timeout):
+    token = _haki_request_id.set(rid)
+    try:
+        scope = {"type": "http", "rid": rid, "wait": wait}
+        async def receive(): return {"type": "http.request"}
+        async def send(msg):
+            if msg[0] == "response": print(f"📦 Request {rid}: done (200)")
+        try:
+            return await asyncio.wait_for(app(scope, receive, send), timeout=timeout)
+        except asyncio.TimeoutError:
+            print(f"⏰ Request {rid}: timeout (cancelled)")
+    finally:
+        _haki_request_id.reset(token)
+
+async def main():
+    await asyncio.gather(
+        asyncio.create_task(handle_request("A", wait=0.03, timeout=0.10), name="req-A"),
+        asyncio.create_task(handle_request("B", wait=0.20, timeout=0.05), name="req-B"),
+        asyncio.create_task(handle_request("C", wait=0.02, timeout=0.10), name="req-C"),
+    )
+`
+,
+mistake_forgot_await:`import asyncio
+
+async def worker():
+    await asyncio.sleep(0.02)
+    print("✅ worker finished")
+
+async def main():
+    print("start")
+    asyncio.create_task(worker())  # mistake: we never await it
+    print("end (worker may never print)")
+
+# Haki auto-runs async main() for you.
+`
+,
+mistake_race:`import asyncio, random
+
+shared = []
+
+async def job(name):
+    await asyncio.sleep(random.random() * 0.03)
+    shared.append(name)  # shared mutation (order is not guaranteed)
+
+async def main():
+    await asyncio.gather(job("A"), job("B"), job("C"))
+    print("finish order:", shared)
+
+# Haki auto-runs async main() for you.
+`
 };
 
 const JS_STARTER_MERGESORT = `// JavaScript — merge sort (recursion)\nfunction merge(left, right) {\n  const out = [];\n  let i = 0;\n  let j = 0;\n  while (i < left.length && j < right.length) {\n    if (left[i] <= right[j]) out.push(left[i++]);\n    else out.push(right[j++]);\n  }\n  while (i < left.length) out.push(left[i++]);\n  while (j < right.length) out.push(right[j++]);\n  return out;\n}\n\nfunction mergeSort(arr) {\n  if (arr.length <= 1) return arr;\n  const mid = Math.floor(arr.length / 2);\n  const left = mergeSort(arr.slice(0, mid));\n  const right = mergeSort(arr.slice(mid));\n  return merge(left, right);\n}\n\nconst data = [3, 1, 4, 1, 5, 9, 2, 6];\nconsole.log(\"in:\", data.join(\", \"));\nconsole.log(\"out:\", mergeSort(data).join(\", \"));\n`;
@@ -1204,6 +1767,8 @@ const JS_STARTER_MERGESORT = `// JavaScript — merge sort (recursion)\nfunction
 const JS_LESSONS = {
   merge: JS_STARTER_MERGESORT,
   micro: `// Microtasks vs macrotasks\nconsole.log('A');\nsetTimeout(() => console.log('timeout'), 0);\nqueueMicrotask(() => console.log('microtask'));\nPromise.resolve().then(() => console.log('promise.then'));\nconsole.log('B');\n`,
+  async: `// async/await interleaving (like "one chef, many pizzas")\nconst sleep = (ms) => new Promise(r => setTimeout(r, ms));\n\nasync function job(name, ms) {\n  console.log(name, 'start');\n  console.log(name, 'wait');\n  await sleep(ms); // yields back to the event loop\n  console.log(name, 'resume');\n  await sleep(0); // yield again\n  console.log(name, 'done');\n}\n\n(async () => {\n  console.log('run');\n  const a = job('A', 30);\n  const b = job('B', 10);\n  await Promise.all([a, b]);\n  console.log('all done');\n})();\n`,
+  fetchcpu: `// fetch (I/O) + CPU (blocking)\n// I/O waits are "nice": they let other tasks run.\n// CPU loops are "not nice": they block the event loop.\n\nfunction burnCpu(ms) {\n  const end = performance.now() + ms;\n  while (performance.now() < end) {}\n}\n\nasync function run() {\n  console.log('start');\n  console.log('fetch wait');\n  const res = await fetch('https://jsonplaceholder.typicode.com/todos/1');\n  const data = await res.json();\n  console.log('got data:', data.id);\n\n  console.log('cpu burn (blocks)');\n  burnCpu(60);\n  console.log('after cpu burn');\n}\n\nrun();\n`,
   closure: `// Closure in a loop (var vs let)\nconst fns = [];\nfor (var i = 0; i < 3; i++) {\n  fns.push(() => console.log('var i =', i));\n}\nfor (let j = 0; j < 3; j++) {\n  fns.push(() => console.log('let j =', j));\n}\n\nfns.forEach(fn => fn());\n`,
   this: `// this binding: method vs plain call vs bind\n'use strict';\nconst obj = {\n  x: 10,\n  getX() { return this.x; }\n};\n\nconst f = obj.getX;\nconsole.log('method:', obj.getX());\ntry { console.log('plain:', f()); } catch (e) { console.log('plain threw:', e.message); }\nconsole.log('bound:', f.bind(obj)());\n`,
   proto: `// Prototype property lookup\nfunction A() {}\nA.prototype.p = 1;\nconst a = new A();\na.q = 2;\nconsole.log('a.q', a.q);\nconsole.log('a.p', a.p);\nconsole.log('a.missing', a.missing);\n`,
@@ -1218,10 +1783,19 @@ const EXAMPLE_MENU = {
     { id: 'class', label: 'class & objects' },
     { id: 'closure', label: 'closure' },
     { id: 'gen', label: 'generator' },
+    { id: 'asyncio', label: 'asyncio tasks' },
+    { id: 'asgi', label: 'ASGI (FastAPI-like)' },
+    { id: 'asgi_mw', label: 'ASGI middleware' },
+    { id: 'asgi_block', label: 'ASGI blocking (bad)' },
+    { id: 'asgi_cancel', label: 'ASGI timeout/cancel' },
+    { id: 'mistake_forgot_await', label: 'Mistake: forgot to await' },
+    { id: 'mistake_race', label: 'Mistake: shared-state race' },
   ],
   javascript: [
     { id: 'merge', label: 'merge sort' },
     { id: 'micro', label: 'micro vs macro' },
+    { id: 'async', label: 'async/await interleaving' },
+    { id: 'fetchcpu', label: 'fetch + CPU (blocking)' },
     { id: 'closure', label: 'closure in loop' },
     { id: 'this', label: 'this binding' },
     { id: 'proto', label: 'prototype lookup' },
@@ -1247,6 +1821,54 @@ let insightsTab = localStorage.getItem('haki-insights-tab') || 'step';
 let insightsCollapsed = (localStorage.getItem('haki-insights-collapsed') || '0') === '1';
 let insightsPinnedOpen = (localStorage.getItem('haki-insights-pinned-open') || '1') === '1';
 let _insightsLastOpenSizes = null;
+let pyAnalysis = null; // Python-only derived analysis (call graph, cfg, async timeline)
+let currentExampleId = null;
+let storyMode = (localStorage.getItem('haki-story-mode') || '0') === '1';
+let trafficMode = (localStorage.getItem('haki-traffic-mode') || '1') === '1';
+let explainMode = (localStorage.getItem('haki-explain-mode') || '0') === '1';
+let achievementsOn = (localStorage.getItem('haki-achievements') || '0') === '1';
+let autoRewindOn = (localStorage.getItem('haki-auto-rewind') || '1') === '1';
+
+const EXAMPLE_META = {
+  // When an example is intentionally "bad" or intentionally throws, announce it clearly.
+  asgi_block: {
+    onLoad: { color: 'amber', msg: '⚠ Demo: blocks the event loop on purpose (bad pattern). Watch how everything pauses during time.sleep().' },
+    fix: {
+      label: 'Fix it',
+      apply: (code) => code.replace(/time\\s*\\.\\s*sleep\\s*\\(\\s*([^)]+)\\s*\\)/g, 'await asyncio.sleep($1)'),
+      banner: { color: 'green', msg: '✅ Fixed: replaced time.sleep(...) with await asyncio.sleep(...).' }
+    }
+  },
+  // If you add future "error demos", put them here:
+  // some_error_demo: { onLoad: { color:'amber', msg:'⚠ Demo: throws an error on purpose.' }, expectError: true }
+  mistake_forgot_await: {
+    onLoad: { color: 'amber', msg: '⚠ Mistake demo: forgot to await. The task never runs.' },
+    expectError: false,
+    fix: {
+      label: 'Fix it',
+      apply: (code) => code.replace(/asyncio\\.create_task\\(worker\\(\\)\\)\\s*# mistake: we never await it/, 'await worker()  # fixed: wait for it to finish'),
+      banner: { color: 'green', msg: '✅ Fixed: we await the worker so it always finishes.' }
+    }
+  },
+  mistake_race: {
+    onLoad: { color: 'amber', msg: '⚠ Mistake demo: shared-state race. The finish order can change.' },
+    expectError: false,
+    fix: {
+      label: 'Fix it',
+      apply: (code) => code
+        .replace(/shared\\s*=\\s*\\[\\]\\n\\nasync def job\\(name\\):[\\s\\S]*?shared\\.append\\(name\\)[^\\n]*\\n\\nasync def main\\(\\):/m,
+`async def job(name):
+    await asyncio.sleep(random.random() * 0.03)
+    return name
+
+async def main():`)
+        .replace(/await asyncio\\.gather\\(job\\(\"A\"\\), job\\(\"B\"\\), job\\(\"C\"\\)\\)\\n\\s*print\\(\"finish order:\", shared\\)/m,
+`out = await asyncio.gather(job("A"), job("B"), job("C"))
+    print("finish order:", out)`),
+      banner: { color: 'green', msg: '✅ Fixed: no shared mutation; gather returns results.' }
+    }
+  }
+};
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
@@ -1264,6 +1886,31 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (ed) ed.setOption('theme', next === 'dark' ? 'default' : 'default');
     });
   };
+
+  // Story Mode toggle
+  const st = document.getElementById('story-toggle');
+  if (st) {
+    st.checked = storyMode;
+    st.onchange = () => {
+      storyMode = !!st.checked;
+      localStorage.setItem('haki-story-mode', storyMode ? '1' : '0');
+      render();
+    };
+  }
+
+  // Achievements (toasts) toggle
+  const at = document.getElementById('ach-toggle');
+  if (at) {
+    at.checked = achievementsOn;
+    at.onchange = () => {
+      achievementsOn = !!at.checked;
+      localStorage.setItem('haki-achievements', achievementsOn ? '1' : '0');
+      if (!achievementsOn) {
+        const wrap = document.getElementById('toast-wrap');
+        if (wrap) wrap.innerHTML = '';
+      }
+    };
+  }
 
   loadFromUrl();
 
@@ -1411,6 +2058,7 @@ function loadExample() {
   if (!exEl) return;
   const k = exEl.value;
   if (!k) return;
+  currentExampleId = k;
   if (mainLang === 'javascript') {
     if (!JS_LESSONS[k]) return;
     editor.setValue(JS_LESSONS[k]);
@@ -1418,9 +2066,30 @@ function loadExample() {
     if (!EXAMPLES[k]) return;
     editor.setValue(EXAMPLES[k]);
   }
-  exEl.value = '';
+  // Keep the selected example visible (better UX while teaching).
+  exEl.value = k;
   codeHints = null; jsAnalysis = null;
   applyHintsToEditor();
+  try {
+    const meta = EXAMPLE_META[k];
+      if (meta && meta.onLoad) {
+      if (meta.fix) {
+        showActionBanner(meta.onLoad.msg, meta.onLoad.color || 'blue', meta.fix.label || 'Fix', () => {
+          try {
+            const before = editor.getValue();
+            const next = meta.fix.apply ? meta.fix.apply(before) : before;
+            if (next && next !== before) editor.setValue(next);
+            // Always show a diff (even if no change) so the user gets feedback.
+            try { showFixDiff(before, next); }
+            catch (e) { try { showBanner('Could not render diff view.', 'red'); } catch(_) {} }
+            if (meta.fix.banner) showBanner(meta.fix.banner.msg, meta.fix.banner.color || 'green');
+          } catch(_) {}
+        });
+      } else {
+        showBanner(meta.onLoad.msg, meta.onLoad.color || 'blue');
+      }
+    }
+  } catch(_) {}
 }
 
 function refreshExamplesMenu() {
@@ -1554,9 +2223,83 @@ async function runCode() {
       return;
     }
     if (!pyodide) return;
-    const raw = await pyodide.runPythonAsync(`_run(${JSON.stringify(code)})`);
+    // Beginner-friendly: if the user defines `async def main()` but forgets to run it,
+    // we await it inside `_run_async` (safe even when an event loop is already running).
+    let codeToRun = code;
+    let autoMain = false;
+    try {
+      const hasAsyncMain = /(^|\n)\s*async\s+def\s+main\s*\(/m.test(code);
+      const alreadyRuns = /asyncio\s*\.\s*run\s*\(\s*main\s*\(/m.test(code) || /\bawait\s+main\s*\(/m.test(code);
+      autoMain = hasAsyncMain && !alreadyRuns;
+    } catch(_) {}
+
+    // Premium teaching cue: highlight the intentional "bad" blocking demo.
+    try {
+      if (/time\s*\.\s*sleep\s*\(/m.test(codeToRun) && /(^|\n)\s*async\s+def\s+/m.test(codeToRun)) {
+        showBanner('⚠ This demo intentionally blocks the event loop (bad pattern). Use `await asyncio.sleep(...)` instead.', 'amber');
+      }
+    } catch(_) {}
+
+    const raw = await pyodide.runPythonAsync(`_run_async(${JSON.stringify(codeToRun)}, ${autoMain ? 'True' : 'False'})`);
     const res = JSON.parse(raw);
     steps = res.steps;
+    try {
+      const meta = currentExampleId ? EXAMPLE_META[currentExampleId] : null;
+      if (meta && meta.expectError) {
+        const sawErr = (steps || []).some(s => s && (s.ev === 'error' || s.ev === 'exception'));
+        if (sawErr) showBanner('Expected: this example throws an error on purpose.', 'amber');
+      }
+    } catch(_) {}
+    pyAnalysis = null;
+    try {
+      // CFG (approx) from Python AST
+      const rawCfg = await pyodide.runPythonAsync(`_py_cfg(${JSON.stringify(codeToRun)})`);
+      const cfgRes = JSON.parse(rawCfg);
+      const cfgTextByFn = (cfgRes && cfgRes.ok) ? (cfgRes.cfgTextByFn || {}) : {};
+      const cfgEdgesByFn = (cfgRes && cfgRes.ok) ? (cfgRes.cfgEdgesByFn || {}) : {};
+
+      // Dynamic call graph + async switches from trace
+      const edgeCount = new Map();
+      const seenPairs = new Set();
+      let lastTask = null;
+      const switches = [];
+      for (let i = 0; i < (steps || []).length; i++) {
+        const st = steps[i];
+        if (st && st.ev === 'call' && st.frames && st.frames.length >= 2) {
+          const from = st.frames[st.frames.length - 2].fn;
+          const to = st.frames[st.frames.length - 1].fn;
+          const key = `${from} -> ${to}`;
+          edgeCount.set(key, (edgeCount.get(key) || 0) + 1);
+          seenPairs.add(key);
+        }
+        const curTask = st && st.async && st.async.py ? st.async.cur : null;
+        if (curTask && curTask !== lastTask) {
+          switches.push({
+            step: i + 1,
+            req: st.async.req || null,
+            task: curTask,
+            line: st.line || null,
+            fn: st.fn || null,
+          });
+          lastTask = curTask;
+        }
+      }
+      const callGraphText = Array.from(edgeCount.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 80)
+        .map(([k, n]) => `${k}  (${n})`)
+        .join('\n') || '—';
+
+      pyAnalysis = {
+        callGraphText,
+        cfgTextByFn,
+        cfgEdgesByFn,
+        asyncSwitches: switches.slice(-20),
+        userAsync: /(^|\n)\s*async\s+def\s+/m.test(codeToRun) || /\bawait\s+/m.test(codeToRun) || /\basyncio\s*\./m.test(codeToRun) || /\bcreate_task\s*\(/m.test(codeToRun),
+      };
+    } catch (e) {
+      pyAnalysis = null;
+    }
     idx = 0;
     codeLines = code.split('\n');
     annotations.clear();
@@ -1645,10 +2388,33 @@ function drawScrubMarkers() {
   container.innerHTML = '';
   if (steps.length < 2) return;
   const total = steps.length - 1;
+  let lastTask = null;
   steps.forEach((s, i) => {
-    if (s.ev === 'call' || s.ev === 'error' || s.ev === 'exception' || (s.ev === 'return' && s.fn !== '<module>')) {
+    let kind = null;
+    if (s.ev === 'call') kind = 'call';
+    else if (s.ev === 'return' && s.fn !== '<module>') kind = 'ret';
+    else if (s.ev === 'error' || s.ev === 'exception') kind = 'err';
+    // Async milestones (Python): await lines, task switches, timeouts.
+    try {
+      if (!kind && mainLang === 'python') {
+        const lineText = (codeLines && s.line && codeLines[s.line-1]) ? String(codeLines[s.line-1]) : '';
+        const curTask = s && s.async && s.async.py ? s.async.cur : null;
+        if (/\bawait\b/.test(lineText)) kind = 'await';
+        if (!kind && curTask && lastTask && curTask !== lastTask) kind = 'switch';
+        if (!kind && /\btimeout\b/i.test(lineText)) kind = 'timeout';
+        if (curTask) lastTask = curTask;
+      }
+      // Async milestones (JS): micro/macrotask events and unhandled rejections.
+      if (!kind && mainLang === 'javascript') {
+        if (s.ev === 'microtask') kind = 'micro';
+        else if (s.ev === 'macrotask') kind = 'macro';
+        else if (s.ev === 'unhandledrejection') kind = 'unhandled';
+      }
+    } catch(_) {}
+
+    if (kind) {
       const m = document.createElement('div');
-      m.className = `marker marker-${s.ev === 'call' ? 'call' : s.ev === 'return' ? 'ret' : 'err'}`;
+      m.className = `marker marker-${kind === 'timeout' ? 'timeout' : kind}`;
       m.style.left = (i / total * 100) + '%';
       container.appendChild(m);
     }
@@ -1659,9 +2425,97 @@ function showBanner(msg, color='blue') {
   const b = document.createElement('div');
   b.style.cssText = `padding:5px 14px;background:var(--${color}-l);border-bottom:1px solid var(--${color}-b);font-size:11.5px;color:var(--${color});flex-shrink:0;z-index:10`;
   b.textContent = msg;
-  const cv = document.getElementById('code-view');
-  cv.parentElement.insertBefore(b, cv);
-  setTimeout(()=>b.remove(), 5000);
+  // Insert banner above the editor in Visualize view (safe even if layout changes).
+  const anchor = document.querySelector('#view-viz .viz-editor') || document.querySelector('#view-compare') || document.querySelector('#view-playground') || document.getElementById('viewport') || document.body;
+  try {
+    anchor.parentElement.insertBefore(b, anchor);
+  } catch(_) {
+    try { anchor.prepend(b); } catch(__) {}
+  }
+  setTimeout(()=>{ try { b.remove(); } catch(_) {} }, 5000);
+}
+
+function showActionBanner(msg, color, label, onClick) {
+  const b = document.createElement('div');
+  b.style.cssText = `padding:7px 14px;background:var(--${color}-l);border-bottom:1px solid var(--${color}-b);font-size:11.5px;color:var(--${color});flex-shrink:0;z-index:10;display:flex;align-items:center;gap:10px`;
+  const t = document.createElement('div');
+  t.style.flex = '1';
+  t.textContent = msg;
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = label;
+  btn.style.pointerEvents = 'auto';
+  btn.onclick = () => { try { onClick(); } catch(_) {} };
+  b.appendChild(t);
+  b.appendChild(btn);
+  const anchor = document.querySelector('#view-viz .viz-editor') || document.querySelector('#view-compare') || document.querySelector('#view-playground') || document.getElementById('viewport') || document.body;
+  try { anchor.parentElement.insertBefore(b, anchor); } catch(_) { try { anchor.prepend(b); } catch(__) {} }
+  setTimeout(()=>{ try { b.remove(); } catch(_) {} }, 7000);
+}
+
+let _lastToastAt = 0;
+function toast(kind, title, msg) {
+  if (!achievementsOn) return;
+  const now = Date.now();
+  if (now - _lastToastAt < 900) return;
+  _lastToastAt = now;
+  const wrap = document.getElementById('toast-wrap');
+  if (!wrap) return;
+  const t = document.createElement('div');
+  t.className = `toast ${kind || 'info'}`;
+  t.innerHTML = `<div class="k">${esc(title || 'tip')}</div><div>${esc(msg || '')}</div>`;
+  wrap.appendChild(t);
+  // Keep only a couple visible.
+  while (wrap.children.length > 3) wrap.removeChild(wrap.firstChild);
+  setTimeout(()=>{ try { t.remove(); } catch(_) {} }, 2800);
+}
+
+function closeFixModal() {
+  const m = document.getElementById('fix-modal');
+  if (m) m.classList.remove('show');
+}
+
+function openFixModal(title, html) {
+  const m = document.getElementById('fix-modal');
+  const t = document.getElementById('fix-title');
+  const b = document.getElementById('fix-body');
+  if (!m || !t || !b) { try { showBanner('Could not open diff view (missing UI elements).', 'red'); } catch(_) {} ; return; }
+  if (t) t.textContent = title || 'Fix changes';
+  if (b) b.innerHTML = html || '';
+  if (m) m.classList.add('show');
+}
+
+// Simple line diff (LCS) for small code edits.
+function diffLines(oldStr, newStr) {
+  const a = String(oldStr || '').split('\n');
+  const b = String(newStr || '').split('\n');
+  const n = a.length, m = b.length;
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = m - 1; j >= 0; j--) {
+      dp[i][j] = (a[i] === b[j]) ? (1 + dp[i + 1][j + 1]) : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const out = [];
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { out.push({ t: 'eq', s: a[i] }); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { out.push({ t: 'del', s: a[i] }); i++; }
+    else { out.push({ t: 'add', s: b[j] }); j++; }
+  }
+  while (i < n) { out.push({ t: 'del', s: a[i++] }); }
+  while (j < m) { out.push({ t: 'add', s: b[j++] }); }
+  return out;
+}
+
+function showFixDiff(oldCode, newCode) {
+  const rows = diffLines(oldCode, newCode);
+  const html = rows.map(r => {
+    const cls = r.t === 'add' ? 'dline dadd' : r.t === 'del' ? 'dline ddel' : 'dline';
+    const tag = r.t === 'add' ? '+' : r.t === 'del' ? '−' : ' ';
+    return `<div class="${cls}"><div class="dtag">${tag}</div><div class="dtext">${esc(r.s)}</div></div>`;
+  }).join('');
+  openFixModal('Fix changes (diff)', html || '<div style="color:var(--t4)">no changes</div>');
 }
 
 // ─── HEATMAP ─────────────────────────────────────────────────────────────────
@@ -1802,7 +2656,7 @@ function rv(val) {
   if (!val.id)     return `<span class="v-trunc">${esc(val.r||t)}</span>`;
   const cnt = val.items ? val.items.length : (val.attrs ? Object.keys(val.attrs).length : 0);
   const lbl = t==='list'?`list[${cnt}]`:t==='tuple'?`tuple[${cnt}]`:t==='dict'?`{${cnt}}`:t==='set'?`set{${cnt}}`:t==='frozenset'?`frozenset{${cnt}}`:`${t}`;
-  return `<span class="v-ref" data-id="${val.id}" onmouseenter="hlHeap(${val.id})" onmouseleave="uhlHeap()" onclick="showObjHistory(${val.id})">→ ${esc(lbl)}</span>`;
+  return `<span class="v-ref" data-id="${val.id}" onmouseenter="hlHeap(${val.id})" onmouseleave="uhlHeap()" onclick="pinHeap(${val.id});return false">→ ${esc(lbl)}</span>`;
 }
 
 function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1813,6 +2667,38 @@ function render() {
   const s = steps[idx];
   const prevS = idx > 0 ? steps[idx-1] : null;
   highlightEditorLine(s.line, s.ev);
+
+  // Achievements + async spotlight (low-noise).
+  try {
+    if (mainLang === 'python') {
+      const lineText = (codeLines && s.line && codeLines[s.line-1]) ? String(codeLines[s.line-1]) : '';
+      const sawAwait = /\bawait\b/.test(lineText);
+      const sawBlock = /\btime\s*\.\s*sleep\s*\(/.test(lineText);
+      const curTask = s && s.async && s.async.py ? s.async.cur : null;
+      const prevTask = prevS && prevS.async && prevS.async.py ? prevS.async.cur : null;
+      if (sawAwait) toast('good', 'You found await', 'This task is waiting, so others can run.');
+      if (sawBlock) toast('warn', 'Blocking!', 'time.sleep blocks everyone. Use await asyncio.sleep.');
+      if (curTask && prevTask && curTask !== prevTask) {
+        toast('info', 'Switch', 'The event loop picked another task to run.');
+        // Spotlight: highlight the await line that likely caused the switch (previous line if it had await).
+        if (prevS && prevS.line && codeLines && /\bawait\b/.test(String(codeLines[prevS.line-1] || ''))) {
+          try {
+            _cmAwaitHandle = prevS.line - 1;
+            editor.addLineClass(_cmAwaitHandle, 'wrap', 'cm-await-spotlight');
+            setTimeout(()=>{ try { if (_cmAwaitHandle !== null) editor.removeLineClass(_cmAwaitHandle, 'wrap', 'cm-await-spotlight'); _cmAwaitHandle = null; } catch(_) {} }, 650);
+          } catch(_) {}
+        }
+      }
+    }
+    if (mainLang === 'javascript') {
+      if (s.ev === 'microtask') toast('good', 'Microtask', 'A Promise/microtask ran.');
+      if (s.ev === 'macrotask') toast('info', 'Macrotask', 'A timer/callback ran.');
+      if (s.ev === 'unhandledrejection') toast('warn', 'Unhandled!', 'A Promise rejected without catch.');
+      // Heuristic: highlight blocking loops in examples like fetch+CPU.
+      const lt = (codeLines && s.line && codeLines[s.line-1]) ? String(codeLines[s.line-1]) : '';
+      if (/\bwhile\s*\(/.test(lt) && /performance\.now/.test(lt)) toast('warn', 'Blocking loop', 'This blocks the event loop.');
+    }
+  } catch(_) {}
 
   renderFrames(s, prevS);
   renderHeap(s, prevS);
@@ -1831,6 +2717,7 @@ function render() {
 }
 
 let _cmHiHandle = null;
+let _cmAwaitHandle = null;
 function highlightEditorLine(line, ev) {
   if (!editor || !line || line < 1) return;
   try {
@@ -1839,6 +2726,11 @@ function highlightEditorLine(line, ev) {
   _cmHiHandle = line - 1;
   const cls = ev === 'return' ? 'cm-exec-ret' : ev === 'call' ? 'cm-exec-call' : (ev === 'error' || ev === 'exception') ? 'cm-exec-err' : 'cm-exec-line';
   editor.addLineClass(_cmHiHandle, 'wrap', cls);
+  // Clear any prior await spotlight.
+  try {
+    if (_cmAwaitHandle !== null) editor.removeLineClass(_cmAwaitHandle, 'wrap', 'cm-await-spotlight');
+  } catch(_) {}
+  _cmAwaitHandle = null;
   // Exec dot gutter marker
   try {
     if (execMarkerLine !== null) editor.setGutterMarker(execMarkerLine, 'execpoint', null);
@@ -1942,6 +2834,44 @@ function flashHeap() {
 function renderScopePanel(s) {
   const el = document.getElementById('scope-scroll');
   if (!el) return;
+  if (mainLang === 'python') {
+    const frame = s && s.frames && s.frames.length ? s.frames[s.frames.length - 1] : null;
+    if (!frame) { el.innerHTML = '<div style="color:var(--t4)">no frame</div>'; return; }
+
+    const locals = frame.locals || {};
+    const globals = frame.globals || {};
+    const free = new Set(frame.freevars || []);
+    const cell = new Set(frame.cellvars || []);
+
+    const pill = (name, val, cls) => {
+      const v = val ? rv(val) : '<span class="v-trunc">—</span>';
+      return `<div style="display:flex;gap:8px;align-items:baseline;padding:2px 0;border-bottom:1px dashed rgba(0,0,0,0.08)">
+        <div style="min-width:140px;color:var(--amber);font-family:var(--mono);overflow-wrap:anywhere">${esc(name)}${cls ? `<span class="el-chip micro" style="margin-left:6px">${esc(cls)}</span>` : ''}</div>
+        <div style="flex:1;min-width:0">${v}</div>
+      </div>`;
+    };
+
+    const localsHtml = Object.keys(locals).slice(0, 40).map(k => pill(k, locals[k], free.has(k) ? 'free' : cell.has(k) ? 'cell' : '')).join('') || '<div style="color:var(--t4)">—</div>';
+    const globalsHtml = Object.keys(globals).slice(0, 40).map(k => pill(k, globals[k], 'global')).join('') || '<div style="color:var(--t4)">—</div>';
+    const freeList = (frame.freevars || []).map(n => `<span class="sv param">${esc(n)}</span>`).join('') || '<span style="color:var(--t4)">—</span>';
+    const cellList = (frame.cellvars || []).map(n => `<span class="sv let">${esc(n)}</span>`).join('') || '<span style="color:var(--t4)">—</span>';
+
+    el.innerHTML = `
+      <div class="scope-card">
+        <div class="scope-h"><span>Python scope</span><span style="color:var(--t4)">${esc(frame.fn||'')}</span></div>
+        <div class="scope-sub">line ${frame.line || '—'} · locals / globals / closure</div>
+        <div style="margin-top:10px;color:var(--t4);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em">locals</div>
+        <div style="margin-top:6px">${localsHtml}</div>
+        <div style="margin-top:12px;color:var(--t4);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em">globals (small subset)</div>
+        <div style="margin-top:6px">${globalsHtml}</div>
+        <div style="margin-top:12px;color:var(--t4);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em">closure names</div>
+        <div class="scope-vars" style="margin-top:6px">free: ${freeList}</div>
+        <div class="scope-vars" style="margin-top:6px">cell: ${cellList}</div>
+      </div>
+    `;
+    return;
+  }
+
   if (mainLang !== 'javascript') {
     el.innerHTML = '<div style="color:var(--t4)">scope viewer is available for JavaScript runs</div>';
     return;
@@ -1974,6 +2904,82 @@ function renderScopePanel(s) {
 function renderGraphsPanel(s) {
   const el = document.getElementById('graph-scroll');
   if (!el) return;
+  if (mainLang === 'python') {
+    if (!pyAnalysis) {
+      el.innerHTML = '<div style="color:var(--t4)">no graph analysis yet (run Python code)</div>';
+      return;
+    }
+    const call = pyAnalysis.callGraphText || '—';
+    const curFn = s && s.frames && s.frames.length ? s.frames[s.frames.length-1].fn : '<global>';
+    const focus = graphFocusFn || curFn;
+    const cfg = pyAnalysis.cfgTextByFn ? (pyAnalysis.cfgTextByFn[focus] || pyAnalysis.cfgTextByFn['<global>'] || '—') : '—';
+    const cfgEdges = (pyAnalysis.cfgEdgesByFn && pyAnalysis.cfgEdgesByFn[focus]) ? pyAnalysis.cfgEdgesByFn[focus] : [];
+    const cfgLines = String(cfg || '').split('\n').filter(Boolean);
+    const cfgNodes = cfgLines.map(line => {
+      const m = line.match(/^#(\\d+) \\(line (\\d+)\\):\\s*(.*)$/);
+      if (!m) return null;
+      return { id: +m[1], line: +m[2], label: m[3] };
+    }).filter(Boolean);
+    const curLine = s && s.line ? s.line : 1;
+    const curNode = (cfgNodes.slice().reverse().find(n => n.line <= curLine) || null);
+
+    el.innerHTML = `
+      <div class="gbox">
+        <div class="gtitle"><span>Call Graph (from trace)</span><span style="color:var(--t4)">focus: ${esc(focus)}</span></div>
+        <div class="gpre">${esc(call).split('\\n').map(line=>{
+          const m = line.match(/^([^\\s]+)\\s+->\\s+([^\\s(]+)/);
+          if (!m) return esc(line);
+          const from = m[1], to = m[2];
+          const tail = line.slice((from + ' -> ' + to).length);
+          return `<span style="cursor:pointer;color:var(--blue)" onclick="graphFocusFn='${esc(from)}';render();">${esc(from)}</span> -> <span style="cursor:pointer;color:var(--blue)" onclick="graphFocusFn='${esc(to)}';render();">${esc(to)}</span>${esc(tail)}`;
+        }).join('\\n')}</div>
+      </div>
+      <div class="gbox">
+        <div class="gtitle"><span>CFG (approx, AST)</span><span style="color:var(--t4)">${esc(focus)}</span></div>
+        <div class="gpre">${esc(cfg)}</div>
+        ${cfgNodes.length ? `<svg class="gsvg" viewBox="0 0 800 260" preserveAspectRatio="none">
+          <defs>
+            <marker id="garrow" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+              <polygon points="0 0,7 2.5,0 5" fill="rgba(240,240,245,.3)"></polygon>
+            </marker>
+          </defs>
+          ${(() => {
+            const padX = 30, padY = 18;
+            const gapX = 150, gapY = 44;
+            const cols = 5;
+            const pos = new Map();
+            cfgNodes.forEach((n, i) => {
+              const col = i % cols;
+              const row = Math.floor(i / cols);
+              const x = padX + col * gapX;
+              const y = padY + row * gapY;
+              pos.set(n.id, { x, y });
+            });
+            const edgesSvg = (cfgEdges||[]).map(e => {
+              const a = pos.get(e.from), b = pos.get(e.to);
+              if (!a || !b) return '';
+              const x1 = a.x + 22, y1 = a.y;
+              const x2 = b.x - 22, y2 = b.y;
+              const cx1 = x1 + (x2 - x1) * 0.4;
+              const cx2 = x1 + (x2 - x1) * 0.6;
+              return `<path class="gedge" d="M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}"></path>`;
+            }).join('');
+            const nodesSvg = cfgNodes.map(n => {
+              const p = pos.get(n.id);
+              const isCur = curNode && n.id === curNode.id;
+              const label = `#${n.id} ${n.label}`;
+              return `
+                <circle class="gnode${isCur?' cur':''}" cx="${p.x}" cy="${p.y}" r="18" onclick="alert('CFG node ${n.id} @ line ${n.line}: ${n.label}')"></circle>
+                <text class="glabel" x="${p.x + 26}" y="${p.y + 3}">${esc(label).slice(0,40)}</text>
+              `;
+            }).join('');
+            return edgesSvg + nodesSvg;
+          })()}
+        </svg>` : ''}
+      </div>
+    `;
+    return;
+  }
   if (mainLang !== 'javascript') {
     el.innerHTML = '<div style="color:var(--t4)">graphs are available for JavaScript runs</div>';
     return;
@@ -2099,10 +3105,80 @@ function renderEventLoop(s) {
   const el = document.getElementById('eventloop-scroll');
   if (!el) return;
   if (!s || !s.async) {
-    el.innerHTML = '<div style="color:var(--t4)">no event loop data (run JS code that schedules async work)</div>';
+    el.innerHTML = (mainLang === 'python')
+      ? '<div style="color:var(--t4)">no asyncio data (run Python async code, e.g. the “asyncio tasks” example)</div>'
+      : '<div style="color:var(--t4)">no event loop data (run JS code that schedules async work)</div>';
     return;
   }
   const a = s.async;
+  if (a.py) {
+    const cur = a.cur ? `#${a.cur}${a.curName ? ` (${esc(a.curName)})` : ''}` : '—';
+    const loopTime = (typeof a.loopTime === 'number') ? a.loopTime.toFixed(6) : '—';
+    const req = (a.req !== undefined && a.req !== null && a.req !== '') ? String(a.req) : null;
+    const switches = (pyAnalysis && pyAnalysis.asyncSwitches) ? pyAnalysis.asyncSwitches.slice(-8) : [];
+    const userAsync = !!(pyAnalysis && pyAnalysis.userAsync);
+    const isRunnerOnly = !userAsync;
+    const swHtml = switches.length ? switches.map(x => {
+      const who = x.req ? `req ${esc(String(x.req))}` : 'req —';
+      return `<div class="el-edge"><strong>${who}</strong> <span style="color:var(--t4)">→</span> <strong>#${esc(String(x.task))}</strong> <span style="color:var(--t4)">line ${esc(String(x.line||'—'))}</span></div>`;
+    }).join('') : '<div style="color:var(--t4)">—</div>';
+    const tasks = (a.tasks || []).slice(0, 14).map(t => {
+      const cls = t.state === 'done' ? 'render' : (t.state === 'pending' ? 'micro' : 'macro');
+      const nm = t.name ? ` ${t.name}` : '';
+      return `<span class="el-chip ${cls}">#${t.id}${esc(nm)} · ${esc(t.coro||'?')} · ${esc(t.state||'?')}</span>`;
+    }).join('') || '<div style="color:var(--t4)">no tasks</div>';
+
+    const toggle = `<div style="display:flex;align-items:center;gap:8px;padding-top:6px">
+      <label class="toggle" title="Traffic Light view">
+        <input type="checkbox" ${trafficMode ? 'checked' : ''} onchange="trafficMode=this.checked;localStorage.setItem('haki-traffic-mode',trafficMode?'1':'0');render()">
+        traffic
+      </label>
+    </div>`;
+
+    const tl = () => {
+      const list = (a.tasks || []).slice(0, 8);
+      if (!list.length) return '<div style="color:var(--t4)">—</div>';
+      return `<div class="tl-wrap">${
+        list.map(t => {
+          const running = a.cur && String(t.id) === String(a.cur);
+          const state = running ? 'RUNNING' : (t.state === 'done' ? 'DONE' : 'WAITING');
+          const pillCls = running ? 'tl-pill tl-run' : (t.state === 'done' ? 'tl-pill tl-done' : 'tl-pill tl-wait');
+          const who = (a.req && running) ? `req ${esc(String(a.req))}` : (t.name ? esc(t.name) : 'task');
+          return `<div class="tl-card${running ? ' flash' : ''}" data-taskid="${esc(String(t.id))}">
+            <div class="tl-top">
+              <div class="tl-name">${who}</div>
+              <div class="${pillCls}">${state}</div>
+            </div>
+            <div class="tl-sub">
+              <span class="tl-pill">id ${esc(String(t.id))}</span>
+              ${t.coro ? `<span class="tl-pill">${esc(String(t.coro))}</span>` : ''}
+              ${t.state ? `<span class="tl-pill">${esc(String(t.state))}</span>` : ''}
+            </div>
+          </div>`;
+        }).join('')
+      }</div>`;
+    };
+
+    el.innerHTML = `
+      <div class="el-row"><div class="el-k">python thread</div><div class="el-v">${s.thread ? `${esc(s.thread.name||'')} (${s.thread.id||'?'})` : '—'}</div></div>
+      ${isRunnerOnly ? `<div style="padding-top:8px;color:var(--t3);font-size:11px;line-height:1.45">
+        This code is <strong>synchronous</strong> (no <code>await</code>). The event loop here is just Pyodide’s runner.
+      </div>` : `
+        <div class="el-row"><div class="el-k">current request</div><div class="el-v">${req ? esc(req) : '—'}</div></div>
+        <div class="el-row"><div class="el-k">current task</div><div class="el-v">${cur}</div></div>
+        <div class="el-row"><div class="el-k">loop time</div><div class="el-v">${loopTime}</div></div>
+        <div class="el-row"><div class="el-k">tasks</div><div class="el-v">${(a.tasks||[]).length}</div></div>
+        ${toggle}
+        ${trafficMode ? tl() : `<div style="padding:6px 0 10px;display:flex;flex-wrap:wrap;gap:6px">${tasks}</div>
+          <div style="padding-top:8px;color:var(--t4);font-size:10px;text-transform:uppercase;letter-spacing:.08em">recent task switches</div>
+          ${swHtml}`}
+      `}
+      <div style="padding-top:8px;color:var(--t4);font-size:10px;line-height:1.4">
+        Tip: asyncio is single-threaded; tasks interleave at <code>await</code> points.
+      </div>
+    `;
+    return;
+  }
   const chips = (list) => (list||[]).slice(0, 8).map(t => {
     const cls = t.kind === 'micro' ? 'micro' : t.kind === 'render' ? 'render' : 'macro';
     return `<span class="el-chip ${cls}">#${t.id} ${esc(t.label||t.kind||'task')}</span>`;
@@ -2112,15 +3188,48 @@ function renderEventLoop(s) {
     return `<div class="el-edge"><strong>#${e.from}</strong> → <strong>#${e.to}</strong> <span style="color:var(--t4)">${esc(e.via||'')}</span></div>`;
   }).join('') || '<div style="color:var(--t4)">no async edges yet</div>';
 
+  const toggle = `<div style="display:flex;align-items:center;gap:8px;padding-top:6px">
+    <label class="toggle" title="Traffic Light view">
+      <input type="checkbox" ${trafficMode ? 'checked' : ''} onchange="trafficMode=this.checked;localStorage.setItem('haki-traffic-mode',trafficMode?'1':'0');render()">
+      traffic
+    </label>
+  </div>`;
+
+  const tlJs = () => {
+    const running = a.last ? a.last : null;
+    const runHtml = running ? `<div class="tl-card flash">
+        <div class="tl-top">
+          <div class="tl-name">RUNNING</div>
+          <div class="tl-pill tl-run">#${esc(String(running.id))} ${esc(running.kind||'')}</div>
+        </div>
+        <div class="tl-sub">
+          <span class="tl-pill">${esc(running.label||'task')}</span>
+          ${running.via ? `<span class="tl-pill">${esc(running.via)}</span>` : ''}
+          ${running.from ? `<span class="tl-pill">from #${esc(String(running.from))}</span>` : ''}
+        </div>
+      </div>` : `<div style="color:var(--t4)">—</div>`;
+    const mkWait = (name, list, cls) => `<div class="tl-card">
+      <div class="tl-top">
+        <div class="tl-name">${esc(name)}</div>
+        <div class="tl-pill ${cls}">WAITING · ${esc(String((list||[]).length))}</div>
+      </div>
+      <div class="tl-sub">${(list||[]).slice(0,6).map(t=>`<span class="tl-pill">#${esc(String(t.id))} ${esc(t.label||t.kind||'')}</span>`).join('') || '<span style="color:var(--t4)">—</span>'}</div>
+    </div>`;
+    return `<div class="tl-wrap">${runHtml}${mkWait('MACRO QUEUE', a.macroQ, 'tl-done')}${mkWait('MICRO QUEUE', a.microQ, 'tl-wait')}</div>`;
+  };
+
   el.innerHTML = `
-    <div class="el-row"><div class="el-k">current task</div><div class="el-v">${a.cur ? `#${a.cur} (${esc(a.curKind||'')})` : '—'}</div></div>
-    <div class="el-row"><div class="el-k">macro queue</div><div class="el-v">${(a.macroQ||[]).length}</div></div>
-    <div style="padding:6px 0 10px">${chips(a.macroQ)}</div>
-    <div class="el-row"><div class="el-k">micro queue</div><div class="el-v">${(a.microQ||[]).length}</div></div>
-    <div style="padding:6px 0 10px">${chips(a.microQ)}</div>
-    <div class="el-row"><div class="el-k">unhandled</div><div class="el-v">${(a.unhandled||[]).length}</div></div>
-    <div style="padding-top:8px;color:var(--t4);font-size:10px;text-transform:uppercase;letter-spacing:.08em">causality (recent)</div>
-    ${edges}
+    ${toggle}
+    ${trafficMode ? tlJs() : `
+      <div class="el-row"><div class="el-k">current task</div><div class="el-v">${a.cur ? `#${a.cur} (${esc(a.curKind||'')})` : '—'}</div></div>
+      <div class="el-row"><div class="el-k">macro queue</div><div class="el-v">${(a.macroQ||[]).length}</div></div>
+      <div style="padding:6px 0 10px">${chips(a.macroQ)}</div>
+      <div class="el-row"><div class="el-k">micro queue</div><div class="el-v">${(a.microQ||[]).length}</div></div>
+      <div style="padding:6px 0 10px">${chips(a.microQ)}</div>
+      <div class="el-row"><div class="el-k">unhandled</div><div class="el-v">${(a.unhandled||[]).length}</div></div>
+      <div style="padding-top:8px;color:var(--t4);font-size:10px;text-transform:uppercase;letter-spacing:.08em">causality (recent)</div>
+      ${edges}
+    `}
   `;
 }
 
@@ -2213,7 +3322,69 @@ function renderHeap(s, prevS) {
   hs.innerHTML = '';
   if (!heap.size) { hs.innerHTML = '<div class="empty-heap">no heap objects</div>'; return; }
 
-  heap.forEach(val => {
+  const isLib = (val) => {
+    if (!val) return false;
+    if (String(val.t || '').toLowerCase() !== 'module') return false;
+    const r = String(val.r || '');
+    return /python\d/i.test(r) || /\/lib\//i.test(r) || /\.zip\//i.test(r);
+  };
+
+  const user = [];
+  const lib = [];
+  heap.forEach(v => (isLib(v) ? lib : user).push(v));
+
+  const mkSection = (title, items, storageKey, defaultCollapsed) => {
+    const collapsed = (localStorage.getItem(storageKey) ?? (defaultCollapsed ? '1' : '0')) === '1';
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 8px;margin:2px 0 6px;border:1px solid var(--border);border-radius:10px;background:var(--s2);color:var(--t2);font-family:var(--mono);font-size:11px';
+    const left = document.createElement('div');
+    left.innerHTML = `<strong style="color:var(--t1)">${esc(title)}</strong> <span style="color:var(--t4)">(${items.length})</span>`;
+    const btn = document.createElement('button');
+    btn.className = 'btn ghost';
+    btn.style.cssText = 'padding:2px 8px;box-shadow:none';
+    btn.textContent = collapsed ? 'show' : 'hide';
+    hdr.appendChild(left);
+    hdr.appendChild(btn);
+
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%;display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px';
+    wrap.style.display = collapsed ? 'none' : 'flex';
+
+    btn.onclick = () => {
+      const next = wrap.style.display === 'none';
+      wrap.style.display = next ? 'flex' : 'none';
+      btn.textContent = next ? 'hide' : 'show';
+      localStorage.setItem(storageKey, next ? '0' : '1');
+      drawArrows();
+    };
+
+    hs.appendChild(hdr);
+    hs.appendChild(wrap);
+    return { wrap, hdr, btn, storageKey };
+  };
+
+  const userSec = mkSection('your objects', user, 'haki-heap-user-collapsed', false);
+  const libSec = mkSection('library modules', lib, 'haki-heap-lib-collapsed', true);
+
+  // Kid-friendly CTA: keep details, but make it obvious how to reveal the library objects.
+  try {
+    const libCollapsed = libSec.wrap.style.display === 'none';
+    if (libCollapsed && userSec.hdr) {
+      const cta = document.createElement('button');
+      cta.className = 'btn ghost';
+      cta.style.cssText = 'padding:2px 8px;box-shadow:none;pointer-events:auto';
+      cta.textContent = 'show scary stuff';
+      cta.onclick = () => {
+        libSec.wrap.style.display = 'flex';
+        libSec.btn.textContent = 'hide';
+        localStorage.setItem(libSec.storageKey, '0');
+        drawArrows();
+      };
+      userSec.hdr.appendChild(cta);
+    }
+  } catch(_) {}
+
+  const renderInto = (container, val) => {
     const t = val.t;
     const changed = prevHeap.has(val.id) && JSON.stringify(prevHeap.get(val.id)) !== JSON.stringify(val);
     const isNew = !prevHeap.has(val.id) && prevS;
@@ -2249,30 +3420,60 @@ function renderHeap(s, prevS) {
     el.innerHTML = `<div class="ho-hdr">${t.toUpperCase()}${newBadge}<span class="ho-id">id:${val.id}</span></div>
 <div class="ho-body">${body}</div>
 `;
-    hs.appendChild(el);
-  });
+    container.appendChild(el);
+  };
+
+  user.forEach(v => renderInto(userSec.wrap, v));
+  lib.forEach(v => renderInto(libSec.wrap, v));
 }
 
 // ─── SVG ARROWS ──────────────────────────────────────────────────────────────
+let arrowOnlyId = null;
+let pinnedHeapId = null;
+
+function pinHeap(id) {
+  const next = String(pinnedHeapId) === String(id) ? null : id;
+  pinnedHeapId = next;
+  arrowOnlyId = next || arrowOnlyId;
+  if (pinnedHeapId) {
+    hlHeap(pinnedHeapId);
+  } else {
+    uhlHeap();
+  }
+  drawArrows();
+}
+
 function drawArrows() {
   requestAnimationFrame(() => {
     const svg = document.getElementById('arrows-svg');
-    if (svg) svg.innerHTML = `<defs><marker id="arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="rgba(91,159,214,.55)"/></marker></defs>`;
-    document.querySelectorAll('.v-ref[data-id]').forEach(el => {
-      const id = el.dataset.id;
-      const target = document.getElementById('ho-' + id);
-      if (!target) return;
+    if (!svg) return;
+    svg.innerHTML = `<defs><marker id="arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="rgba(91,159,214,.55)"/></marker></defs>`;
+
+    const targetId = pinnedHeapId || arrowOnlyId;
+    if (!targetId) return;
+
+    // Only draw arrows from the CURRENT frame, so async/multi-step code stays readable.
+    const curFrameHeader = document.querySelector('.fh.cur');
+    const curBlock = curFrameHeader ? curFrameHeader.closest('.frame-block') : null;
+    const scope = curBlock || document;
+    const refs = Array.from(scope.querySelectorAll(`.v-ref[data-id="${CSS.escape(String(targetId))}"]`));
+    const target = document.getElementById('ho-' + targetId);
+    if (!target || !refs.length) return;
+
+    const tr = target.getBoundingClientRect();
+    if (!tr.width) return;
+    const x2 = tr.left, y2 = tr.top + tr.height / 2;
+    refs.slice(0, 8).forEach(el => {
       const sr = el.getBoundingClientRect();
-      const tr = target.getBoundingClientRect();
-      if (!sr.width || !tr.width) return;
+      if (!sr.width) return;
       const x1 = sr.right, y1 = sr.top + sr.height/2;
-      const x2 = tr.left, y2 = tr.top + tr.height/2;
-      const cx1 = x1 + Math.abs(x2-x1)*0.5;
-      const cx2 = x2 - Math.abs(x2-x1)*0.2;
+      const dx = Math.max(40, Math.abs(x2 - x1));
+      const cx1 = x1 + dx * 0.55;
+      const cx2 = x2 - dx * 0.2;
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('d',`M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`);
-      path.setAttribute('stroke','rgba(91,159,214,.5)');
-      path.setAttribute('stroke-width','1.4');
+      path.setAttribute('stroke','rgba(91,159,214,.45)');
+      path.setAttribute('stroke-width','1.6');
       path.setAttribute('fill','none');
       path.setAttribute('marker-end','url(#arr)');
       svg.appendChild(path);
@@ -2283,9 +3484,15 @@ function drawArrows() {
 function hlHeap(id) {
   document.querySelectorAll('.ho').forEach(e=>e.classList.remove('hi-heap'));
   const el = document.getElementById('ho-'+id);
+  arrowOnlyId = id;
+  drawArrows();
   if (el) { el.classList.add('hi-heap'); el.scrollIntoView({block:'nearest',behavior:'smooth'}); }
 }
-function uhlHeap() { document.querySelectorAll('.ho').forEach(e=>e.classList.remove('hi-heap')); }
+function uhlHeap() {
+  if (!pinnedHeapId) arrowOnlyId = null;
+  drawArrows();
+  document.querySelectorAll('.ho').forEach(e=>e.classList.remove('hi-heap'));
+}
 
 // ─── DEPTH METER ─────────────────────────────────────────────────────────────
 function renderDepthMeter(s) {
@@ -2322,9 +3529,34 @@ function renderStepInfo(s) {
 
   // Narrative Layer
   const nt = document.getElementById('narrative-text');
+  const narMode = document.getElementById('nar-mode');
   const prevS = idx > 0 ? steps[idx-1] : null;
 
   let nar = "";
+  // Kid-friendly "Story Mode" (esp. async demos).
+  let kidNar = "";
+  let techNar = "";
+  if (storyMode && mainLang === 'python') {
+    const prevS = idx > 0 ? steps[idx-1] : null;
+    const rid = s && s.async && s.async.py ? (s.async.req || null) : null;
+    const curTask = s && s.async && s.async.py ? s.async.cur : null;
+    const prevTask = prevS && prevS.async && prevS.async.py ? prevS.async.cur : null;
+    const lineText = (codeLines && s.line && codeLines[s.line-1]) ? String(codeLines[s.line-1]) : '';
+    const isAwait = /\bawait\b/.test(lineText);
+    const who = rid ? `Request ${rid}` : (s.fn === '<module>' ? 'the program' : s.fn);
+    if (prevTask && curTask && prevTask !== curTask) {
+      kidNar = `${who} is running now because the other job is waiting.`;
+    } else if (isAwait) {
+      kidNar = `${who} is waiting (like pizza in the oven), so someone else can run.`;
+    } else if (s.ev === 'call') {
+      kidNar = `${who} is opening a new box (calling a function).`;
+    } else if (s.ev === 'return') {
+      kidNar = `${who} finished a box and goes back.`;
+    } else {
+      kidNar = `${who} takes one small step.`;
+    }
+  }
+
   if (s.ev === 'microtask' || s.ev === 'macrotask' || s.ev === 'unhandledrejection') {
     const a = s.async || {};
     const last = a.last || null;
@@ -2361,7 +3593,17 @@ function renderStepInfo(s) {
     nar = `${mainLang === 'javascript' ? 'JavaScript is currently executing' : 'Python is currently executing'} line ${s.line} in ${esc(fn)}.`;
   }
 
-  if (nt) nt.innerHTML = nar || `<span class="ins-empty">—</span>`;
+  techNar = nar;
+  const modeLabel = storyMode ? (explainMode ? 'story + explain' : 'story') : 'why this ran';
+  if (narMode) narMode.textContent = modeLabel;
+  if (nt) {
+    if (storyMode && kidNar) {
+      const btn = `<button class="btn ghost" style="padding:3px 8px;box-shadow:none;margin-top:8px;pointer-events:auto" onclick="toggleExplain()">${explainMode ? 'hide explain' : 'explain'}</button>`;
+      nt.innerHTML = `<div>${kidNar}</div>${btn}${explainMode ? `<div style="margin-top:8px;color:var(--t2);line-height:1.5">${techNar}</div>` : ''}`;
+    } else {
+      nt.innerHTML = techNar || `<span class="ins-empty">—</span>`;
+    }
+  }
 }
 
 // ─── TOOLTIPS ────────────────────────────────────────────────────────────────
@@ -2377,6 +3619,12 @@ function showTooltip(x, y, txt) {
 function hideTooltip() {
   const tt = document.getElementById('tooltip');
   if (tt) tt.style.display = 'none';
+}
+
+function toggleExplain() {
+  explainMode = !explainMode;
+  localStorage.setItem('haki-explain-mode', explainMode ? '1' : '0');
+  render();
 }
 
 function resolutionForVar(varName, step) {
@@ -2429,6 +3677,10 @@ function updateBadge(s) {
 function updateScrub() {
   const sc = document.getElementById('scrub');
   if (sc) sc.value = idx;
+  const minEl = document.getElementById('scrub-min');
+  const maxEl = document.getElementById('scrub-max');
+  if (minEl) minEl.textContent = idx <= 0 ? 'now' : 'before';
+  if (maxEl) maxEl.textContent = (idx >= steps.length - 1) ? 'now' : 'after';
 }
 function scrubTo(i) { idx = i; render(); }
 
@@ -2485,7 +3737,11 @@ function togglePlay() {
   const spd = speedEl ? +speedEl.value : 5;
   const delay = Math.round(1200/spd);
   timer = setInterval(()=>{
-    if (idx>=steps.length-1) { stopTimer(); return; }
+    if (idx>=steps.length-1) {
+      stopTimer();
+      if (autoRewindOn) { idx = 0; render(); }
+      return;
+    }
     // stop at breakpoints
     const next = steps[idx+1];
     if (breakpoints.has(next?.line)) { idx++; render(); stopTimer(); return; }
@@ -4317,11 +5573,12 @@ function jsTracerWorkerWrapper() {
             case 'VariableDeclarator':
               return gen(node.id) + (node.init ? ' = ' + gen(node.init) : '');
             case 'FunctionDeclaration':
-              return 'function ' + gen(node.id) + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body);
+              return (node.async ? 'async ' : '') + 'function ' + gen(node.id) + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body);
             case 'FunctionExpression':
-              return '(function' + (node.id ? ' ' + gen(node.id) : '') + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body) + ')';
+              return '(' + (node.async ? 'async ' : '') + 'function' + (node.id ? ' ' + gen(node.id) : '') + '(' + (node.params || []).map(gen).join(', ') + ') ' + gen(node.body) + ')';
             case 'ArrowFunctionExpression':
-              return '(' + (node.params || []).map(gen).join(', ') + ') => ' + (node.body.type === 'BlockStatement' ? gen(node.body) : gen(node.body));
+              // Always parenthesize arrow functions to keep them valid when used as callees: (async () => {})()
+              return '(' + (node.async ? 'async ' : '') + '(' + (node.params || []).map(gen).join(', ') + ') => ' + (node.body.type === 'BlockStatement' ? gen(node.body) : gen(node.body)) + ')';
             case 'TryStatement':
               return 'try ' + gen(node.block) + (node.handler ? ' catch (' + gen(node.handler.param) + ') ' + gen(node.handler.body) : '') + (node.finalizer ? ' finally ' + gen(node.finalizer) : '');
             case 'Identifier':
@@ -4382,7 +5639,11 @@ function jsTracerWorkerWrapper() {
         function deepInstrumentFunctions(n) {
           if (!n || typeof n !== 'object') return n;
           if (Array.isArray(n)) return n.map(deepInstrumentFunctions);
-          if (n.type === 'FunctionExpression' || n.type === 'ArrowFunctionExpression') {
+          // Arrow functions are extremely common in modern JS, and instrumenting them
+          // can easily change semantics (lexical `this`) or produce hard-to-debug syntax
+          // issues across browsers. Keep them as-is for stability.
+          if (n.type === 'ArrowFunctionExpression') return n;
+          if (n.type === 'FunctionExpression') {
             return instrumentFunctionLike(n, n.id && n.id.name ? n.id.name : '<anonymous>');
           }
           const out = { ...n };
@@ -4636,9 +5897,7 @@ function jsTracerWorkerWrapper() {
           } catch(_) {}
         };
 
-        try {
-          const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', '__tdz__', '__read__', '__get__', '__set__', '__mcall__', instrumented);
-          runner(console, __step__, __enter__, __exit__, __var__, __tdz__, __read__, __get__, __set__, __mcall__);
+        const finishOk = () => {
           // Pretty-print static graphs for UI.
           const uniqEdges = new Map();
           (analysis.callEdges || []).forEach(e => {
@@ -4654,8 +5913,29 @@ function jsTracerWorkerWrapper() {
           const cfgTextByFn = {};
           Object.keys(analysis.cfgByFn || {}).forEach(fn => { cfgTextByFn[fn] = buildCfgText(fn) || '—'; });
           postMessage({ ok: true, steps: _steps, hints, stdout: _stdout.join('\n'), analysis: { scopes: analysis.scopes, scopeChainByFn: analysis.scopeChainByFn, freevarsByFn: analysis.freevarsByFn, shadowByFn: analysis.shadowByFn, callGraphText, cfgTextByFn, cfgEdgesByFn: analysis.cfgEdgesByFn } });
+        };
+
+        try {
+          const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', '__tdz__', '__read__', '__get__', '__set__', '__mcall__', instrumented);
+          const maybePromise = runner(console, __step__, __enter__, __exit__, __var__, __tdz__, __read__, __get__, __set__, __mcall__);
+          Promise.resolve(maybePromise).then(finishOk).catch((e) => postMessage({ ok: false, err: (e && e.stack) ? e.stack : (e && e.message ? e.message : String(e)) }));
         } catch(e) {
-          postMessage({ ok: false, err: e.message });
+          // Fallback: if our code instrumentation generates invalid JS for this browser,
+          // still run the original program so the Event Loop view works (macro/micro queues).
+          try {
+            _stdout.push('note: ran without code instrumentation (event loop view only)');
+            __step__(1, 'line');
+            const runner2 = new Function('console', code);
+            const maybePromise2 = runner2(console);
+            Promise.resolve(maybePromise2).then(finishOk).catch((err) => {
+              postMessage({ ok: false, err: (err && err.stack) ? err.stack : (err && err.message ? err.message : String(err)) });
+            });
+          } catch(err2) {
+            const msg = (e && e.stack) ? e.stack : (e && e.message ? e.message : String(e));
+            const msg2 = (err2 && err2.stack) ? err2.stack : (err2 && err2.message ? err2.message : String(err2));
+            const snip = String(instrumented || '').slice(0, 1200);
+            postMessage({ ok: false, err: msg + "\\n\\n(fallback also failed)\\n" + msg2 + "\\n\\n--- instrumented (first 1200 chars) ---\\n" + snip });
+          }
         }
     };
 }
