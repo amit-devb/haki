@@ -133,6 +133,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .logo em{color:var(--blue);font-style:normal}
 .sep{width:1px;height:16px;background:var(--border2);margin:0 2px;flex-shrink:0}
 .toolgrp{display:flex;align-items:center;gap:6px}
+.langdd{position:relative}
+.langdd-btn{display:inline-flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.02);color:var(--t1);cursor:pointer;transition:var(--transition);font-family:var(--sans);font-weight:650}
+.langdd-btn:hover{border-color:var(--t4);background:rgba(255,255,255,.03)}
+.langdd-btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.langdd-ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center}
+.langdd-ico svg{width:18px;height:18px;display:block}
+.langdd-lbl{font-size:12px}
+.langdd-ch{color:var(--t3);font-size:12px;margin-left:2px}
+.langdd-menu{position:absolute;top:38px;left:0;min-width:220px;max-width:260px;max-height:260px;overflow:auto;display:none;flex-direction:column;gap:6px;padding:8px;border:1px solid var(--border2);border-radius:14px;background:rgba(20,20,24,.95);backdrop-filter:blur(10px);box-shadow:0 24px 50px rgba(0,0,0,.45);z-index:3000;-webkit-overflow-scrolling:touch}
+body.theme-light .langdd-menu{background:rgba(250,250,252,.95);box-shadow:0 18px 40px rgba(0,0,0,.10)}
+.langdd.open .langdd-menu{display:flex}
+.langopt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--t2);cursor:pointer}
+.langopt:hover{background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.25);color:var(--t1)}
+.langopt.on{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.35);color:var(--blue)}
+.langopt .k{margin-left:auto;color:var(--t4);font-family:var(--mono);font-size:11px}
+.langopt svg{width:18px;height:18px}
 .toolgrp + .toolgrp{margin-left:6px}
 .btn.icon{padding:4px 8px}
 .btn.ghost{background:transparent;box-shadow:none}
@@ -603,7 +619,7 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .CodeMirror-scroll{min-height:100%}
 .CodeMirror-gutters{min-height:100%}
 .viz-right-top{flex:1;display:flex;overflow:hidden;border-bottom:1px solid var(--border);min-height:0}
-.viz-right-bot{flex:1;overflow:hidden;background:var(--bg);min-height:140px}
+.viz-right-bot{flex:1;overflow:hidden;background:var(--bg);min-height:140px;display:flex;flex-direction:column;min-height:0}
 .viz-left-insights{flex:none;overflow:hidden;border-top:1px solid var(--border);background:var(--bg);min-height:0}
 .ins-drawer{height:100%;display:flex;flex-direction:column;min-height:0}
 .viz-left-insights.ins-collapsed .ins-body{display:none}
@@ -622,7 +638,7 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .ins-pre{padding:10px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:pre-wrap}
 .ins-text{padding:10px;font-size:12px;color:var(--t2);line-height:1.55}
 .ins-empty{color:var(--t4);font-style:italic}
-.viz-right-bot-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr minmax(120px, 0.72fr);gap:10px;height:100%;min-height:0;padding:10px;box-sizing:border-box}
+.viz-right-bot-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr minmax(120px, 0.72fr);gap:10px;min-height:0;padding:10px;box-sizing:border-box;overflow:auto}
 .panels-bar{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
 .panels-bar .ttl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
 .panels-bar .sp{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -648,6 +664,60 @@ body:not(.show-extras) .viz-right-bot-grid{grid-template-rows:1fr !important}
 .panel-b{padding:10px}
 .right-col{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .right-col + .right-col{border-left:1px solid var(--border)}
+
+/* React mode layout */
+body.react-mode #col-state,
+body.react-mode #col-heap,
+body.react-mode #eventloop-scroll,
+body.react-mode #scope-scroll,
+body.react-mode #graph-scroll,
+body.react-mode #focus-scroll{display:none !important}
+body.react-mode #react-tree-col,
+body.react-mode #react-diff-col{display:flex !important}
+body.react-mode #rightbot-grid .tile[data-tile="eventloop"],
+body.react-mode #rightbot-grid .tile[data-tile="scope"],
+body.react-mode #rightbot-grid .tile[data-tile="graphs"],
+body.react-mode #rightbot-grid .tile[data-tile="focus"],
+body.react-mode #rightbot-grid .tile[data-tile="io"]{display:none !important}
+body.react-mode #rightbot-grid .tile[data-tile="reacttimeline"],
+body.react-mode #rightbot-grid .tile[data-tile="reactdom"]{display:flex !important}
+body.react-mode .panels-bar .ttl::after{content:" (React)";font-weight:600;color:var(--t3);text-transform:none;letter-spacing:0}
+body.react-mode #ins-tab-react{display:inline-flex !important}
+body.react-mode #ins-tab-step,
+body.react-mode #ins-tab-nar,
+body.react-mode #ins-tab-diff{display:none !important}
+body.react-mode #ins-step,
+body.react-mode #ins-nar,
+body.react-mode #ins-diff{display:none !important}
+body.react-mode #ins-react{display:block !important;margin-top:0 !important}
+
+/* React: timeline is the primary surface; details are optional */
+body.react-mode:not(.react-details) #view-viz .viz-right-top{display:none !important}
+body.react-mode:not(.react-details) #view-viz #viz-bot{flex:1}
+body.react-mode .viz-right-bot-grid{grid-template-columns:1fr !important;grid-template-rows:minmax(240px, 1fr) minmax(200px, 0.85fr) !important}
+body.react-mode .tile[data-tile="reacttimeline"],
+body.react-mode .tile[data-tile="reactdom"]{display:flex !important}
+body.react-mode #btn-react-details{display:inline-flex !important}
+body.react-mode:not(.react-details) #react-tree-col,
+body.react-mode:not(.react-details) #react-diff-col{display:none !important}
+
+/* React tree viz (box + connectors) */
+.rtree{padding:10px;display:flex;flex-direction:column;gap:10px}
+.rnode{position:relative;display:inline-flex;flex-direction:column;gap:6px;max-width:100%}
+.rbox{display:inline-flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;border:1px solid var(--border2);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,0));box-shadow:0 10px 30px rgba(0,0,0,.18);min-width:220px;max-width:100%}
+body.theme-light .rbox{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.rname{font-weight:750;color:var(--t1)}
+.rmeta{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--t4)}
+.rsub{display:flex;flex-wrap:wrap;gap:6px;padding-left:18px}
+.rchip{font-family:var(--mono);font-size:11px;color:var(--t2);padding:3px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.02)}
+.rchip.ui{border-color:rgba(91,159,214,.25);background:rgba(91,159,214,.08);color:var(--t2)}
+.rchip.host{border-color:rgba(245,158,11,.20);background:rgba(245,158,11,.06);color:var(--t2)}
+.rchildren{display:flex;gap:22px;padding-left:34px;flex-wrap:wrap;position:relative}
+.rchildren::before{content:"";position:absolute;left:16px;top:-6px;bottom:6px;width:2px;background:rgba(255,255,255,.06)}
+body.theme-light .rchildren::before{background:rgba(0,0,0,.08)}
+.rchild{position:relative}
+.rchild::before{content:"";position:absolute;left:-18px;top:22px;width:18px;height:2px;background:rgba(255,255,255,.06)}
+body.theme-light .rchild::before{background:rgba(0,0,0,.08)}
 
 /* --- RESPONSIVE MOBILE FIXES --- */
 @media (max-width: 850px) {
@@ -752,6 +822,13 @@ body:not(.show-extras) .viz-right-bot-grid{grid-template-rows:1fr !important}
 </style>
 </head>
 <body>
+<script>
+  // Hide the SEO hero banner on page load to prevent UI overlap
+  window.addEventListener('DOMContentLoaded', function() {
+    var seoHero = document.getElementById('seo-hero');
+    if (seoHero) seoHero.style.display = 'none';
+  });
+</script>
 
 <div id="loading">
   <div class="spin"></div>
@@ -825,8 +902,9 @@ body:not(.show-extras) .viz-right-bot-grid{grid-template-rows:1fr !important}
     <div class="toolgrp">
       <button class="btn icon ghost" id="theme-toggle" title="Theme">🌓</button>
       <select class="sel" id="main-lang" onchange="setMainLang(this.value)">
-        <option value="python">🐍 Python</option>
-        <option value="javascript">🟨 JavaScript</option>
+        <option value="python">Python</option>
+        <option value="javascript">JavaScript</option>
+        <option value="react">React</option>
       </select>
       <select class="sel" id="examples" onchange="loadExample()">
         <option value="">examples…</option>
@@ -950,6 +1028,7 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
               <span class="ins-title">Insights</span>
               <div class="ins-tabs">
                 <button class="ins-tab on" id="ins-tab-step" onclick="setInsightsTab('step')">Step</button>
+                <button class="ins-tab" id="ins-tab-react" onclick="setInsightsTab('react')" style="display:none">Concepts</button>
                 <button class="ins-tab" id="ins-tab-nar" onclick="setInsightsTab('nar')">Narrative</button>
                 <button class="ins-tab" id="ins-tab-diff" onclick="setInsightsTab('diff')">Changes</button>
               </div>
@@ -970,6 +1049,10 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
                   <div class="diff-body" id="diff-body" style="padding:10px"></div>
                 </div>
                 <div class="annot-wrap"><span class="annot-lbl">📎 note:</span><input class="annot-input" id="annot-input" placeholder="annotate this step…" oninput="saveAnnotation()"></div>
+              </div>
+              <div class="ins-card" id="ins-react" style="display:none;margin-top:10px">
+                <div class="ins-card-h"><span>React Concepts</span><span>learn</span></div>
+                <div class="ins-text" id="react-concepts" style="padding:10px"></div>
               </div>
             </div>
           </div>
@@ -999,6 +1082,14 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
             <div class="ph"><div class="phd" style="background:var(--amber)"></div>heap objects</div>
             <div class="heap-scroll" id="heap-scroll"></div>
           </div>
+          <div class="right-col" id="react-tree-col" style="display:none">
+            <div class="ph"><div class="phd" style="background:var(--purple)"></div>component tree</div>
+            <div class="state-scroll" id="react-tree" style="padding:10px"></div>
+          </div>
+          <div class="right-col" id="react-diff-col" style="display:none">
+            <div class="ph"><div class="phd" style="background:var(--amber)"></div>state / props diff</div>
+            <div class="state-scroll" id="react-diff" style="padding:10px"></div>
+          </div>
         </div>
 
         <div class="viz-right-bot" id="viz-bot">
@@ -1006,6 +1097,7 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
             <div class="ttl">Panels</div>
             <div class="sp">
               <button class="chipbtn" id="btn-extras" onclick="toggleExtras()">More</button>
+              <button class="chipbtn" id="btn-react-details" onclick="toggleReactDetails()" style="display:none">Details</button>
             </div>
           </div>
           <div class="viz-right-bot-grid" id="rightbot-grid">
@@ -1070,6 +1162,30 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
                   <div class="io-out" id="io-lane">—</div>
                   <div class="io-hint">Tip: printed output lives here; variables live in the State panel.</div>
                 </div>
+              </div>
+            </div>
+            <div class="tile" data-tile="reacttimeline" style="display:none">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>Timeline</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">render · commit · effects</span>
+                    <button class="picon" onclick="toggleTileMax('reacttimeline')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="react-timeline" style="padding:0"></div></div>
+              </div>
+            </div>
+            <div class="tile" data-tile="reactdom" style="display:none">
+              <div class="panel">
+                <div class="panel-h">
+                  <span>DOM</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">mutations + preview</span>
+                    <button class="picon" onclick="toggleTileMax('reactdom')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b"><div class="eventloop-scroll" id="react-dom" style="padding:0"></div></div>
               </div>
             </div>
           </div>
@@ -2059,6 +2175,151 @@ const JS_LESSONS = {
   proto: `// Prototype property lookup\nfunction A() {}\nA.prototype.p = 1;\nconst a = new A();\na.q = 2;\nconsole.log('a.q', a.q);\nconsole.log('a.p', a.p);\nconsole.log('a.missing', a.missing);\n`,
 };
 
+// ─── REACT LESSONS (SNIPPETS) ────────────────────────────────────────────────
+const REACT_LESSONS = {
+  r_jsx: `// React concept: JSX is just "elements" (plain objects).
+// In Haki, write plain JS (no build step). Use React.createElement.
+
+function App() {
+  return React.createElement('div', { style: { padding: 12, fontFamily: 'system-ui' } },
+    React.createElement('h3', null, 'Hello React'),
+    React.createElement('p', null, 'An element is a description of UI, not the DOM itself.')
+  );
+}
+
+mount(App);`,
+
+  r_props: `// React concept: props flow down; changing props re-renders children.
+
+function Child(props) {
+  return React.createElement('div', null, 'Child says: ', props.msg);
+}
+
+function App() {
+  return React.createElement('div', { style: { padding: 12 } },
+    React.createElement('h3', null, 'Props demo'),
+    React.createElement(Child, { msg: 'hello' }),
+  );
+}
+
+mount(App);`,
+
+  r_state: `// React concept: useState triggers rerender; updates can be batched.
+
+function Counter() {
+  const [count, setCount] = React.useState(0);
+  return React.createElement('div', { style: { padding: 12, display: 'grid', gap: 10 } },
+    React.createElement('h3', null, 'Counter'),
+    React.createElement('div', null, 'count = ', count),
+    React.createElement('button', { onClick: () => setCount(c => c + 1) }, '+1'),
+    React.createElement('button', { onClick: () => { setCount(c => c + 1); setCount(c => c + 1); } }, '+2 (functional)')
+  );
+}
+
+mount(Counter);`,
+
+  r_effect: `// React concept: useEffect runs after commit; cleanup runs before re-run/unmount.
+
+function App() {
+  const [on, setOn] = React.useState(true);
+
+  React.useEffect(() => {
+    // pretend: subscribe
+    return () => {
+      // pretend: cleanup
+    };
+  }, [on]);
+
+  return React.createElement('div', { style: { padding: 12, display: 'grid', gap: 10 } },
+    React.createElement('h3', null, 'Effect demo'),
+    React.createElement('div', null, 'on = ', String(on)),
+    React.createElement('button', { onClick: () => setOn(v => !v) }, 'toggle')
+  );
+}
+
+mount(App);`,
+
+  r_list: `// React concept: keys help React match items across renders.
+
+function App() {
+  const [items, setItems] = React.useState(['A', 'B', 'C']);
+  return React.createElement('div', { style: { padding: 12, display: 'grid', gap: 10 } },
+    React.createElement('h3', null, 'List + key demo'),
+    React.createElement('button', { onClick: () => setItems(x => ['X', ...x]) }, 'prepend X'),
+    React.createElement('ul', null,
+      items.map(it => React.createElement('li', { key: it }, it))
+    )
+  );
+}
+
+mount(App);`,
+
+  r_context: `// React concept: context avoids prop drilling; consumers rerender on value change.
+
+const ThemeCtx = React.createContext('light');
+
+function Badge() {
+  const theme = React.useContext(ThemeCtx);
+  return React.createElement('div', { style: { padding: 8, borderRadius: 10, background: theme === 'dark' ? '#111' : '#eee' } },
+    'theme = ', theme
+  );
+}
+
+function App() {
+  const [theme, setTheme] = React.useState('light');
+  return React.createElement(ThemeCtx.Provider, { value: theme },
+    React.createElement('div', { style: { padding: 12, display: 'grid', gap: 10 } },
+      React.createElement('h3', null, 'Context demo'),
+      React.createElement('button', { onClick: () => setTheme(t => t === 'light' ? 'dark' : 'light') }, 'toggle theme'),
+      React.createElement(Badge, null)
+    )
+  );
+}
+
+mount(App);`
+};
+
+const REACT_ORDER = [
+  { id: 'r_jsx', title: '1) JSX & elements', sub: 'elements are descriptions, not DOM' },
+  { id: 'r_props', title: '2) Components & props', sub: 'props flow down; rerenders happen' },
+  { id: 'r_state', title: '3) useState', sub: 'state updates trigger renders; batching' },
+  { id: 'r_effect', title: '4) useEffect', sub: 'runs after commit; cleanup' },
+  { id: 'r_list', title: '5) Lists & key', sub: 'reconciliation needs stable keys' },
+  { id: 'r_context', title: '6) Context', sub: 'propagation to consumers' },
+];
+
+function renderReactConcepts() {
+  const el = document.getElementById('react-concepts');
+  if (!el) return;
+  if (mainLang !== 'react') { el.innerHTML = '<div style="color:var(--t4)">—</div>'; return; }
+  const cur = (document.getElementById('examples') && document.getElementById('examples').value) || currentExampleId || 'r_state';
+  const rows = REACT_ORDER.map(item => {
+    const on = item.id === cur;
+    return `<button class="btn ${on ? 'btn-blue' : 'ghost'}" style="width:100%;justify-content:flex-start;gap:10px;margin-bottom:8px;padding:8px 10px;box-shadow:none"
+      onclick="selectReactConcept('${esc(item.id)}')">
+      <span style="font-weight:700">${esc(item.title)}</span>
+      <span style="color:var(--t4);font-weight:500;margin-left:auto">${esc(item.sub)}</span>
+    </button>`;
+  }).join('');
+  el.innerHTML = `
+    <div style="color:var(--t2);font-size:12px;line-height:1.5;margin-bottom:10px">
+      Pick a concept. The visualizer shows <strong>Tree</strong>, <strong>Timeline</strong>, <strong>Diff</strong>, and <strong>DOM</strong>.
+    </div>
+    ${rows}
+    <div style="margin-top:8px;color:var(--t4);font-size:11px">
+      Tip: use the <strong>Details</strong> toggle to show/hide Tree + Diff.
+    </div>`;
+}
+
+function selectReactConcept(id) {
+  const ex = document.getElementById('examples');
+  currentExampleId = id;
+  if (ex) ex.value = id;
+  if (REACT_LESSONS[id]) editor.setValue(REACT_LESSONS[id]);
+  try { setInsightsTab('react'); } catch(_) {}
+  try { renderReactConcepts(); } catch(_) {}
+}
+
 const EXAMPLE_MENU = {
   python: [
     { id: 'sort', label: 'recursive sort' },
@@ -2084,6 +2345,14 @@ const EXAMPLE_MENU = {
     { id: 'closure', label: 'closure in loop' },
     { id: 'this', label: 'this binding' },
     { id: 'proto', label: 'prototype lookup' },
+  ],
+  react: [
+    { id: 'r_jsx', label: 'JSX & elements' },
+    { id: 'r_props', label: 'props & rerender' },
+    { id: 'r_state', label: 'useState basics' },
+    { id: 'r_effect', label: 'useEffect + cleanup' },
+    { id: 'r_list', label: 'lists + key' },
+    { id: 'r_context', label: 'context propagation' },
   ]
 };
 
@@ -2246,6 +2515,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     ml.value = mainLang;
     setMainLang(ml.value);
   }
+  try { initLangDropdown(); } catch(_) {}
   refreshExamplesMenu();
   // Split.js Init (2-pane viz: editor | panels)
   splitMain = Split(['.viz-left', '.viz-right'], {
@@ -2346,24 +2616,127 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 function setMainLang(lang) {
   lastMainLang = mainLang;
-  mainLang = lang === 'javascript' ? 'javascript' : 'python';
+  mainLang = (lang === 'javascript' || lang === 'react') ? lang : 'python';
+  try { updateLangDropdown(mainLang); } catch(_) {}
   const ex = document.getElementById('examples');
   if (ex) ex.disabled = false;
   refreshExamplesMenu();
-  if (editor) editor.setOption('mode', mainLang === 'javascript' ? 'javascript' : 'python');
+  // React UX: ensure an example is selected so the Concepts list + editor populate.
+  if (mainLang === 'react') {
+    try {
+      const exEl = document.getElementById('examples');
+      const fallback = (currentExampleId && REACT_LESSONS[currentExampleId]) ? currentExampleId : 'r_state';
+      if (exEl && (!exEl.value || !REACT_LESSONS[exEl.value])) exEl.value = fallback;
+      currentExampleId = exEl ? exEl.value : fallback;
+      if (REACT_LESSONS[currentExampleId] && editor) editor.setValue(REACT_LESSONS[currentExampleId]);
+    } catch(_) {}
+  }
+  if (editor) editor.setOption('mode', (mainLang === 'javascript' || mainLang === 'react') ? 'javascript' : 'python');
   const runBtn = document.getElementById('btn-run');
   if (runBtn) runBtn.disabled = (mainLang === 'python' && !pyodide);
   // Clear stale visualization hints when switching languages.
   codeHints = null;
   jsAnalysis = null;
   applyHintsToEditor();
-  if (editor && mainLang === 'javascript' && lastMainLang !== 'javascript') {
+  document.body.classList.toggle('react-mode', mainLang === 'react');
+  try { toggleReactDetails(reactDetails); } catch(_) {}
+  try { renderReactConcepts(); } catch(_) {}
+  if (mainLang === 'react') {
+    try { setInsightsTab('react'); } catch(_) {}
+  }
+
+  if (editor && (mainLang === 'javascript' || mainLang === 'react') && lastMainLang !== mainLang) {
     const cur = editor.getValue() || '';
     // If user hasn't typed JS yet (still on Python example), switch to the JS demo.
     if (/\bdef\s+/.test(cur) || /\bprint\(/.test(cur) || cur.trim().length === 0) {
-      editor.setValue(JS_STARTER_MERGESORT);
+      editor.setValue(mainLang === 'react' ? REACT_LESSONS.r_state : JS_STARTER_MERGESORT);
     }
   }
+}
+
+function langIconSvg(lang) {
+  const py = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3c4 0 6 1.6 6 4.7V11c0 2.2-1.8 4-4 4H9.5C7.6 15 6 16.6 6 18.5V20c0 .6.4 1 1 1h6" stroke="rgba(59,130,246,.95)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 21c-4 0-6-1.6-6-4.7V13c0-2.2 1.8-4 4-4H14.5C16.4 9 18 7.4 18 5.5V4c0-.6-.4-1-1-1h-6" stroke="rgba(139,92,246,.95)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="9" cy="6.5" r="1" fill="rgba(59,130,246,.95)"/>
+    <circle cx="15" cy="17.5" r="1" fill="rgba(139,92,246,.95)"/>
+  </svg>`;
+  const js = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M5.5 4.5h13v15h-13z" stroke="rgba(245,158,11,.95)" stroke-width="2" />
+    <path d="M8 16c.6 1 1.6 1.6 2.8 1.6 1.4 0 2.2-.7 2.2-1.7 0-1.2-.9-1.6-2.4-2.2l-.8-.3c-1.6-.7-2.6-1.6-2.6-3.4 0-1.7 1.3-3 3.4-3 1.5 0 2.6.5 3.4 1.9" stroke="rgba(245,158,11,.95)" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>`;
+  const react = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="1.8" fill="rgba(56,189,248,.95)"/>
+    <ellipse cx="12" cy="12" rx="9" ry="3.6" stroke="rgba(56,189,248,.85)" stroke-width="1.8"/>
+    <ellipse cx="12" cy="12" rx="9" ry="3.6" stroke="rgba(56,189,248,.85)" stroke-width="1.8" transform="rotate(60 12 12)"/>
+    <ellipse cx="12" cy="12" rx="9" ry="3.6" stroke="rgba(56,189,248,.85)" stroke-width="1.8" transform="rotate(120 12 12)"/>
+  </svg>`;
+  return (lang === 'react') ? react : (lang === 'javascript') ? js : py;
+}
+
+function updateLangDropdown(lang) {
+  const ico = document.getElementById('langdd-ico');
+  const lbl = document.getElementById('langdd-lbl');
+  if (ico) ico.innerHTML = langIconSvg(lang);
+  if (lbl) lbl.textContent = (lang === 'react') ? 'React' : (lang === 'javascript') ? 'JavaScript' : 'Python';
+  // menu selection state
+  const menu = document.getElementById('langdd-menu');
+  if (menu) {
+    menu.querySelectorAll('.langopt').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  }
+}
+
+function initLangDropdown() {
+  const root = document.getElementById('langdd');
+  const btn = document.getElementById('langdd-btn');
+  const menu = document.getElementById('langdd-menu');
+  const sel = document.getElementById('main-lang');
+  if (!root || !btn || !menu || !sel) return;
+
+  const items = [
+    { lang: 'python', label: 'Python', key: 'P' },
+    { lang: 'javascript', label: 'JavaScript', key: 'J' },
+    { lang: 'react', label: 'React', key: 'R' },
+  ];
+  menu.innerHTML = items.map(it => {
+    return `<button class="langopt" type="button" role="option" data-lang="${esc(it.lang)}">
+      ${langIconSvg(it.lang)}
+      <span>${esc(it.label)}</span>
+      <span class="k">${esc(it.key)}</span>
+    </button>`;
+  }).join('');
+
+  function open(v) {
+    const on = (typeof v === 'boolean') ? v : !root.classList.contains('open');
+    root.classList.toggle('open', on);
+    btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on) {
+      try { menu.focus(); } catch(_) {}
+    }
+  }
+
+  btn.onclick = () => open();
+  menu.addEventListener('click', (e) => {
+    const t = e.target && e.target.closest ? e.target.closest('.langopt') : null;
+    if (!t) return;
+    const lang = t.dataset.lang;
+    sel.value = lang;
+    setMainLang(lang);
+    open(false);
+  });
+  document.addEventListener('click', (e) => {
+    if (!root.classList.contains('open')) return;
+    if (root.contains(e.target)) return;
+    open(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') open(false);
+    if (e.key === 'p' || e.key === 'P') { sel.value = 'python'; setMainLang('python'); }
+    if (e.key === 'j' || e.key === 'J') { sel.value = 'javascript'; setMainLang('javascript'); }
+    if (e.key === 'r' || e.key === 'R') { sel.value = 'react'; setMainLang('react'); }
+  });
+
+  updateLangDropdown(mainLang);
 }
 
 // ─── EXAMPLES ────────────────────────────────────────────────────────────────
@@ -2376,6 +2749,9 @@ function loadExample() {
   if (mainLang === 'javascript') {
     if (!JS_LESSONS[k]) return;
     editor.setValue(JS_LESSONS[k]);
+  } else if (mainLang === 'react') {
+    if (!REACT_LESSONS[k]) return;
+    editor.setValue(REACT_LESSONS[k]);
   } else {
     if (!EXAMPLES[k]) return;
     editor.setValue(EXAMPLES[k]);
@@ -2384,6 +2760,7 @@ function loadExample() {
   exEl.value = k;
   codeHints = null; jsAnalysis = null;
   applyHintsToEditor();
+  try { renderReactConcepts(); } catch(_) {}
   try {
     const meta = EXAMPLE_META[k];
       if (meta && meta.onLoad) {
@@ -2419,6 +2796,7 @@ function refreshExamplesMenu() {
     exEl.appendChild(opt);
   });
   exEl.value = keep && items.some(i => i.id === keep) ? keep : '';
+  try { renderReactConcepts(); } catch(_) {}
 }
 
 // ─── EDITOR TOGGLE ───────────────────────────────────────────────────────────
@@ -2437,22 +2815,26 @@ function toggleEditor() {
 
 // ─── INSIGHTS DRAWER ─────────────────────────────────────────────────────────
 function setInsightsTab(tab) {
-  insightsTab = tab === 'nar' ? 'nar' : tab === 'diff' ? 'diff' : 'step';
+  insightsTab = tab === 'react' ? 'react' : tab === 'nar' ? 'nar' : tab === 'diff' ? 'diff' : 'step';
   localStorage.setItem('haki-insights-tab', insightsTab);
 
   const step = document.getElementById('ins-step');
   const nar = document.getElementById('ins-nar');
   const diff = document.getElementById('ins-diff');
+  const react = document.getElementById('ins-react');
   if (step) step.style.display = insightsTab === 'step' ? 'block' : 'none';
   if (nar) nar.style.display = insightsTab === 'nar' ? 'block' : 'none';
   if (diff) diff.style.display = insightsTab === 'diff' ? 'block' : 'none';
+  if (react) react.style.display = insightsTab === 'react' ? 'block' : 'none';
 
   const bStep = document.getElementById('ins-tab-step');
   const bNar = document.getElementById('ins-tab-nar');
   const bDiff = document.getElementById('ins-tab-diff');
+  const bReact = document.getElementById('ins-tab-react');
   if (bStep) bStep.classList.toggle('on', insightsTab === 'step');
   if (bNar) bNar.classList.toggle('on', insightsTab === 'nar');
   if (bDiff) bDiff.classList.toggle('on', insightsTab === 'diff');
+  if (bReact) bReact.classList.toggle('on', insightsTab === 'react');
 }
 
 function collapseInsights(skipPersist) {
@@ -2532,6 +2914,10 @@ async function runCode() {
     runBtn.disabled = true;
   }
   try {
+    if (mainLang === 'react') {
+      await runReactTraceMain(code);
+      return;
+    }
     if (mainLang === 'javascript') {
       await runJsTraceMain(code);
       return;
@@ -2683,6 +3069,488 @@ function runJsTraceMain(code) {
       resolve();
     };
     worker.postMessage(code);
+  });
+}
+
+// ─── REACT (CONCEPT VISUALIZER) ──────────────────────────────────────────────
+let reactFrame = null;
+let reactTrace = { events: [], tree: [], diffs: [], dom: [], vdom: null, mounted: false };
+let _reactOnMsg = null;
+let reactSnapshots = [];
+let reactIdx = 0;
+let reactHostCounts = {};
+let reactDomText = [];
+let reactFollowLive = true;
+
+function _reactReset() {
+  reactTrace = { events: [], tree: [], diffs: [], dom: [], vdom: null, mounted: false };
+  reactDomText = [];
+  reactFollowLive = true;
+  const t = document.getElementById('react-timeline');
+  const d = document.getElementById('react-dom');
+  const tr = document.getElementById('react-tree');
+  const df = document.getElementById('react-diff');
+  if (t) t.innerHTML = '<div style="color:var(--t4);padding:10px">run React snippet to see timeline</div>';
+  if (d) d.innerHTML = '<div style="color:var(--t4);padding:10px">run React snippet to see DOM + mutations</div>';
+  if (tr) tr.innerHTML = '<div style="color:var(--t4);padding:10px">—</div>';
+  if (df) df.innerHTML = '<div style="color:var(--t4);padding:10px">—</div>';
+}
+
+function ensureReactFrame() {
+  const host = document.getElementById('react-dom');
+  if (!host) return null;
+  if (reactFrame && reactFrame.isConnected) return reactFrame;
+  host.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;min-height:0;height:100%';
+  const mut = document.createElement('div');
+  mut.id = 'react-dom-muts';
+  mut.style.cssText = 'flex:0 0 auto;max-height:140px;overflow:auto;border:1px solid var(--border);border-radius:12px;background:var(--s2);padding:8px;font-family:var(--mono);font-size:11.5px;color:var(--t2)';
+  mut.innerHTML = '<div style="color:var(--t4)">mutations will appear here</div>';
+  const frame = document.createElement('iframe');
+  frame.id = 'react-frame';
+  frame.setAttribute('sandbox', 'allow-scripts');
+  frame.style.cssText = 'flex:1;min-height:180px;border:1px solid var(--border);border-radius:12px;background:#fff';
+  wrap.appendChild(mut);
+  wrap.appendChild(frame);
+  host.appendChild(wrap);
+  reactFrame = frame;
+  return reactFrame;
+}
+
+function renderReactPanels() {
+  const tl = document.getElementById('react-timeline');
+  const tree = document.getElementById('react-tree');
+  const diff = document.getElementById('react-diff');
+  const muts = document.getElementById('react-dom-muts');
+
+  if (tree) {
+    const uiText = (reactDomText || []).slice(-1)[0] && (reactDomText || []).slice(-1)[0].text ? String((reactDomText || []).slice(-1)[0].text) : '';
+    renderReactTreeInto(tree, reactTrace.tree || [], reactHostCounts || {}, uiText);
+  }
+
+  if (diff) {
+    const last = reactTrace.diffs.slice(-1)[0];
+    if (!last) diff.innerHTML = '<div style="color:var(--t4)">no state/props diffs yet</div>';
+    else {
+      const rows = (last.changes || []).map(ch => {
+        const kind = ch.kind || 'change';
+        const col = kind === 'state' ? 'var(--amber)' : 'var(--blue)';
+        return `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:8px">
+          <div style="display:flex;gap:8px;align-items:center"><span class="badge" style="display:inline-block;background:rgba(0,0,0,0);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;color:${col};font-size:10px">${esc(kind)}</span>
+          <strong style="color:var(--t1)">${esc(last.name||'?')}</strong>
+          <span style="margin-left:auto;color:var(--t4);font-size:10px">step ${last.step||'—'}</span></div>
+          <div style="margin-top:6px;font-family:var(--mono);font-size:11.5px;color:var(--t2)">${esc(ch.key||'')} : ${esc(ch.prev||'—')} → ${esc(ch.next||'—')}</div>
+        </div>`;
+      }).join('');
+      diff.innerHTML = rows || '<div style="color:var(--t4)">—</div>';
+    }
+  }
+
+  if (tl) {
+    const items = reactTrace.events.slice(-120).map(ev => {
+      const t = ev.t || 'evt';
+      const c = t === 'render' ? 'var(--purple)' : t === 'commit' ? 'var(--green)' : t === 'effect' ? 'var(--amber)' : 'var(--t3)';
+      const msg = ev.msg || '';
+      return `<div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+        <span style="font-family:var(--mono);font-size:10.5px;color:${c};min-width:62px">${esc(String(t)).toUpperCase()}</span>
+        <span style="color:var(--t2);flex:1">${esc(msg)}</span>
+        <span style="color:var(--t4);font-family:var(--mono);font-size:10.5px">#${esc(String(ev.i||0))}</span>
+      </div>`;
+    }).join('');
+    tl.innerHTML = items || '<div style="color:var(--t4);padding:10px">—</div>';
+  }
+
+  if (muts) {
+    const items = reactTrace.dom.slice(-30).map(m => `<div style="padding:4px 0;border-bottom:1px dashed var(--border)"><span style="color:var(--t3)">${esc(m.kind||'mut')}</span> <span style="color:var(--t2)">${esc(m.msg||'')}</span></div>`).join('');
+    muts.innerHTML = items || '<div style="color:var(--t4)">no DOM mutations yet</div>';
+  }
+  try { enableReactControls(); } catch(_) {}
+  try { updateScrub(); } catch(_) {}
+}
+
+function _pushReactSnapshot() {
+  // Store lightweight checkpoints for stepping; keep last 1200.
+  try {
+    const wasAtEnd = reactIdx >= Math.max(0, reactSnapshots.length - 1);
+    reactSnapshots.push({
+      e: reactTrace.events.length,
+      d: reactTrace.diffs.length,
+      m: reactTrace.dom.length,
+      t: reactDomText.length,
+      tree: reactTrace.tree.slice(),
+      host: JSON.parse(JSON.stringify(reactHostCounts || {})),
+    });
+    if (reactSnapshots.length > 1200) reactSnapshots.shift();
+    // Only auto-follow when the user is currently at the live edge.
+    if (reactFollowLive && wasAtEnd) reactIdx = reactSnapshots.length - 1;
+  } catch(_) {}
+}
+
+function renderReactAtIdx() {
+  const snap = reactSnapshots[reactIdx] || null;
+  const tl = document.getElementById('react-timeline');
+  const tree = document.getElementById('react-tree');
+  const diff = document.getElementById('react-diff');
+  const muts = document.getElementById('react-dom-muts');
+  if (!snap) return;
+
+  const eCount = Math.max(0, snap.e || 0);
+  const dCount = Math.max(0, snap.d || 0);
+  const mCount = Math.max(0, snap.m || 0);
+  const tCount = Math.max(0, snap.t || 0);
+  const uiText = (reactDomText || []).slice(0, tCount).slice(-1)[0] || null;
+
+  // Timeline shows events up to this checkpoint.
+  if (tl) {
+    const items = (reactTrace.events || []).slice(0, eCount).slice(-140).map(ev => {
+      const t = ev.t || 'evt';
+      const c = t === 'render' ? 'var(--purple)' : t === 'commit' ? 'var(--green)' : t === 'effect' ? 'var(--amber)' : 'var(--t3)';
+      const msg = ev.msg || '';
+      return `<div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+        <span style="font-family:var(--mono);font-size:10.5px;color:${c};min-width:62px">${esc(String(t)).toUpperCase()}</span>
+        <span style="color:var(--t2);flex:1">${esc(msg)}</span>
+        <span style="color:var(--t4);font-family:var(--mono);font-size:10.5px">#${esc(String(ev.i||0))}</span>
+      </div>`;
+    }).join('');
+    tl.innerHTML = items || '<div style="color:var(--t4);padding:10px">—</div>';
+  }
+
+  // Tree
+  if (tree) {
+    renderReactTreeInto(tree, snap.tree || [], snap.host || {}, uiText && uiText.text ? String(uiText.text) : '');
+  }
+
+  // Diff: show last diff in snapshot
+  if (diff) {
+    const last = (reactTrace.diffs || []).slice(0, dCount).slice(-1)[0];
+    if (!last) diff.innerHTML = '<div style="color:var(--t4)">no state/props diffs yet</div>';
+    else {
+      const rows = (last.changes || []).map(ch => {
+        const kind = ch.kind || 'change';
+        const col = kind === 'state' ? 'var(--amber)' : 'var(--blue)';
+        return `<div style="padding:6px 8px;border:1px solid var(--border);border-radius:12px;background:var(--s2);margin-bottom:8px">
+          <div style="display:flex;gap:8px;align-items:center"><span class="badge" style="display:inline-block;background:rgba(0,0,0,0);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;color:${col};font-size:10px">${esc(kind)}</span>
+          <strong style="color:var(--t1)">${esc(last.name||'?')}</strong>
+          <span style="margin-left:auto;color:var(--t4);font-size:10px">step ${last.step||'—'}</span></div>
+          <div style="margin-top:6px;font-family:var(--mono);font-size:11.5px;color:var(--t2)">${esc(ch.key||'')} : ${esc(ch.prev||'—')} → ${esc(ch.next||'—')}</div>
+        </div>`;
+      }).join('');
+      diff.innerHTML = rows || '<div style="color:var(--t4)">—</div>';
+    }
+  }
+
+  // DOM mutations
+  if (muts) {
+    const items = (reactTrace.dom || []).slice(0, mCount).slice(-40).map(m => `<div style="padding:4px 0;border-bottom:1px dashed var(--border)"><span style="color:var(--t3)">${esc(m.kind||'mut')}</span> <span style="color:var(--t2)">${esc(m.msg||'')}</span></div>`).join('');
+    muts.innerHTML = items || '<div style="color:var(--t4)">no DOM mutations yet</div>';
+  }
+
+  // Keep scrub in sync
+  try { updateScrub(); } catch(_) {}
+}
+
+function renderReactTreeInto(container, nodes, hostCounts, uiText) {
+  if (!container) return;
+  if (!nodes || !nodes.length) { container.innerHTML = '<div style="color:var(--t4);padding:10px">no component tree yet</div>'; return; }
+  const kids = new Map();
+  nodes.forEach(n => {
+    const p = n.parent || null;
+    if (!kids.has(p)) kids.set(p, []);
+    kids.get(p).push(n);
+  });
+  const roots = kids.get(null) || kids.get(undefined) || [];
+  const hostChips = (id) => {
+    const host = hostCounts && hostCounts[id] ? hostCounts[id] : null;
+    if (!host) return '';
+    return Object.entries(host).slice(0, 8).map(([k,v]) => `<span class="rchip host">&lt;${esc(k)}×${esc(String(v))}&gt;</span>`).join('');
+  };
+  const uiChip = (txt) => {
+    const t = String(txt || '').trim();
+    if (!t) return '';
+    const compact = t.replace(/\n+/g, '  ⏎  ').slice(0, 220);
+    return `<span class="rchip ui">UI: ${esc(compact)}</span>`;
+  };
+
+  const renderNode = (n) => {
+    const children = kids.get(n.id) || [];
+    const subs = hostChips(n.id) + (n.parent == null ? uiChip(uiText) : '');
+    const subRow = subs ? `<div class="rsub">${subs}</div>` : '';
+    const childHtml = children.length
+      ? `<div class="rchildren">${children.map(ch => `<div class="rchild">${renderNode(ch)}</div>`).join('')}</div>`
+      : '';
+    return `<div class="rnode">
+      <div class="rbox">
+        <div class="rname">${esc(n.name || '?')}</div>
+        <div class="rmeta">r#${esc(String(n.renders || 0))}</div>
+      </div>
+      ${subRow}
+      ${childHtml}
+    </div>`;
+  };
+
+  container.innerHTML = `<div class="rtree">${roots.map(r => renderNode(r)).join('')}</div>`;
+}
+
+function enableReactControls() {
+  // Enable the common transport controls for React stepping through snapshots.
+  ['btn-prev','btn-next','btn-play'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.disabled = false;
+  });
+  // Step over/out don't apply to React concept mode.
+  ['btn-sover','btn-sout'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  const scrub = document.getElementById('scrub');
+  if (scrub) {
+    scrub.max = Math.max(0, reactSnapshots.length - 1);
+    scrub.value = Math.max(0, Math.min(reactSnapshots.length - 1, reactIdx));
+  }
+  const scrubMax = document.getElementById('scrub-max');
+  if (scrubMax) scrubMax.textContent = Math.max(0, reactSnapshots.length - 1);
+  // Let user know scrub is now "timeline steps" in React mode.
+  const ctr = document.getElementById('step-ctr');
+  if (ctr) ctr.textContent = `react ${reactIdx + 1}/${Math.max(reactSnapshots.length, 1)}${reactFollowLive ? ' · live' : ''}`;
+}
+
+function startReactTimer() {
+  const btn = document.getElementById('btn-play');
+  if (btn) {
+    btn.textContent='⏸';
+    btn.className='btn btn-red';
+  }
+  const speedEl = document.getElementById('speed');
+  const spd = speedEl ? +speedEl.value : 5;
+  const delay = Math.round(1200/spd);
+  if (reactIdx >= reactSnapshots.length - 1) {
+    if (autoRewindOn) reactIdx = 0;
+    else { stopTimer(); return; }
+  }
+  timer = setInterval(()=>{
+    if (reactIdx >= reactSnapshots.length - 1) {
+      stopTimer();
+      return;
+    }
+    reactIdx++;
+    renderReactAtIdx();
+  }, delay);
+}
+
+function runReactTraceMain(code) {
+  return new Promise((resolve) => {
+    _reactReset();
+    reactSnapshots = [];
+    reactIdx = 0;
+    const frame = ensureReactFrame();
+    if (!frame) { showBanner('React panel missing in UI.', 'red'); resolve(); return; }
+
+    // IMPORTANT: avoid a literal '</scr'+'ipt>' sequence in this outer HTML file (it would terminate the main script tag).
+    const inner = `
+      const send = (payload)=> parent.postMessage({__haki_react: true, ...payload}, '*');
+      let _i = 0;
+      const events = [];
+      const tree = new Map(); // id -> node
+      const hostCounts = new Map(); // compId -> {tag:count}
+      const stack = []; // ids
+      const prevProps = new Map(); // path -> props json
+      const prevState = new Map(); // path -> state values
+      let _treeT = null;
+      function sendTreeSoon() {
+        if (_treeT) return;
+        _treeT = setTimeout(() => {
+          _treeT = null;
+          try { send({ kind:'tree', tree: Array.from(tree.values()), host: Object.fromEntries(Array.from(hostCounts.entries())) }); } catch(e) {}
+        }, 0);
+      }
+
+      const wrapType = (type) => {
+        if (typeof type !== 'function') return type;
+        if (type.__haki_wrapped) return type;
+        const name = type.displayName || type.name || 'Anonymous';
+        function Wrapped(props) {
+          const parent = stack.length ? stack[stack.length-1] : null;
+          const path = parent ? (parent + '>' + name) : name;
+          const id = path; // stable-ish for concept demos
+          if (!tree.has(id)) tree.set(id, { id, parent, name, renders: 0 });
+          const node = tree.get(id);
+          node.parent = parent;
+          node.renders++;
+          try { sendTreeSoon(); } catch(e) {}
+          stack.push(id);
+
+          // props diff (best-effort)
+          try {
+            const pj = JSON.stringify(props || {});
+            const prev = prevProps.get(id);
+            if (prev && prev !== pj) {
+              send({ kind: 'diff', name, step: _i, changes: [{ kind:'props', key:'props', prev: prev.slice(0,120), next: pj.slice(0,120) }] });
+            }
+            prevProps.set(id, pj);
+          } catch(e) {}
+
+          events.push({ t:'render', msg: name });
+          send({ kind:'event', ev: { t:'render', msg: name, i: ++_i } });
+          let out;
+          try { out = type(props); } finally { stack.pop(); }
+          return out;
+        }
+        Wrapped.__haki_wrapped = true;
+        Wrapped.displayName = name;
+        return Wrapped;
+      };
+
+      const _ce = React.createElement;
+      React.createElement = function(type, props, ...children) {
+        // Host element accounting for richer "tree" view (conceptual DOM under component).
+        try {
+          if (typeof type === 'string') {
+            const cur = stack.length ? stack[stack.length-1] : null;
+            if (cur) {
+              if (!hostCounts.has(cur)) hostCounts.set(cur, {});
+              const m = hostCounts.get(cur);
+              m[type] = (m[type]||0) + 1;
+            }
+          }
+        } catch(e) {}
+        return _ce.call(this, wrapType(type), props, ...children);
+      };
+
+      // Hook wrappers (concept-level)
+      const _useState = React.useState;
+      React.useState = function(init) {
+        const cur = stack.length ? stack[stack.length-1] : '<root>';
+        const [v, setV] = _useState.call(this, init);
+        const key = cur + ':state';
+        try {
+          const pv = prevState.get(key);
+          const nv = JSON.stringify(v);
+          if (pv === undefined) {
+            send({ kind:'diff', name: cur.split('>').slice(-1)[0], step: _i, changes: [{ kind:'state', key:'state (init)', prev: '(init)', next: nv }] });
+          } else if (pv !== nv) {
+            send({ kind:'diff', name: cur.split('>').slice(-1)[0], step: _i, changes: [{ kind:'state', key:'state', prev: pv, next: nv }] });
+          }
+          prevState.set(key, nv);
+        } catch(e) {}
+        const wrappedSetter = (next) => {
+          send({ kind:'event', ev: { t:'state', msg: (cur.split('>').slice(-1)[0]||'?') + ' setState', i: ++_i } });
+          return setV(next);
+        };
+        return [v, wrappedSetter];
+      };
+
+      const _useEffect = React.useEffect;
+      React.useEffect = function(fn, deps) {
+        const cur = stack.length ? stack[stack.length-1] : '<root>';
+        const nm = cur.split('>').slice(-1)[0]||'?';
+        return _useEffect.call(this, () => {
+          send({ kind:'event', ev: { t:'effect', msg: nm + ' effect', i: ++_i } });
+          const cleanup = fn && fn();
+          return () => {
+            send({ kind:'event', ev: { t:'effect', msg: nm + ' cleanup', i: ++_i } });
+            try { if (cleanup) cleanup(); } catch(e) {}
+          };
+        }, deps);
+      };
+
+      // DOM mutations
+      const rootEl = document.getElementById('root');
+      const mo = new MutationObserver((list) => {
+        list.slice(0, 15).forEach(m => {
+          let msg = m.type;
+          if (m.type === 'attributes') msg = m.target.tagName.toLowerCase() + '.' + m.attributeName;
+          if (m.type === 'childList') msg = (m.addedNodes.length ? '+'+m.addedNodes.length : '') + (m.removedNodes.length ? ' -'+m.removedNodes.length : '');
+          send({ kind:'dom', m: { kind: m.type, msg } });
+        });
+        try {
+          const txt = (rootEl && rootEl.innerText) ? String(rootEl.innerText).trim().replace(/\\s+\\n/g, '\\n') : '';
+          if (txt) send({ kind:'domtext', t: { i: _i, text: txt.slice(0, 500) } });
+        } catch(e) {}
+      });
+      mo.observe(rootEl, { subtree: true, childList: true, attributes: true, characterData: true });
+
+      let root = null;
+      function mount(App) {
+        if (!root) root = ReactDOM.createRoot(rootEl);
+        root.render(React.createElement(App, null));
+        // React 18 may render/commit asynchronously; send commit/tree on a tick.
+        setTimeout(() => {
+          try { send({ kind:'event', ev: { t:'commit', msg: 'commit', i: ++_i } }); } catch(e) {}
+          try { send({ kind:'tree', tree: Array.from(tree.values()), host: Object.fromEntries(Array.from(hostCounts.entries())) }); } catch(e) {}
+          try {
+            const txt = (rootEl && rootEl.innerText) ? String(rootEl.innerText).trim().replace(/\\s+\\n/g, '\\n') : '';
+            if (txt) send({ kind:'domtext', t: { i: _i, text: txt.slice(0, 500) } });
+          } catch(e) {}
+        }, 0);
+      }
+
+      window.mount = mount;
+
+      window.addEventListener('message', (e) => {
+        if (!e.data || !e.data.__haki_run) return;
+        const code = e.data.code || '';
+        try {
+          // eslint-disable-next-line no-eval
+          eval(code);
+          send({ kind:'ok' });
+        } catch(err) {
+          send({ kind:'err', err: (err && err.stack) ? err.stack : String(err) });
+        }
+      });
+      window.onerror = (msg, url, line, col, err) => {
+        try { send({ kind:'err', err: String(err && err.stack ? err.stack : (msg || 'error')) }); } catch(e) {}
+      };
+      send({ kind:'ready' });
+    `;
+
+    const srcdoc =
+      '<!doctype html><html><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<style>' +
+      'html,body{height:100%;margin:0}' +
+      'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;background:#fff}' +
+      '#root{height:100%;padding:12px;box-sizing:border-box}' +
+      'button{padding:8px 12px;border-radius:10px;border:1px solid #ddd;background:#f7f7f7;cursor:pointer}' +
+      'button:active{transform:translateY(1px)}' +
+      '</style></head><body><div id="root"></div>' +
+      '<scr' + 'ipt src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></scr' + 'ipt>' +
+      '<scr' + 'ipt src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></scr' + 'ipt>' +
+      '<scr' + 'ipt>' + inner + '</scr' + 'ipt></body></html>';
+
+    if (_reactOnMsg) {
+      try { window.removeEventListener('message', _reactOnMsg); } catch(_) {}
+      _reactOnMsg = null;
+    }
+    const onMsg = (e) => {
+      const d = e.data || {};
+      if (!d.__haki_react) return;
+      if (d.kind === 'ready') {
+        try { frame.contentWindow.postMessage({ __haki_run: true, code }, '*'); } catch(_) {}
+        resolve();
+        return;
+      }
+      if (d.kind === 'event' && d.ev) reactTrace.events.push(d.ev);
+      if (d.kind === 'tree' && d.tree) { reactTrace.tree = d.tree; reactHostCounts = d.host || reactHostCounts || {}; }
+      if (d.kind === 'diff') reactTrace.diffs.push(d);
+      if (d.kind === 'dom' && d.m) reactTrace.dom.push(d.m);
+      if (d.kind === 'domtext' && d.t) reactDomText.push(d.t);
+      if (d.kind === 'err') { showBanner(String(d.err||'React error'), 'red'); return; }
+      if (d.kind === 'ok') { /* ignore */ }
+      try { _pushReactSnapshot(); } catch(_) {}
+      if (reactFollowLive) renderReactAtIdx();
+      else renderReactPanels();
+      try { enableReactControls(); } catch(_) {}
+    };
+    _reactOnMsg = onMsg;
+    window.addEventListener('message', onMsg);
+    frame.srcdoc = srcdoc;
+    // Show the React panels immediately.
+    try { document.body.classList.add('react-mode'); } catch(_) {}
+    try { switchMode('viz'); } catch(_) {}
+    // Make sure extras bar doesn't hide our tiles.
+    try { toggleExtras(true); } catch(_) {}
   });
 }
 
@@ -2913,6 +3781,15 @@ function toggleExtras(force) {
   document.body.classList.toggle('show-extras', showExtras);
   const b = document.getElementById('btn-extras');
   if (b) b.classList.toggle('on', showExtras);
+}
+
+let reactDetails = (localStorage.getItem('haki-react-details') || '0') === '1';
+function toggleReactDetails(force) {
+  reactDetails = typeof force === 'boolean' ? force : !reactDetails;
+  localStorage.setItem('haki-react-details', reactDetails ? '1' : '0');
+  document.body.classList.toggle('react-details', reactDetails);
+  const b = document.getElementById('btn-react-details');
+  if (b) b.classList.toggle('on', reactDetails);
 }
 
 // Swipe left/right on mobile to switch views.
@@ -4394,13 +5271,18 @@ function updateBadge(s) {
 // ─── SCRUB ───────────────────────────────────────────────────────────────────
 function updateScrub() {
   const sc = document.getElementById('scrub');
-  if (sc) sc.value = idx;
+  if (sc) sc.value = (mainLang === 'react') ? reactIdx : idx;
   const minEl = document.getElementById('scrub-min');
   const maxEl = document.getElementById('scrub-max');
-  if (minEl) minEl.textContent = idx <= 0 ? 'now' : 'before';
-  if (maxEl) maxEl.textContent = (idx >= steps.length - 1) ? 'now' : 'after';
+  const cur = (mainLang === 'react') ? reactIdx : idx;
+  const max = (mainLang === 'react') ? Math.max(0, reactSnapshots.length - 1) : Math.max(0, steps.length - 1);
+  if (minEl) minEl.textContent = cur <= 0 ? 'now' : 'before';
+  if (maxEl) maxEl.textContent = (cur >= max) ? 'now' : 'after';
 }
-function scrubTo(i) { idx = i; render(); }
+function scrubTo(i) {
+  if (mainLang === 'react') { reactFollowLive = false; reactIdx = Math.max(0, Math.min(reactSnapshots.length - 1, i)); renderReactAtIdx(); try { enableReactControls(); } catch(_) {} return; }
+  idx = i; render();
+}
 
 // ─── ANNOTATIONS ─────────────────────────────────────────────────────────────
 function updateAnnotation() {
@@ -4417,6 +5299,7 @@ function saveAnnotation() {
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
 function go(d) {
+  if (mainLang === 'react') { reactFollowLive = false; reactIdx = Math.max(0, Math.min(reactSnapshots.length - 1, reactIdx + d)); renderReactAtIdx(); try { enableReactControls(); } catch(_) {} return; }
   idx = Math.max(0, Math.min(steps.length-1, idx+d));
   render();
 }
@@ -4446,6 +5329,7 @@ function jumpToEv(ev) {
 
 function togglePlay() {
   if (timer) { stopTimer(); return; }
+  if (mainLang === 'react') { startReactTimer(); return; }
   const btn = document.getElementById('btn-play');
   if (btn) {
     btn.textContent='⏸';
