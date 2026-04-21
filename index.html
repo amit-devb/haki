@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Haki — Python & JavaScript Code Visualizer</title>
+<title>Haki — Code Visualizer</title>
 <meta name="description" content="Haki is a fast, free, in-browser Python and JavaScript code visualizer (visualiser) to step through execution and understand control flow, frames, and heap state.">
 <meta name="google-site-verification" content="dHWF_kem61UjS94ykC8SG9M3LKhNErNnQG2ejkK3pu8">
 <link rel="canonical" href="https://amit-devb.github.io/haki/">
@@ -62,12 +62,14 @@
   --red: #ef4444; --red-l: rgba(239, 68, 68, 0.12); --red-b: rgba(239, 68, 68, 0.25);
   --purple: #8b5cf6; --purple-l: rgba(139, 92, 246, 0.12); --purple-b: rgba(139, 92, 246, 0.25);
   --teal: #14b8a6; --teal-l: rgba(20, 184, 166, 0.1);
+  --slate: #94a3b8; --slate-l: rgba(148, 163, 184, 0.12);
   --radius: 10px;
   --radius-lg: 14px;
   --ring: 0 0 0 3px rgba(59, 130, 246, 0.18);
   --mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --sans: 'Inter', -apple-system, system-ui, sans-serif;
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --footer-h: 26px;
 }
 
 body.theme-dark {
@@ -119,7 +121,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 #load-sub{color:var(--t3);font-size:11px}
 
 /* LAYOUT */
-.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.app{display:flex;flex-direction:column;height:calc(100vh - var(--footer-h) - env(safe-area-inset-bottom, 0px));overflow:hidden}
 .toolbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;min-height:44px}
 .toolbar.premium{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,0)) , var(--s1);backdrop-filter:blur(10px);border-bottom:1px solid var(--border2)}
 .toolbar.premium .logo{letter-spacing:.01em}
@@ -197,11 +199,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
 .cm-badge.tdz{border-color:rgba(245,158,11,.55);color:var(--amber);background:rgba(245,158,11,.07);font-weight:700}
 .cm-badge.hoist{border-color:rgba(147,197,253,.35);color:#93c5fd;background:rgba(147,197,253,.06)}
 .cm-exec-dot{width:10px;height:10px;border-radius:50%;background:rgba(91,159,214,.95);box-shadow:0 0 0 2px rgba(91,159,214,.25)}
+.cm-ev-dot{width:10px;height:10px;border-radius:50%;background:rgba(148,163,184,.85);box-shadow:0 0 0 2px rgba(148,163,184,.18)}
+.cm-ev-dot.chg{background:rgba(245,158,11,.95);box-shadow:0 0 0 2px rgba(245,158,11,.22)}
+.cm-ev-dot.br{background:rgba(16,185,129,.95);box-shadow:0 0 0 2px rgba(16,185,129,.22)}
+.cm-ev-dot.err{background:rgba(239,68,68,.95);box-shadow:0 0 0 2px rgba(239,68,68,.22)}
+.cm-branch-pill{display:inline-block;margin-left:10px;padding:1px 7px;border-radius:999px;font-size:10px;line-height:1.4;border:1px solid var(--border2);color:var(--t2);background:rgba(255,255,255,.03);font-family:var(--mono)}
+.cm-branch-pill.true{border-color:rgba(16,185,129,.35);color:var(--green);background:rgba(16,185,129,.08);font-weight:700}
+.cm-branch-pill.false{border-color:rgba(239,68,68,.28);color:var(--red);background:rgba(239,68,68,.08);font-weight:700}
 
 /* EDITOR */
 .editor-section{flex-shrink:0;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
 .editor-section.shut{height:0 !important; flex-basis: 0 !important}
-.CodeMirror{flex:1;font-family:var(--mono);font-size:12.5px;line-height:1.65;background:var(--bg);color:var(--t1)}
+.CodeMirror{flex:1;font-family:var(--mono);font-size:13.5px;line-height:1.7;background:var(--bg);color:var(--t1)}
 .CodeMirror-scroll{background:var(--bg)}
 .CodeMirror-gutters{background:var(--s1);border-right:1px solid var(--border)}
 .CodeMirror-linenumber{color:var(--t4);padding:0 8px}
@@ -258,6 +267,34 @@ body.theme-dark .cm-operator{color:rgba(212,212,212,.75)}
 /* HEATMAP LEGEND */
 .hm-legend{display:flex;align-items:center;gap:6px;padding:4px 12px;border-top:1px solid var(--border);font-size:10px;color:var(--t3);flex-shrink:0}
 .hm-grad{width:60px;height:6px;border-radius:2px;background:linear-gradient(to right,var(--blue-l),var(--amber),var(--red))}
+
+/* STATE (RIGHT) */
+.state-toolbar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);background:var(--s1)}
+.state-toolbar .lbl{font-size:10px;color:var(--t4);text-transform:uppercase;letter-spacing:.08em}
+.state-toolbar .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;border:1px solid var(--border2);background:rgba(255,255,255,.02);font-size:10.5px;color:var(--t2);font-family:var(--mono);cursor:pointer;user-select:none}
+.state-toolbar .pill.on{border-color:rgba(59,130,246,.35);color:var(--blue);background:var(--blue-l)}
+.state-toolbar .sep{width:1px;height:14px;background:var(--border2);margin:0 2px}
+.state-scroll{flex:1;overflow:auto;padding:8px 10px;background:var(--bg)}
+.st-empty{color:var(--t4);font-style:italic;font-size:11.5px;padding:10px}
+.st{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px}
+.st tr{border-bottom:1px dashed rgba(255,255,255,0.04)}
+body.theme-light .st tr{border-bottom:1px dashed rgba(0,0,0,0.06)}
+.st td{padding:6px 6px;vertical-align:top}
+.st .k{color:var(--t3);white-space:nowrap;cursor:pointer}
+.st .v{color:var(--t2)}
+.st .v.mut{background:var(--amber-l);border-radius:8px}
+.st .meta{font-size:10px;color:var(--t4);padding-left:6px;white-space:nowrap}
+.st .chip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;border:1px solid var(--border2);font-size:10px;color:var(--t3)}
+.st .chip.chg{border-color:rgba(245,158,11,.35);color:var(--amber);background:rgba(245,158,11,.08)}
+.st .chip.new{border-color:rgba(16,185,129,.25);color:var(--green);background:rgba(16,185,129,.08)}
+.st .chip.free{border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.08)}
+.st-diff{margin-top:4px;font-size:10.5px;color:var(--t3)}
+.st-diff .d{display:inline-block;margin-right:8px}
+
+/* IO LANE (BOTTOM TILE) */
+.io-lane{height:100%;display:flex;flex-direction:column;min-height:0}
+.io-out{flex:1;overflow:auto;padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--t2);white-space:pre-wrap}
+.io-hint{padding:6px 12px;border-top:1px solid var(--border);background:var(--s2);font-size:10.5px;color:var(--t4)}
 
 /* FRAMES */
 .frames-scroll{flex:1;overflow-y:auto}
@@ -378,7 +415,7 @@ body.theme-dark .cm-operator{color:rgba(212,212,212,.75)}
 .toast.warn{border-color:rgba(245,158,11,.35)}
 .toast.info{border-color:rgba(147,197,253,.25)}
 .tl-card.flash{animation:flash-change .55s ease}
-#footer{position:fixed;left:0;right:0;bottom:0;height:26px;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--s1);border-top:1px solid var(--border);color:var(--t3);font-size:11px;z-index:250;pointer-events:none}
+#footer{position:fixed;left:0;right:0;bottom:0;height:calc(var(--footer-h) + env(safe-area-inset-bottom, 0px));display:flex;align-items:center;gap:10px;padding:0 10px;padding-bottom:env(safe-area-inset-bottom, 0px);background:var(--s1);border-top:1px solid var(--border);color:var(--t3);font-size:11px;z-index:250;pointer-events:none}
 #footer strong{color:var(--t1)}
 #footer code{font-family:var(--mono);font-size:10.5px;color:var(--t2)}
 
@@ -585,7 +622,16 @@ canvas.chart{display:block;border-radius:var(--radius)}
 .ins-pre{padding:10px;font-family:var(--mono);font-size:11px;color:var(--t2);white-space:pre-wrap}
 .ins-text{padding:10px;font-size:12px;color:var(--t2);line-height:1.55}
 .ins-empty{color:var(--t4);font-style:italic}
-.viz-right-bot-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;height:100%;min-height:0;padding:10px;box-sizing:border-box}
+.viz-right-bot-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr minmax(120px, 0.72fr);gap:10px;height:100%;min-height:0;padding:10px;box-sizing:border-box}
+.panels-bar{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0}
+.panels-bar .ttl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t4)}
+.panels-bar .sp{margin-left:auto;display:flex;align-items:center;gap:8px}
+.panels-bar .chipbtn{padding:4px 10px;border-radius:999px;border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:11px;font-weight:650;cursor:pointer}
+.panels-bar .chipbtn.on{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)}
+body:not(.show-extras) .tile[data-tile="graphs"],
+body:not(.show-extras) .tile[data-tile="focus"],
+body:not(.show-extras) .tile[data-tile="io"]{display:none}
+body:not(.show-extras) .viz-right-bot-grid{grid-template-rows:1fr !important}
 .tile{min-width:0;min-height:0;display:flex;flex-direction:column}
 .tile .panel{display:flex;flex-direction:column;height:100%;margin-bottom:0}
 .tile .panel-b{flex:1;min-height:0;overflow:auto}
@@ -641,6 +687,36 @@ canvas.chart{display:block;border-radius:var(--radius)}
   .viz-right-top{flex:0 0 auto;flex-direction:column}
   .right-col + .right-col{border-left:none;border-top:1px solid var(--border)}
   .viz-right-bot{padding:8px}
+  /* Bottom tiles become a single column */
+  .viz-right-bot-grid{grid-template-columns:1fr !important;grid-template-rows:auto !important}
+  .tile[data-tile="io"]{grid-column:auto !important}
+
+  /* Mobile panel switcher */
+  .mobile-only{display:block}
+  .mobile-switch{position:sticky;top:0;z-index:60;display:flex;gap:6px;align-items:center;padding:8px 10px;background:var(--s1);border-bottom:1px solid var(--border)}
+  .mobile-switch .seg{flex:1;display:flex;gap:6px}
+  .mobile-switch .mbtn{flex:1;padding:7px 10px;border-radius:999px;border:1px solid var(--border2);background:transparent;color:var(--t2);font-size:12px;font-weight:600;cursor:pointer}
+  .mobile-switch .mbtn.on{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)}
+  .mobile-switch .hint{font-size:10px;color:var(--t4);white-space:nowrap}
+
+  /* Show one surface at a time for small screens */
+  body.mv-code #view-viz .viz-right{display:none !important}
+  body.mv-code #view-viz .viz-left{display:flex !important;min-height:70vh}
+
+  body.mv-state #view-viz .viz-left{display:none !important}
+  body.mv-state #view-viz .viz-right{display:flex !important}
+  body.mv-state #view-viz #col-heap{display:none !important}
+  body.mv-state #view-viz #viz-bot{display:none !important}
+
+  body.mv-heap #view-viz .viz-left{display:none !important}
+  body.mv-heap #view-viz .viz-right{display:flex !important}
+  body.mv-heap #view-viz #col-state{display:none !important}
+  body.mv-heap #view-viz #viz-bot{display:none !important}
+
+  body.mv-panels #view-viz .viz-left{display:none !important}
+  body.mv-panels #view-viz .viz-right{display:flex !important}
+  body.mv-panels #view-viz .viz-right-top{display:none !important}
+  body.mv-panels #view-viz #viz-bot{display:block !important}
   
   /* Compare Mode Stack */
   .cmp-side { 
@@ -655,6 +731,24 @@ canvas.chart{display:block;border-radius:var(--radius)}
   .gutter { display: none !important; }
   #arrows-svg { display: none !important; }
 }
+
+@media (max-width: 600px) {
+  .logo em { display:none; }
+  .toolgrp .btn#btn-sover, .toolgrp .btn#btn-sout { display:none; }
+  .speed-wrap { display:none; }
+  .step-ctr { display:none; }
+  .state-toolbar { flex-wrap:wrap; }
+}
+
+@media (min-width: 1400px) {
+  /* Large screens: more breathing room + slightly narrower panels */
+  .viz-right{width:40%;min-width:520px}
+  .viz-left{padding-right:0}
+  .viz-right-bot-grid{gap:12px}
+}
+
+/* Hidden by default; enabled in mobile breakpoint */
+.mobile-only{display:none}
 </style>
 </head>
 <body>
@@ -781,6 +875,7 @@ canvas.chart{display:block;border-radius:var(--radius)}
     <span class="step-ctr" id="step-ctr">—</span>
     <span class="badge" id="ev-badge" style="display:none"></span>
     <div class="more">
+      <button class="btn icon" id="btn-io" onclick="openIoLane()" title="I/O (stdout/return)">🧾</button>
       <button class="btn icon" onclick="exportPNG()" title="PNG">⬇</button>
       <button class="btn icon" onclick="exportJSON()" title="JSON">⎘</button>
       <button class="btn icon" onclick="shareTrace()" title="Share link">🔗</button>
@@ -810,11 +905,11 @@ canvas.chart{display:block;border-radius:var(--radius)}
   <div class="mode-tabs">
     <div class="mtab on" onclick="switchMode('viz')" data-mode="viz">Visualize</div>
 
-    <div class="mtab" onclick="switchMode('compare')" data-mode="compare">Compare</div>
+    <div class="mtab" onclick="switchMode('compare')" data-mode="compare" style="display:none">Compare</div>
 
     <div class="mtab" onclick="switchMode('playground')" data-mode="playground">🌐 Playground</div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <select class="sel" id="more-modes" onchange="switchMode(this.value); this.value='';" title="More">
+      <select class="sel" id="more-modes" onchange="switchMode(this.value); this.value='';" title="More" style="display:none">
         <option value="">More…</option>
         <option value="complexity">Complexity</option>
         <option value="slides">Slides</option>
@@ -832,6 +927,15 @@ canvas.chart{display:block;border-radius:var(--radius)}
 
   <!-- VISUALIZE VIEW -->
   <div class="view" id="view-viz">
+    <div class="mobile-switch mobile-only" aria-label="Mobile view switcher">
+      <div class="seg">
+        <button class="mbtn" id="mv-code" onclick="setMobileView('code')">Code</button>
+        <button class="mbtn" id="mv-state" onclick="setMobileView('state')">State</button>
+        <button class="mbtn" id="mv-heap" onclick="setMobileView('heap')">Heap</button>
+        <button class="mbtn" id="mv-panels" onclick="setMobileView('panels')">Panels</button>
+      </div>
+      <div class="hint">1 of 4</div>
+    </div>
     <div class="viz2">
       <div class="viz-left">
         <div class="ph"><div class="phd" style="background:var(--blue)"></div>
@@ -874,19 +978,36 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
 
       <div class="viz-right">
         <div class="viz-right-top">
-          <div class="right-col">
+          <div class="right-col" id="col-state">
             <div class="ph"><div class="phd" style="background:var(--purple)"></div>frames · call stack</div>
             <div class="depth-meter"><span class="depth-lbl" id="depth-lbl">depth: 0 / 0</span><div class="depth-track"><div class="depth-fill" id="depth-fill"></div></div></div>
             <div id="stack-bc" style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10.5px;color:var(--t3);white-space:nowrap;overflow:auto"></div>
+            <div class="state-toolbar">
+              <span class="lbl">state</span>
+              <div class="sep"></div>
+              <span class="pill" id="st-changed" title="Show only variables that changed at this step" onclick="toggleStateChanged()">Δ changed</span>
+              <span class="pill" id="st-heap" title="Follow selected heap object arrows from this frame only" onclick="togglePinFromState()">pin heap</span>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                <span class="lbl" id="st-scope-lbl">scope</span>
+                <select class="sel" id="st-scope" style="height:26px;padding:3px 10px;font-size:11px" onchange="setStateScope(+this.value)"></select>
+              </div>
+            </div>
+            <div class="state-scroll" id="state-scroll"></div>
             <div class="frames-scroll" id="frames-scroll"></div>
           </div>
-          <div class="right-col">
+          <div class="right-col" id="col-heap">
             <div class="ph"><div class="phd" style="background:var(--amber)"></div>heap objects</div>
             <div class="heap-scroll" id="heap-scroll"></div>
           </div>
         </div>
 
-        <div class="viz-right-bot">
+        <div class="viz-right-bot" id="viz-bot">
+          <div class="panels-bar">
+            <div class="ttl">Panels</div>
+            <div class="sp">
+              <button class="chipbtn" id="btn-extras" onclick="toggleExtras()">More</button>
+            </div>
+          </div>
           <div class="viz-right-bot-grid" id="rightbot-grid">
             <div class="tile" data-tile="eventloop">
               <div class="panel">
@@ -934,6 +1055,21 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
                   </div>
                 </div>
                 <div class="panel-b"><div class="eventloop-scroll" id="focus-scroll" style="padding:0"></div></div>
+              </div>
+            </div>
+            <div class="tile" data-tile="io" style="grid-column:1 / span 2">
+              <div class="panel io-lane">
+                <div class="panel-h">
+                  <span>I/O</span>
+                  <div class="panel-actions">
+                    <span style="color:var(--t4)">stdout + return</span>
+                    <button class="picon" onclick="toggleTileMax('io')" title="Maximize">⛶</button>
+                  </div>
+                </div>
+                <div class="panel-b" style="display:flex;flex-direction:column;min-height:0">
+                  <div class="io-out" id="io-lane">—</div>
+                  <div class="io-hint">Tip: printed output lives here; variables live in the State panel.</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1187,11 +1323,59 @@ code <span style="font-size:9px;color:var(--t4);text-transform:none;letter-spaci
 const PY_TRACER = `
 import sys, json, io as _io
 import threading as _threading
+import ast as _ast
 
 _steps = []
 _buf = _io.StringIO()
 _FNAME = '<usr>'
 _MAX = 2500
+_COND_BY_LINE = {}
+
+def _build_cond_map(code):
+    # Map line -> {expr:str, kind:str} for simple branch visualization.
+    # Uses best-effort source segments; falls back to ast.unparse.
+    out = {}
+    try:
+        tree = _ast.parse(code)
+    except Exception:
+        return out
+    for n in _ast.walk(tree):
+        try:
+            if isinstance(n, _ast.If):
+                ln = getattr(n, 'lineno', None)
+                if not ln: 
+                    continue
+                seg = None
+                try:
+                    seg = _ast.get_source_segment(code, n.test)
+                except Exception:
+                    seg = None
+                if not seg:
+                    try:
+                        seg = _ast.unparse(n.test)
+                    except Exception:
+                        seg = None
+                if seg:
+                    out[int(ln)] = {'kind':'if', 'expr':str(seg)[:200]}
+            if isinstance(n, _ast.While):
+                ln = getattr(n, 'lineno', None)
+                if not ln:
+                    continue
+                seg = None
+                try:
+                    seg = _ast.get_source_segment(code, n.test)
+                except Exception:
+                    seg = None
+                if not seg:
+                    try:
+                        seg = _ast.unparse(n.test)
+                    except Exception:
+                        seg = None
+                if seg:
+                    out[int(ln)] = {'kind':'while', 'expr':str(seg)[:200]}
+        except Exception:
+            pass
+    return out
 
 def _sv(v, d=0, seen=None):
     if seen is None: seen = set()
@@ -1273,6 +1457,20 @@ def _tr(frame, event, arg):
         mem = {'heap': 0}
 
     step={'ev':event,'line':frame.f_lineno,'fn':frame.f_code.co_name,'frames':frames,'out':_buf.getvalue(),'mem':mem}
+    # Branch visualization: best-effort condition value for if/while lines.
+    try:
+        ln = int(frame.f_lineno or 0)
+        if event == 'line' and ln in _COND_BY_LINE:
+            cd = _COND_BY_LINE.get(ln) or {}
+            expr = cd.get('expr')
+            if expr:
+                try:
+                    val = eval(expr, frame.f_globals, frame.f_locals)
+                    step['branch'] = {'line': ln, 'expr': expr, 'val': bool(val), 'raw': repr(val)[:120], 'kind': cd.get('kind')}
+                except Exception as _e:
+                    step['branch'] = {'line': ln, 'expr': expr, 'err': str(_e)[:120], 'kind': cd.get('kind')}
+    except Exception:
+        pass
     try:
         ct = _threading.current_thread()
         step['thread'] = {'id': ct.ident, 'name': ct.name}
@@ -1344,6 +1542,11 @@ def _run(code):
     global _steps,_buf
     _steps=[]
     _buf=_io.StringIO()
+    global _COND_BY_LINE
+    try:
+        _COND_BY_LINE = _build_cond_map(code)
+    except Exception:
+        _COND_BY_LINE = {}
     old=sys.stdout
     olde=getattr(sys,'stderr',None)
     sys.stdout=_buf
@@ -1383,6 +1586,11 @@ async def _run_async(code, auto_main=False):
     global _steps,_buf
     _steps=[]
     _buf=_io.StringIO()
+    global _COND_BY_LINE
+    try:
+        _COND_BY_LINE = _build_cond_map(code)
+    except Exception:
+        _COND_BY_LINE = {}
     old=sys.stdout
     olde=getattr(sys,'stderr',None)
     sys.stdout=_buf
@@ -1895,6 +2103,7 @@ let quizState = {qi:0, score:0, answered:false};
 let slideIdx = 0;
 let cmpSteps = {a:[], b:[]};
 let insightsTab = localStorage.getItem('haki-insights-tab') || 'step';
+// Learner default: show Steps/Narrative (they’re part of the learning loop).
 let insightsCollapsed = (localStorage.getItem('haki-insights-collapsed') || '0') === '1';
 let insightsPinnedOpen = (localStorage.getItem('haki-insights-pinned-open') || '1') === '1';
 let _insightsLastOpenSizes = null;
@@ -2004,6 +2213,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 
   loadFromUrl();
+  // Default panel visibility (persisted).
+  try { toggleExtras(showExtras); } catch(_) {}
 
   // `file://` runs in a unique opaque origin in modern browsers; some features
   // (iframes, cross-origin embeds, URL sharing) will be limited. GitHub Pages or
@@ -2015,7 +2226,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   editor = CodeMirror.fromTextArea(document.getElementById('cm-textarea'), {
     mode:'python', theme:'default', lineNumbers:true, matchBrackets:true,
     autoCloseBrackets:true, indentUnit:4, tabSize:4, indentWithTabs:false,
-    gutters: ["CodeMirror-linenumbers", "execpoint", "breakpoints"],
+    gutters: ["CodeMirror-linenumbers", "events", "execpoint", "breakpoints"],
     extraKeys:{"Ctrl-Space":"autocomplete","Tab": cm => {
       if (cm.somethingSelected()) cm.indentSelection("add");
       else cm.replaceSelection("    ");
@@ -2038,7 +2249,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   refreshExamplesMenu();
   // Split.js Init (2-pane viz: editor | panels)
   splitMain = Split(['.viz-left', '.viz-right'], {
-    sizes: [54, 46],
+    // Learner default: more space for code.
+    sizes: [60, 40],
     minSize: [320, 420],
     gutterSize: 6,
     onDrag: () => drawArrows(),
@@ -2048,7 +2260,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Left pane vertical resize: editor vs insights strip
   splitLeft = Split(['.viz-editor', '.viz-left-insights'], {
     direction: 'vertical',
-    sizes: [86, 14],
+    // Learner default: keep Steps/Narrative visible.
+    sizes: [82, 18],
     minSize: [260, 34],
     gutterSize: 6,
     onDrag: () => { try { if (editor) editor.refresh(); } catch(_) {} },
@@ -2083,6 +2296,16 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (rb) rb.style.flex = 'none';
   } catch(_) {}
   setTimeout(() => { try { if (editor) editor.refresh(); } catch(_) {} }, 50);
+  // Responsive: disable Split.js in stacked layout.
+  try { applyResponsiveSplits(); } catch(_) {}
+  try {
+    let _rsT = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(_rsT);
+      _rsT = setTimeout(() => { try { applyResponsiveSplits(); } catch(_) {} }, 120);
+    });
+  } catch(_) {}
+  try { attachMobileSwipe(); } catch(_) {}
 
   splitBottom = Split(['#cmp-workspace', '#cmp-bottom-bar'], {
     direction: 'vertical',
@@ -2396,7 +2619,9 @@ async function runCode() {
     annotations.clear();
     buildHeatmap();
     maxDepth = Math.max(...steps.map(s=>s.frames.length), 1);
+    stateScopeIdx = -1;
     buildCodeView();
+    applyEventGutterMeta();
     enableControls();
     render();
     ensureInsightsOpen('run');
@@ -2437,7 +2662,9 @@ function runJsTraceMain(code) {
       annotations.clear();
       buildHeatmap();
       maxDepth = Math.max(...steps.map(s => (s.frames || []).length), 1);
+      stateScopeIdx = -1;
       buildCodeView();
+      applyEventGutterMeta();
       enableControls();
       render();
       ensureInsightsOpen('run');
@@ -2564,6 +2791,175 @@ function toast(kind, title, msg) {
 function closeFixModal() {
   const m = document.getElementById('fix-modal');
   if (m) m.classList.remove('show');
+}
+
+// ─── RESPONSIVE SPLIT MANAGEMENT ─────────────────────────────────────────────
+let _splitMainSizes = [60, 40];
+let _splitLeftSizes = [92, 8];
+let _splitRightSizes = [56, 44];
+let _splitsDisabled = false;
+
+function _destroySplit(s) {
+  try { if (s && typeof s.getSizes === 'function') return { sizes: s.getSizes(), ok: true }; } catch(_) {}
+  try { if (s && typeof s.destroy === 'function') s.destroy(); } catch(_) {}
+  return { sizes: null, ok: false };
+}
+
+function _clearSplitInlineStyles() {
+  // Split.js writes inline flex-basis/width/height; clear these when stacking.
+  try {
+    ['.viz-left', '.viz-right', '.viz-editor', '.viz-left-insights', '.viz-right-top', '.viz-right-bot'].forEach(sel => {
+      document.querySelectorAll(sel).forEach(el => {
+        try {
+          el.style.width = '';
+          el.style.height = '';
+          el.style.flexBasis = '';
+        } catch(_) {}
+      });
+    });
+  } catch(_) {}
+}
+
+function applyResponsiveSplits() {
+  const isMobile = window.matchMedia && window.matchMedia('(max-width: 850px)').matches;
+  if (isMobile && !_splitsDisabled) {
+    try { if (splitMain) _splitMainSizes = splitMain.getSizes(); } catch(_) {}
+    try { if (splitLeft) _splitLeftSizes = splitLeft.getSizes(); } catch(_) {}
+    try { if (splitRight) _splitRightSizes = splitRight.getSizes(); } catch(_) {}
+    try { if (splitMain) splitMain.destroy(); } catch(_) {}
+    try { if (splitLeft) splitLeft.destroy(); } catch(_) {}
+    try { if (splitRight) splitRight.destroy(); } catch(_) {}
+    splitMain = null; splitLeft = null; splitRight = null;
+    _splitsDisabled = true;
+    _clearSplitInlineStyles();
+    try { if (editor) editor.refresh(); } catch(_) {}
+    try { applyMobileView(); } catch(_) {}
+    return;
+  }
+  if (!isMobile && _splitsDisabled) {
+    _splitsDisabled = false;
+    // Re-init splits with last known sizes (best effort).
+    try {
+      splitMain = Split(['.viz-left', '.viz-right'], {
+        sizes: _splitMainSizes || [60, 40],
+        minSize: [320, 420],
+        gutterSize: 6,
+        onDrag: () => drawArrows(),
+        onDragEnd: () => drawArrows()
+      });
+    } catch(_) {}
+    try {
+      splitLeft = Split(['.viz-editor', '.viz-left-insights'], {
+        direction: 'vertical',
+        sizes: _splitLeftSizes || [92, 8],
+        minSize: [260, 34],
+        gutterSize: 6,
+        onDrag: () => { try { if (editor) editor.refresh(); } catch(_) {} },
+        onDragEnd: () => { try { if (editor) editor.refresh(); } catch(_) {} }
+      });
+    } catch(_) {}
+    try {
+      splitRight = Split(['.viz-right-top', '.viz-right-bot'], {
+        direction: 'vertical',
+        sizes: _splitRightSizes || [56, 44],
+        minSize: [220, 160],
+        gutterSize: 6,
+        onDrag: () => drawArrows(),
+        onDragEnd: () => drawArrows()
+      });
+    } catch(_) {}
+    try { if (editor) editor.refresh(); } catch(_) {}
+  }
+  try { applyMobileView(); } catch(_) {}
+}
+
+// ─── MOBILE VIEW SWITCHER ────────────────────────────────────────────────────
+let mobileView = localStorage.getItem('haki-mobile-view') || 'code';
+function setMobileView(v) {
+  mobileView = v || 'code';
+  localStorage.setItem('haki-mobile-view', mobileView);
+  applyMobileView();
+}
+function applyMobileView() {
+  const isMobile = window.matchMedia && window.matchMedia('(max-width: 850px)').matches;
+  const views = ['code','state','heap','panels'];
+  // Clear old classes
+  views.forEach(k => document.body.classList.remove('mv-' + k));
+  // Only apply in Visualize view on mobile.
+  if (!isMobile || curMode !== 'viz') {
+    // Keep buttons in a sane state if visible for any reason.
+    views.forEach(k => { const b = document.getElementById('mv-' + k); if (b) b.classList.remove('on'); });
+    return;
+  }
+  const v = views.includes(mobileView) ? mobileView : 'code';
+  document.body.classList.add('mv-' + v);
+  views.forEach(k => {
+    const b = document.getElementById('mv-' + k);
+    if (b) b.classList.toggle('on', k === v);
+  });
+  // Update "1 of 4" hint
+  try {
+    const hint = document.querySelector('#view-viz .mobile-switch .hint');
+    if (hint) hint.textContent = `${views.indexOf(v) + 1} of 4`;
+  } catch(_) {}
+  try { if (editor) editor.refresh(); } catch(_) {}
+}
+
+// Extra panels toggle (Graphs/Focus/I-O)
+let showExtras = (localStorage.getItem('haki-show-extras') || '0') === '1';
+function toggleExtras(force) {
+  showExtras = typeof force === 'boolean' ? force : !showExtras;
+  localStorage.setItem('haki-show-extras', showExtras ? '1' : '0');
+  document.body.classList.toggle('show-extras', showExtras);
+  const b = document.getElementById('btn-extras');
+  if (b) b.classList.toggle('on', showExtras);
+}
+
+// Swipe left/right on mobile to switch views.
+let _mvTouch = null;
+function attachMobileSwipe() {
+  try {
+    const root = document.getElementById('view-viz');
+    if (!root) return;
+    root.addEventListener('touchstart', (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      _mvTouch = { x: t.clientX, y: t.clientY, at: Date.now(), moved: false };
+    }, { passive: true });
+    root.addEventListener('touchmove', (e) => {
+      if (!_mvTouch || !e.touches || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - _mvTouch.x;
+      const dy = t.clientY - _mvTouch.y;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) _mvTouch.moved = true;
+      // Do not preventDefault; allow normal scrolling unless we commit a swipe on end.
+    }, { passive: true });
+    root.addEventListener('touchend', (e) => {
+      try {
+        if (!_mvTouch) return;
+        const isMobile = window.matchMedia && window.matchMedia('(max-width: 850px)').matches;
+        if (!isMobile || curMode !== 'viz') return;
+        if (!_mvTouch.moved) return;
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - _mvTouch.x;
+        const dy = t.clientY - _mvTouch.y;
+        const dt = Date.now() - (_mvTouch.at || Date.now());
+        // Heuristics: mostly horizontal, decent distance, quick-ish.
+        if (Math.abs(dx) < 45) return;
+        if (Math.abs(dx) < Math.abs(dy) * 1.2) return;
+        if (dt > 900) return;
+        const views = ['code','state','heap','panels'];
+        const cur = views.includes(mobileView) ? mobileView : 'code';
+        let i = views.indexOf(cur);
+        if (dx < 0) i = Math.min(views.length - 1, i + 1); // swipe left => next
+        else i = Math.max(0, i - 1); // swipe right => prev
+        setMobileView(views[i]);
+      } finally {
+        _mvTouch = null;
+      }
+    }, { passive: true });
+  } catch(_) {}
 }
 
 function openFixModal(title, html) {
@@ -2752,6 +3148,225 @@ function rv(val) {
 
 function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ─── STATE PANEL (RIGHT) ────────────────────────────────────────────────────
+let stateChangedOnly = (localStorage.getItem('haki-state-changed') || '1') === '1';
+let stateScopeIdx = -1; // 0..frames-1, -1 means current (top)
+let _statePinnedFromPanel = false;
+
+function toggleStateChanged() {
+  stateChangedOnly = !stateChangedOnly;
+  localStorage.setItem('haki-state-changed', stateChangedOnly ? '1' : '0');
+  const pill = document.getElementById('st-changed');
+  if (pill) pill.classList.toggle('on', stateChangedOnly);
+  render();
+}
+function setStateScope(i) {
+  stateScopeIdx = Number.isFinite(i) ? i : -1;
+  render();
+}
+function togglePinFromState() {
+  _statePinnedFromPanel = !_statePinnedFromPanel;
+  const pill = document.getElementById('st-heap');
+  if (pill) pill.classList.toggle('on', _statePinnedFromPanel);
+  if (!_statePinnedFromPanel) pinnedHeapId = null;
+  render();
+}
+
+function _selFrameIdx(s) {
+  if (!s || !s.frames || !s.frames.length) return -1;
+  if (stateScopeIdx >= 0 && stateScopeIdx < s.frames.length) return stateScopeIdx;
+  return s.frames.length - 1;
+}
+
+function _prevFrameForSelected(s, prevS) {
+  if (!s || !prevS || !s.frames || !prevS.frames) return null;
+  const sel = _selFrameIdx(s);
+  if (sel < 0) return null;
+  // Keep "same depth from top" stable as stack grows/shrinks.
+  const fromTop = s.frames.length - 1 - sel;
+  const prevSel = (prevS.frames.length - 1 - fromTop);
+  const pf = prevS.frames[prevSel];
+  const cf = s.frames[sel];
+  if (pf && cf && pf.fn === cf.fn) return pf;
+  return pf || null;
+}
+
+function _valEq(a, b) {
+  try { return JSON.stringify(a) === JSON.stringify(b); } catch(_) { return false; }
+}
+
+function _collectionDiffHtml(cur, prev) {
+  if (!cur || !prev) return '';
+  if (!cur.t || !prev.t) return '';
+  if (cur.t !== prev.t) return `<div class="st-diff"><span class="d">type: ${esc(prev.t)} → ${esc(cur.t)}</span></div>`;
+  if (cur.t === 'list' || cur.t === 'tuple') {
+    const a = cur.items || [];
+    const b = prev.items || [];
+    const out = [];
+    const n = Math.max(a.length, b.length);
+    for (let i = 0; i < n; i++) {
+      if (!_valEq(a[i], b[i])) out.push(`<span class="d">[${i}]: ${esc(renderVal(b[i]))} → ${esc(renderVal(a[i]))}</span>`);
+      if (out.length >= 6) break;
+    }
+    return out.length ? `<div class="st-diff">${out.join('')}</div>` : '';
+  }
+  if (cur.t === 'dict') {
+    const a = new Map((cur.items || []).map(([k, v]) => [renderVal(k), v]));
+    const b = new Map((prev.items || []).map(([k, v]) => [renderVal(k), v]));
+    const keys = Array.from(new Set([...a.keys(), ...b.keys()]));
+    const out = [];
+    for (const k of keys) {
+      const av = a.get(k);
+      const bv = b.get(k);
+      if (!_valEq(av, bv)) out.push(`<span class="d">${esc(k)}: ${esc(renderVal(bv))} → ${esc(renderVal(av))}</span>`);
+      if (out.length >= 6) break;
+    }
+    return out.length ? `<div class="st-diff">${out.join('')}</div>` : '';
+  }
+  return '';
+}
+
+function renderState(s, prevS) {
+  const out = document.getElementById('state-scroll');
+  const sel = document.getElementById('st-scope');
+  const pill = document.getElementById('st-changed');
+  if (pill) pill.classList.toggle('on', stateChangedOnly);
+  const pin = document.getElementById('st-heap');
+  if (pin) pin.classList.toggle('on', _statePinnedFromPanel);
+  if (!out || !sel) return;
+  if (!s || !s.frames || !s.frames.length) {
+    out.innerHTML = '<div class="st-empty">no frames</div>';
+    sel.innerHTML = '<option value="-1">—</option>';
+    return;
+  }
+  // Scope selector: top frame first (current), then callers.
+  sel.innerHTML = s.frames.map((f, i) => {
+    const isCur = i === s.frames.length - 1;
+    const name = f.fn === '<module>' ? 'global' : f.fn;
+    return `<option value="${i}" ${isCur ? 'data-cur="1"' : ''}>${esc(isCur ? '▶ ' : '')}${esc(name)} @${f.line}</option>`;
+  }).join('');
+  const si = _selFrameIdx(s);
+  sel.value = String(si);
+
+  const f = s.frames[si];
+  const pf = _prevFrameForSelected(s, prevS);
+  const locals = (f && f.locals) ? f.locals : {};
+  const prevLocals = (pf && pf.locals) ? pf.locals : {};
+  const keys = Object.keys(locals);
+  if (!keys.length) {
+    out.innerHTML = '<div class="st-empty">no locals in this scope</div>';
+    return;
+  }
+  // Sort: changed first, then alpha.
+  const rows = keys.map(k => {
+    const curV = locals[k];
+    const prevV = prevLocals[k];
+    const changed = prevS ? !_valEq(curV, prevV) : false;
+    const isNew = prevS ? (prevV === undefined) : false;
+    const isFree = !!(f.freevars && f.freevars.includes(k)) || !!(f.free && Object.prototype.hasOwnProperty.call(f.free, k));
+    return { k, curV, prevV, changed, isNew, isFree };
+  }).filter(r => !stateChangedOnly || r.changed || r.isNew);
+  rows.sort((a, b) => (b.changed ? 1 : 0) - (a.changed ? 1 : 0) || a.k.localeCompare(b.k));
+
+  const html = rows.map(r => {
+    const cls = `v${(r.changed || r.isNew) ? ' mut' : ''}`;
+    const chips = [
+      r.isNew ? '<span class="chip new">new</span>' : '',
+      r.changed ? '<span class="chip chg">changed</span>' : '',
+      r.isFree ? '<span class="chip free">free</span>' : '',
+    ].join('');
+    const tip = prevS ? `prev: ${renderVal(r.prevV)}\nnow:  ${renderVal(r.curV)}` : `value: ${renderVal(r.curV)}`;
+    const diff = (r.changed && r.curV && r.prevV && (r.curV.t === 'list' || r.curV.t === 'tuple' || r.curV.t === 'dict'))
+      ? _collectionDiffHtml(r.curV, r.prevV)
+      : '';
+    return `<tr>
+      <td class="k" title="${esc(tip)}" onclick="focusVar('${esc(r.k)}')">${esc(r.k)}${chips}</td>
+      <td class="${cls}" title="${esc(tip)}">${rv(r.curV)}${diff}</td>
+      <td class="meta">${r.changed ? 'Δ' : ''}</td>
+    </tr>`;
+  }).join('');
+  out.innerHTML = `<table class="st">${html}</table>`;
+}
+
+function focusVar(name) {
+  // Variable spotlight: pin the first heap ref if this var points to an object.
+  try {
+    const s = steps[idx];
+    const fi = _selFrameIdx(s);
+    const f = s && s.frames ? s.frames[fi] : null;
+    if (!f || !f.locals) return;
+    const v = f.locals[name];
+    if (_statePinnedFromPanel && v && v.id) pinHeap(v.id);
+  } catch(_) {}
+}
+
+// ─── GUTTER EVENTS + BRANCH PILLS ────────────────────────────────────────────
+let eventByLine = null; // { line -> { changed:boolean, branch:boolean, err:boolean } }
+let branchBookmarks = [];
+
+function clearBranchWidgets() {
+  branchBookmarks.forEach(b => { try { b.clear(); } catch(_) {} });
+  branchBookmarks = [];
+}
+
+function applyBranchWidgetForStep(s) {
+  if (!editor) return;
+  clearBranchWidgets();
+  if (!s) return;
+  const br = s.branch || (s.branch === 0 ? s.branch : null);
+  if (!br || !br.line) return;
+  const ln = br.line;
+  const line = ln - 1;
+  if (line < 0) return;
+  const lineText = editor.getLine(line) || '';
+  const wrap = document.createElement('span');
+  const val = (br.val === true) ? true : (br.val === false) ? false : null;
+  wrap.className = 'cm-branch-pill ' + (val === true ? 'true' : val === false ? 'false' : '');
+  if (br.err) wrap.textContent = `→ ?`;
+  else if (val === true) wrap.textContent = `→ true`;
+  else if (val === false) wrap.textContent = `→ false`;
+  else wrap.textContent = `→ ${String(br.raw || '?')}`;
+  const bm = editor.setBookmark({ line, ch: lineText.length }, { widget: wrap, insertLeft: true });
+  branchBookmarks.push(bm);
+}
+
+function applyEventGutterMeta() {
+  if (!editor || !steps || !steps.length) return;
+  eventByLine = {};
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i];
+    const p = i > 0 ? steps[i - 1] : null;
+    const ln = s && s.line ? s.line : null;
+    if (!ln || ln < 1) continue;
+    if (!eventByLine[ln]) eventByLine[ln] = { changed: false, branch: false, err: false };
+    const m = eventByLine[ln];
+    if (s.ev === 'error' || s.ev === 'exception') m.err = true;
+    if (s.ev === 'branch' || s.branch) m.branch = true;
+    // changed heuristic: diff of current frame locals vs previous step's current frame locals.
+    try {
+      if (p && s.frames && p.frames && s.frames.length && p.frames.length) {
+        const sf = s.frames[s.frames.length - 1];
+        const pf = p.frames[p.frames.length - 1];
+        const sk = sf && sf.locals ? Object.keys(sf.locals) : [];
+        for (const k of sk) {
+          if (!_valEq(sf.locals[k], (pf.locals || {})[k])) { m.changed = true; break; }
+        }
+      }
+    } catch(_) {}
+  }
+
+  // Apply markers per line once.
+  const lineCount = editor.lineCount();
+  for (let i = 0; i < lineCount; i++) {
+    const ln = i + 1;
+    const meta = eventByLine[ln];
+    if (!meta) { editor.setGutterMarker(i, 'events', null); continue; }
+    const dot = document.createElement('div');
+    dot.className = 'cm-ev-dot' + (meta.err ? ' err' : meta.branch ? ' br' : meta.changed ? ' chg' : '');
+    editor.setGutterMarker(i, 'events', dot);
+  }
+}
+
 // ─── MAIN RENDER ─────────────────────────────────────────────────────────────
 function render() {
   if (!steps.length) return;
@@ -2791,6 +3406,8 @@ function render() {
     }
   } catch(_) {}
 
+  applyBranchWidgetForStep(s);
+  renderState(s, prevS);
   renderFrames(s, prevS);
   renderHeap(s, prevS);
   renderEventLoop(s);
@@ -3340,56 +3957,34 @@ function renderFrames(s, prevS) {
   fb.innerHTML = '';
   const bc = document.getElementById('stack-bc');
   if (bc) {
-    const parts = s.frames.map((f, i) => {
+    const take = s.frames.slice(-3);
+    const parts = take.map((f, j) => {
+      const i = s.frames.length - take.length + j;
       const cur = i === s.frames.length - 1;
       const name = f.fn === '<module>' ? 'global' : f.fn;
-      return `<span style="cursor:pointer;color:${cur ? 'var(--t1)' : 'var(--blue)'}" onclick="focusFrame(${i})">${esc(name)}</span>`;
+      const col = cur ? 'var(--t1)' : 'var(--blue)';
+      return `<span style="cursor:pointer;color:${col};font-weight:${cur ? 700 : 500}" onclick="setStateScope(${i})">${esc(name)}</span>`;
     });
-    bc.innerHTML = parts.join('<span style="color:var(--t4)">  ›  </span>') || '<span style="color:var(--t4)">—</span>';
+    const prefix = s.frames.length > 3 ? `<span style="color:var(--t4)">…</span><span style="color:var(--t4)">  ›  </span>` : '';
+    bc.innerHTML = prefix + (parts.join('<span style="color:var(--t4)">  ›  </span>') || '<span style="color:var(--t4)">—</span>');
   }
+  // Render a clean stack list; variables live in the State panel.
   s.frames.forEach((f, fi) => {
     const cur = fi === s.frames.length - 1;
     const mod = f.fn === '<module>';
-    const block = document.createElement('div');
-    block.className = 'frame-block';
-
-    const fh = document.createElement('div');
-    fh.className = 'fh' + (cur?' cur':'');
+    const row = document.createElement('div');
+    row.className = 'fh' + (cur ? ' cur' : '');
+    row.style.cursor = 'pointer';
+    row.onclick = () => setStateScope(fi);
     const badges = [];
     if (cur) badges.push('<span class="badge badge-blue" style="font-size:8.5px">current</span>');
     if (f.is_gen) badges.push('<span class="badge badge-green" style="font-size:8.5px">gen</span>');
     if (f.is_coro) badges.push('<span class="badge badge-purple" style="font-size:8.5px">async</span>');
-    if (f.freevars&&f.freevars.length) badges.push('<span class="badge badge-amber" style="font-size:8.5px">closure</span>');
+    if (f.freevars && f.freevars.length) badges.push('<span class="badge badge-amber" style="font-size:8.5px">closure</span>');
     const thisLine = (mainLang === 'javascript' && f.thisVal) ? `<span class="fh-line" style="margin-left:8px;color:var(--t4)">this(${esc(f.thisKind||'call')}): ${renderVal(f.thisVal)}</span>` : '';
-    fh.innerHTML = `<span class="fh-name${mod?' mod-fn':''}">${esc(mod?'global scope':f.fn)}</span><div class="fh-badges">${badges.join('')}</div>
+    row.innerHTML = `<span class="fh-name${mod ? ' mod-fn' : ''}">${esc(mod ? 'global scope' : f.fn)}</span><div class="fh-badges">${badges.join('')}</div>
 <span class="fh-line">line ${f.line}</span>${thisLine}`;
-    block.appendChild(fh);
-
-    const keys = Object.keys(f.locals);
-    const prevF = prevS && prevS.frames && prevS.frames[fi] ? prevS.frames[fi] : null;
-    if (keys.length) {
-      const tbl = document.createElement('table');
-      tbl.className = 'vt';
-      keys.forEach(k => {
-        const isFree = f.freevars && f.freevars.includes(k);
-        const changed = prevF && prevF.locals && JSON.stringify(prevF.locals[k]) !== JSON.stringify(f.locals[k]);
-        const tr = document.createElement('tr');
-        if (cur && s.ev==='return' && s.ret && fi===s.frames.length-1) tr.className='ret-val-row';
-        tr.innerHTML = `<td class="vk" onclick="showVarTimeline('${esc(k)}',${fi})" title="click to see timeline">${esc(k)}${isFree?'<sup class="freevar-tag">free</sup>':''}</td><td class="vv${changed?' v-mut':''}">${rv(f.locals[k])}</td>`;
-        tbl.appendChild(tr);
-      });
-      if (cur && s.ev==='return' && s.ret) {
-        const tr = document.createElement('tr');
-        tr.className='ret-val-row';
-        tr.innerHTML=`<td class="vk">↩ return</td><td class="vv">${rv(s.ret)}</td>`;
-        tbl.appendChild(tr);
-      }
-      block.appendChild(tbl);
-    } else {
-      block.innerHTML += '<div class="no-locals">no locals</div>';
-    }
-
-    fb.appendChild(block);
+    fb.appendChild(row);
   });
 }
 
@@ -3601,9 +4196,41 @@ function renderDepthMeter(s) {
 // ─── STDOUT ──────────────────────────────────────────────────────────────────
 function renderStdout() {
   const s = steps[idx];
-  const el = document.getElementById('console-logs');
+  const el = document.getElementById('io-lane');
   if (!el || !s) return;
-  el.textContent = s.out || '—';
+  // Keep output stable even when trace steps don't change stdout.
+  const out = (s.out || '').trimEnd();
+  const ret = s.ret ? `\n↩ return: ${renderVal(s.ret)}` : '';
+  el.textContent = (out ? out : '—') + (ret && out ? ret : (ret ? ret.trimStart() : ''));
+  try { updateIoButton(s); } catch(_) {}
+}
+
+function updateIoButton(s) {
+  const b = document.getElementById('btn-io');
+  if (!b) return;
+  const out = (s && typeof s.out === 'string') ? s.out.trim() : '';
+  const lastLine = out ? out.split('\n').slice(-1)[0] : '';
+  // Show a tiny hint in the tooltip to make it discoverable.
+  const hint = lastLine ? `Last: ${lastLine.slice(0, 40)}` : 'No output yet';
+  b.title = `I/O (stdout/return) · ${hint}`;
+  // Subtle emphasis when there is output.
+  b.classList.toggle('btn-green', !!out);
+}
+
+function openIoLane() {
+  // Ensure the IO tile exists (and is visible even if extras are hidden).
+  try { toggleExtras(true); } catch(_) {}
+  // On mobile, jump to the panels surface.
+  try {
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 850px)').matches;
+    if (isMobile) setMobileView('panels');
+  } catch(_) {}
+  // Maximize IO tile and scroll it into view.
+  try {
+    toggleTileMax('io');
+    const t = document.querySelector('.tile[data-tile="io"]');
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch(_) {}
 }
 
 // ─── STEP INFO ───────────────────────────────────────────────────────────────
@@ -4138,6 +4765,7 @@ function switchMode(mode) {
     const el = document.getElementById('view-'+m);
     if (el) el.classList.toggle('hidden', m!==mode);
   });
+  try { applyMobileView(); } catch(_) {}
   
   // Logic for the split handle on mode change
   if (mode === 'compare') {
@@ -5560,13 +6188,20 @@ function jsTracerWorkerWrapper() {
               inst = { ...st, expression: transformExpr(st.expression, { parentType: 'ExpressionStatement' }) };
             } else if (st.type === 'IfStatement') {
               inst = { ...st,
-                test: transformExpr(st.test, {}),
+                test: call(id('__branch__'), [lit(ln), transformExpr(st.test, {})]),
                 consequent: st.consequent && st.consequent.type === 'BlockStatement'
                   ? { ...st.consequent, body: instrumentStmtList(st.consequent.body, fnName, thisKind) }
                   : st.consequent,
                 alternate: st.alternate && st.alternate.type === 'BlockStatement'
                   ? { ...st.alternate, body: instrumentStmtList(st.alternate.body, fnName, thisKind) }
                   : st.alternate
+              };
+            } else if (st.type === 'WhileStatement') {
+              inst = { ...st,
+                test: call(id('__branch__'), [lit(ln), transformExpr(st.test, {})]),
+                body: st.body && st.body.type === 'BlockStatement'
+                  ? { ...st.body, body: instrumentStmtList(st.body.body, fnName, thisKind) }
+                  : st.body
               };
             } else if (st.type === 'ReturnStatement') {
               inst = { ...st, argument: transformExpr(st.argument, {}) };
@@ -5815,6 +6450,7 @@ function jsTracerWorkerWrapper() {
            return { t: '?', v: String(val) };
         }
 
+        let _lastBranch = null;
         function __step__(line, ev) {
           if (_stepCount++ > 1000) throw new Error("Trace limit exceeded");
           if (_frames.length) _frames[_frames.length - 1].line = line;
@@ -5826,8 +6462,17 @@ function jsTracerWorkerWrapper() {
              if (f.free) for (const k in f.free) freeCopy[k] = _pyTutorSerialize(f.free[k], seen);
              return { fn: f.fn, line: f.line, locals: localsCopy, free: freeCopy, thisKind: f.thisKind || 'call', thisVal: _pyTutorSerialize(f.thisVal, seen) };
           });
-          _steps.push({ line, ev, fn: _frames[_frames.length-1].fn, frames: framesCopy, mem: { heap: seen.size * 64 }, async: _snapAsync(), prop: _lastProp });
+          _steps.push({ line, ev, fn: _frames[_frames.length-1].fn, frames: framesCopy, mem: { heap: seen.size * 64 }, async: _snapAsync(), prop: _lastProp, branch: _lastBranch, out: _stdout.join('\\n') });
           _lastProp = null;
+          _lastBranch = null;
+        }
+
+        function __branch__(line, val) {
+          try {
+            _lastBranch = { line: line || 1, val: !!val, raw: String(val).slice(0, 120) };
+          } catch(_) {}
+          try { __step__(line || (_frames[_frames.length-1].line||1), 'branch'); } catch(_) {}
+          return val;
         }
 
         function __tdz__(name) {
@@ -6007,8 +6652,8 @@ function jsTracerWorkerWrapper() {
         };
 
         try {
-          const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', '__tdz__', '__read__', '__get__', '__set__', '__mcall__', instrumented);
-          const maybePromise = runner(console, __step__, __enter__, __exit__, __var__, __tdz__, __read__, __get__, __set__, __mcall__);
+        const runner = new Function('console', '__step__', '__enter__', '__exit__', '__var__', '__tdz__', '__read__', '__get__', '__set__', '__mcall__', '__branch__', instrumented);
+        const maybePromise = runner(console, __step__, __enter__, __exit__, __var__, __tdz__, __read__, __get__, __set__, __mcall__, __branch__);
           Promise.resolve(maybePromise).then(finishOk).catch((e) => postMessage({ ok: false, err: (e && e.stack) ? e.stack : (e && e.message ? e.message : String(e)) }));
         } catch(e) {
           // Fallback: if our code instrumentation generates invalid JS for this browser,
